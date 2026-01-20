@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+
+# Build Outputs
+dist/
+out/
+build/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# OS System Files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Environment
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Testing
+coverage/
+
+# Temporary
+tmp/
+temp/
+
+# output
+sample/output/*

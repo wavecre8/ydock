@@ -1,0 +1,49 @@
+Rules:
+  ProdCheck:
+    _alias: "Production Environment Check"
+    RuleCondition: "When to Validate"
+    Assertions:
+      _alias: "Validation Checks"
+      0:
+        Assert: "Assertion Logic"
+        AssertDescription: "Error Message"
+
+Resources:
+  FunctionTester:
+    _alias: "Intrinsic Functions Demo"
+    Type: "Resource Type"
+    Properties:
+      Base64Val: "Base64 Encoded Value"
+
+  EC2Instance:
+    _alias: "EC2 Instance (Function Examples)"
+    Type: "Resource Type"
+    CreationPolicy:
+      _alias: "Creation Policy"
+      ResourceSignal:
+        _alias: "Signal Configuration"
+        Timeout: "Timeout Duration"
+    Properties:
+      ImageId: "AMI ID"
+      InstanceType: "Instance Type"
+      JoinVal: "Join Example"
+      SplitVal: "Split Example"
+      SelectVal: "Select Example"
+      CidrVal: "CIDR Example"
+      AzsVal: "Availability Zones"
+      MapVal: "FindInMap Example"
+      ImportVal: "ImportValue Example"
+      JsonVal: "ToJsonString Example"
+      LengthVal: "Length Example"
+
+  "Fn::ForEach::Loop":
+    _alias: "ForEach Loop Macro"
+    0: "Iterator Variable"
+    1: "Collection"
+    2:
+      _alias: "Resource Template"
+      "Resource${Identifier}":
+        _alias: "Dynamic SNS Topic"
+        Type: "Resource Type"
+        Properties:
+          TopicName: "Topic Name"

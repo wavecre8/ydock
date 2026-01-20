@@ -1,0 +1,15 @@
+_imports:
+  - common_ecs_alias.yml
+
+tasks:
+  _alias: "ECSタスク一覧"
+  0:
+    _alias: "代表タスク"
+    lastStatus: "最新ステータス"
+    desiredStatus: "希望ステータス"
+    cpu: "CPUユニット数"
+    memory: "メモリ割り当て (MiB)"
+    createdAt: "作成日時"
+    startedAt: "開始日時"
+    containers:
+      _alias: "コンテナ定義一覧"

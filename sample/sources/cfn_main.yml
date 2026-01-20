@@ -1,0 +1,84 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  CloudFormation features demonstration template (Main).
+  Demonstrates multi-line description and standard sections.
+
+Transform:
+  - AWS::LanguageExtensions
+  - AWS::Serverless-2016-10-31
+
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: "Network Configuration"
+        Parameters:
+          - VPC
+          - Subnets
+      - Label:
+          default: "Server Configuration"
+        Parameters:
+          - InstanceType
+          - KeyPair
+    ParameterLabels:
+      VPC:
+        default: "Which VPC should this be deployed to?"
+
+Parameters:
+  EnvType:
+    Type: String
+    Default: dev
+    Description: Environment type for the deployment
+    AllowedValues:
+      - dev
+      - prod
+    ConstraintDescription: Must be either dev or prod
+  MyKey:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: EC2 Key Pair for SSH access
+
+Mappings:
+  RegionMap:
+    us-east-1: 
+      AMI: "ami-12345"
+    ap-northeast-1:
+      AMI: "ami-67890"
+
+Conditions:
+  IsProd: !Equals [!Ref EnvType, "prod"]
+  IsNotDev: !Not [ !Equals [!Ref EnvType, "dev"] ]
+  IsComplex: !And
+    - !Condition IsProd
+    - !Or [ !Equals [!Ref "AWS::Region", "us-east-1"], !Condition IsNotDev ]
+
+Resources:
+  MainResource:
+    Type: AWS::SSM::Parameter
+    Metadata: 
+      LocalMeta: "Local Metadata Value"
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    DependsOn: DependentResource 
+    Condition: IsProd
+    Properties:
+      Name: !Sub "${AWS::StackName}-Param"
+      Type: String
+      Value: !Ref EnvType
+      Description: !If [IsProd, "Production Value", "Development Value"]
+      Tier: Standard
+      DataType: text
+      AllowedPattern: "^[a-zA-Z0-9_.-]+$"
+      Tags:
+        Environment: !Ref EnvType
+
+  DependentResource:
+    Type: Custom::Test
+    Properties:
+      Target: !GetAtt MainResource.Type
+
+Outputs:
+  MainOutput:
+    Value: !Ref MainResource
+    Export:
+      Name: !Sub "${AWS::StackName}-MainOutput"
+

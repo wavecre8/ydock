@@ -1,0 +1,31 @@
+<%
+     // Unified Card Component
+     // Supports two modes of content injection:
+     // 1. contentHtml: Pre-rendered HTML string (e.g. from Markdown)
+     // 2. contentPartial: Path to a partial to include, along with contentData
+
+     const collapsedClass = (typeof isCollapsed !== 'undefined' && isCollapsed) ? 'is-collapsed' : '';
+%>
+<div id="<%= cardId %>" class="card-container bg-white rounded-xl shadow-sm border border-slate-200 mb-8 scroll-mt-6 overflow-hidden <%= collapsedClass %>">
+    <div class="card-header bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center cursor-pointer hover:bg-slate-200" 
+         onclick="toggleSection('<%= contentId %>', '<%= iconId %>')">
+        <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
+            <span id="<%= iconId %>" class="text-slate-400 flex-shrink-0 rotate-icon <%= collapsedClass %>"><svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></span>
+            <span><%- title %></span>
+            <% if (typeof extraHeaderHtml !== 'undefined' && extraHeaderHtml) { %>
+                <%- extraHeaderHtml %>
+            <% } %>
+        </h2>
+    </div>
+    <div id="<%= contentId %>" class="collapsible-wrapper transition-all duration-300 ease-in-out <%= collapsedClass %>">
+        <div class="collapsible-inner">
+            <% if (typeof contentPartial !== 'undefined' && contentPartial) { %>
+                <div class="p-6">
+                    <%- include(contentPartial, typeof contentData !== 'undefined' ? contentData : {}) %>
+                </div>
+            <% } else if (typeof contentHtml !== 'undefined' && contentHtml) { %>
+                <div class="p-6 font-mono text-sm text-slate-700 whitespace-pre-wrap"><%- contentHtml %></div>
+            <% } %>
+        </div>
+    </div>
+</div>
