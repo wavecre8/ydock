@@ -1,0 +1,12 @@
+tasks:
+  "*":
+    launchType: "起動タイプ"
+    platformVersion: "プラットフォームバージョン"
+    availabilityZone: "アベイラビリティゾーン"
+    connectivity: "接続ステータス"
+    containers:
+      "*":
+        name: "コンテナ名"
+        image: "使用イメージ"
+        cpu: "コンテナCPU"
+        memory: "コンテナメモリ"

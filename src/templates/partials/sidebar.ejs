@@ -1,0 +1,85 @@
+<!-- Sidebar -->
+<aside id="sidebar" class="h-screen sticky top-0 flex-shrink-0 z-40 bg-white border-r border-slate-200" style="width: var(--sidebar-width); min-width: 16rem;">
+    <!-- Resizer is relative to aside, which is visible -->
+    <div id="sidebar-resizer" class="sidebar-resizer"></div>
+    
+    <!-- Inner Scroll Container -->
+    <div class="flex flex-col h-full w-full overflow-hidden">
+        <header class="p-6 border-b border-slate-100 flex-shrink-0">
+            <h1 class="text-lg font-bold text-slate-700 leading-tight break-words"><%= title %></h1>
+            
+            <div class="mt-6 flex gap-2 bg-slate-100 p-1 rounded-lg">
+                <button onclick="setMode('inline')" data-mode="inline" class="mode-btn flex-1 px-2 py-1.5 rounded-md text-xs font-medium transition-colors text-center">
+                    Inline
+                </button>
+                <button onclick="setMode('tooltip')" data-mode="tooltip" class="mode-btn flex-1 px-2 py-1.5 rounded-md text-xs font-medium transition-colors text-center">
+                    Tooltip
+                </button>
+            </div>
+
+            <div class="mt-4 flex gap-2">
+                <button onclick="expandAll()" class="flex-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition-colors" title="Expand All">
+                    <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"></path>
+                    </svg>
+                </button>
+                <button onclick="collapseAll()" class="flex-1 px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded transition-colors" title="Collapse All">
+                    <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 9V4.5M9 9H4.5M9 9L3.75 3.75M9 15v4.5M9 15H4.5M9 15l-5.25 5.25M15 9h4.5M15 9V4.5M15 9l5.25-5.25M15 15h4.5M15 15v4.5m0-4.5l5.25 5.25"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Alias Toggle Switch -->
+            <div class="mt-4 flex items-center justify-between bg-slate-100 p-2 rounded-lg">
+                <span class="text-xs font-medium text-slate-700">Show Alias</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                    <input type="checkbox" id="alias-toggle-checkbox" class="sr-only peer" checked onchange="toggleAliasSwitch(this)">
+                    <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                </label>
+            </div>
+        </header>
+
+        <nav class="flex-1 p-4 overflow-y-auto">
+            <% renderableSections.forEach((sectionName, sectionIndex) => { %>
+                <%
+                    const sectionGuide = doc.description?.[sectionName];
+                    const sectionMeta = extractMetadata(sectionGuide);
+                    const sectionDisplayName = sectionMeta.alias || sectionName;
+                %>
+                <h2 class="text-sm font-bold text-slate-600 tracking-wider mb-2 px-2 mt-4 pt-4 border-t border-slate-200 first:mt-0 first:pt-0 first:border-t-0"><%= sectionDisplayName %></h2>
+                <ul class="space-y-1">
+                    <% 
+                    const sectionData = doc.template[sectionName];
+                    const entries = (typeof sectionData === 'object' && sectionData !== null) ? Object.entries(sectionData) : [];
+                    %>
+                    <% entries.forEach(([logicalId, content], cardIndex) => { %>
+                        <%
+                            const guideDesc = doc.description?.[sectionName]?.[logicalId];
+                            const meta = extractMetadata(guideDesc);
+                            if (meta.hidden) return;
+                            const displayName = meta.alias || logicalId;
+                            // SectionName is safe. LogicalId needs santization.
+                            const uniqueId = `${sectionName}__${logicalId.replace(/[^a-zA-Z0-9_\-]/g, '_')}`;
+                        %>
+                        <li class="flex items-center gap-1">
+                            <button 
+                                data-item-id="<%= uniqueId %>"
+                                data-section-index="<%= sectionIndex %>"
+                                data-card-index="<%= cardIndex %>"
+                                onclick="onSidebarItemClick(this)"
+                                class="flex-1 px-2 py-1.5 rounded-md text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-700 transition-colors truncate text-left" 
+                                title="<%= logicalId %>">
+                                <%= displayName %>
+                            </button>
+                        </li>
+                    <% }); %>
+                </ul>
+            <% }); %>
+        </nav>
+
+        <footer class="p-4 border-t border-slate-100 text-center text-slate-400 text-xs flex-shrink-0">
+            Generated by YamlDocDock
+        </footer>
+    </div>
+</aside>

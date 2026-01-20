@@ -1,0 +1,66 @@
+Transform:
+  0: "Language Extensions"
+  1: "SAM Transform"
+
+Metadata:
+  AWS::CloudFormation::Interface: "Console UI Configuration"
+
+Parameters:
+  EnvType:
+    _alias: "Environment Type"
+    Type: "Data Type"
+    Default: "Default Value"
+    AllowedValues: "Allowed Values"
+  MyKey:
+    _alias: "SSH Key Pair"
+    Type: "Parameter Type"
+
+Mappings:
+  RegionMap:
+    _alias: "Region-Specific AMIs"
+    us-east-1:
+      _alias: "US East (N. Virginia)"
+      AMI: "AMI ID"
+    ap-northeast-1:
+      _alias: "Asia Pacific (Tokyo)"
+      AMI: "AMI ID"
+
+Conditions:
+  IsProd: "Is Production?"
+  IsNotDev: "Not Development?"
+  IsComplex: "Complex Condition"
+
+Resources:
+  MainResource:
+    _alias: "Environment Parameter"
+    Type: "Resource Type"
+    Metadata: "Resource Metadata"
+    DeletionPolicy: "Deletion Policy"
+    UpdateReplacePolicy: "Update Policy"
+    DependsOn: "Dependencies"
+    Condition: "Creation Condition"
+    Properties:
+      Name: "Parameter Name"
+      Type: "Value Type"
+      Value: "Parameter Value"
+      Description: "Description"
+      Tier: "Parameter Tier"
+      DataType: "Data Type"
+      AllowedPattern: "Validation Pattern"
+      Tags:
+        _alias: "Resource Tags"
+        Environment: "Environment Tag"
+
+  DependentResource:
+    _alias: "Test Resource"
+    Type: "Resource Type"
+    Properties:
+      Target: "Target Attribute"
+
+Outputs:
+  MainOutput:
+    _alias: "Main Output"
+    Value: "Output Value"
+    Export:
+      _alias: "Export Configuration"
+      Name: "Export Name"

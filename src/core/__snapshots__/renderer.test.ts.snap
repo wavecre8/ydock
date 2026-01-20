@@ -1,0 +1,69 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`TemplateRenderer > renderFlow (array) > should render array items 1`] = `
+"<span class="font-mono text-slate-600 inline-flex flex-wrap items-center gap-y-1">
+                <span class="text-slate-400 mr-1">[</span><span class="property-value font-mono text-slate-700">1</span><span class="text-slate-400 mx-1">,</span><span class="property-value font-mono text-slate-700">2</span><span class="text-slate-400 ml-1">]</span>
+            </span>"
+`;
+
+exports[`TemplateRenderer > renderFlow (primitive) > should render number 1`] = `"<span class="property-value font-mono text-slate-700">123</span>"`;
+
+exports[`TemplateRenderer > renderFlow (primitive) > should render string 1`] = `"<span class="property-value font-mono text-slate-700">hello</span>"`;
+
+exports[`TemplateRenderer > renderIntrinsic > should render intrinsic function 1`] = `"<div class="flex items-start gap-2"><span class="badge-fn">!Ref</span> <span><span class="property-value">MyResource</span></span></div>"`;
+
+exports[`TemplateRenderer > renderValue (Table) > should hide hidden keys 1`] = `
+"<table class="table-base nested-table text-sm bg-white">
+            <colgroup>
+                <col style="width: var(--col-width-level-0, var(--col-width-level-default));">
+                <col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="relative">
+                        Property
+                        <div class="col-resizer" data-level="0"></div>
+                    </th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                
+            </tbody>
+        </table>"
+`;
+
+exports[`TemplateRenderer > renderValue (Table) > should render object as table 1`] = `
+"<table class="table-base nested-table text-sm bg-white">
+            <colgroup>
+                <col style="width: var(--col-width-level-0, var(--col-width-level-default));">
+                <col>
+            </colgroup>
+            <thead>
+                <tr>
+                    <th class="relative">
+                        Property
+                        <div class="col-resizer" data-level="0"></div>
+                    </th>
+                    <th>Value</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr id="root__key1" class="hover-row scroll-mt-20">
+                        <td class="property-key-cell font-mono text-slate-600 relative pr-8">
+                            <span class="break-all">key1</span>
+                            <button onclick="copyToClipboard('key1', this, event)" class="copy-cmd-btn absolute top-3 right-2 p-1 text-slate-400 hover:text-blue-600 rounded" title="Copy Key">
+                                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                            </button>
+                        </td>
+                        <td>
+                            <div class="flex items-start h-full">
+                                <div class="flex-grow w-full min-w-0"><span class="property-value">value1</span></div>
+                                
+                            </div>
+                            
+                        </td>
+                    </tr>
+            </tbody>
+        </table>"
+`;
