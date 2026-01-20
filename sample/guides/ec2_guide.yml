@@ -1,0 +1,36 @@
+---
+Reservations:
+- Instances:
+  - ImageId: "AMI ID to use. Region-specific. Check [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-public-parameters-ami.html) for latest IDs."
+    InstanceType: "Instance type. t3.micro is eligible for free tier."
+    State:
+      Code: |-
+        Instance state code:
+        0 = pending
+        16 = running
+        80 = stopped
+      Name: "Current state name"
+    BlockDeviceMappings:
+    - Ebs:
+        DeleteOnTermination: |-
+          Whether to delete the volume when instance is terminated
+          (See [ECS RuntimeID](tasks__0__containers__0__runtimeId))
+        VolumeId: "EBS volume ID"
+    NetworkInterfaces:
+    - Association:
+        PublicIp: "Elastic IP or auto-assigned public IP"
+      Groups:
+      - GroupId: "Security group ID (e.g. sg-xxxxx)"
+      PrivateIpAddresses:
+    Tags:
+    - Key: "Tag key"
+      Value: "Tag value. Used for cost allocation and automation."
+    MetadataOptions:
+      HttpTokens: |-
+        IMDSv2 enforcement setting:
+        optional = Allow both IMDSv1/v2
+        required = Require IMDSv2 only (recommended)
+        
+        Details: [Use IMDSv2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html)
+  OwnerId:
+    _hidden: true
