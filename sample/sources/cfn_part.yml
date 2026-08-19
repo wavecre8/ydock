@@ -1,0 +1,44 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: |
+  CloudFormation features demonstration template (Main).
+
+Transform: AWS::LanguageExtensions
+
+Rules:
+  ProdCheck:
+    RuleCondition: !Equals [!Ref EnvType, "prod"]
+    Assertions:
+      - Assert: !Contains [ ["prod", "stg"], !Ref EnvType ]
+        AssertDescription: "Environment must be prod or stg"
+
+Resources:
+  FunctionTester:
+    Type: Custom::Functions
+    Properties:
+      Base64Val: !Base64 "Hello World"
+
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    CreationPolicy:
+      ResourceSignal:
+        Timeout: PT5M
+    Properties:
+      ImageId: ami-12345
+      InstanceType: t2.micro
+      JoinVal: !Join [ "-", [ "a", "b", "c" ] ]
+      SplitVal: !Split [ "-", "a-b-c" ]
+      SelectVal: !Select [ 1, !Ref SplitVal ]
+      CidrVal: !Cidr [ "10.0.0.0/16", 2, 8 ]
+      AzsVal: !GetAZs "us-east-1"
+      MapVal: !FindInMap [ RegionMap, !Ref "AWS::Region", AMI ]
+      ImportVal: !ImportValue "SomeExportedValue"
+      JsonVal: !ToJsonString { Key: "Value" }
+      LengthVal: !Length [ !Ref SplitVal ]
+
+  Fn::ForEach::Loop:
+    - Identifier
+    - [A, B]
+    - "Resource${Identifier}":
+        Type: AWS::SNS::Topic
+        Properties:
+          TopicName: !Sub "Topic-${Identifier}"

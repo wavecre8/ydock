@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="<%= language %>">
+
+<%- include('partials/head') %>
+<body class="bg-slate-50 min-h-screen flex text-slate-800">
+    <script>
+        window.DocDockConstants = JSON.parse('<%- JSON.stringify(constants) %>');
+        (function() {
+            try {
+                const C = window.DocDockConstants;
+                const savedMode = localStorage.getItem(C.LocalStorageKeys.DocMode) || C.Modes.Inline;
+                document.body.classList.add('mode-' + savedMode);
+                const savedAliasMode = localStorage.getItem(C.LocalStorageKeys.AliasMode) || C.Modes.Show;
+                if (savedAliasMode === C.Modes.Hide) document.body.classList.add(C.CssClasses.HideDeepAliases);
+                const savedCompactMode = localStorage.getItem(C.LocalStorageKeys.CompactMode) || 'false';
+                if (savedCompactMode === 'true') document.body.classList.add(C.CssClasses.CompactMode);
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Sidebar -->
+    <%- include('partials/sidebar', { title, doc, renderableSections, extractMetadata }) %>
+
+    <!-- Main Content -->
+    <%- include('partials/content', { 
+        doc, 
+        renderableSections, 
+        strategy, 
+        extractMetadata, 
+        renderTooltip, 
+        renderMarkdownClient, 
+        renderValue, 
+        renderFlow,
+        isIntrinsic 
+    }) %>
+    <%- include('partials/footer') %>
+</body>
+</html>

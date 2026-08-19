@@ -1,0 +1,217 @@
+Reservations:
+- Groups: []
+  Instances:
+  - AmiLaunchIndex: 0
+    ImageId: ami-9999999
+    InstanceId: i-99999999999999999
+    InstanceType: t3.micro
+    KeyName: KEY_Name
+    LaunchTime: '2022-10-18T20:00:09+00:00'
+    Monitoring:
+      State: enabled
+    Placement:
+      AvailabilityZone: ap-northeast-1a
+      GroupName: ''
+      Tenancy: default
+    PrivateDnsName: ip-255-255-255-255.ap-northeast-1.compute.internal
+    PrivateIpAddress: 255.255.255.255
+    ProductCodes: []
+    PublicDnsName: ec2-255-255-255-255.ap-northeast-1.compute.amazonaws.com
+    PublicIpAddress: 255.255.255.255
+    State:
+      Code: 16
+      Name: running
+    StateTransitionReason: ''
+    SubnetId: subnet-99999999999999999
+    VpcId: vpc-99999999999999999
+    Architecture: x86_64
+    BlockDeviceMappings:
+    - DeviceName: "/dev/xvda"
+      Ebs:
+        AttachTime: '2016-06-17T08:21:48+00:00'
+        DeleteOnTermination: true
+        Status: attached
+        VolumeId: vol-99999999999999999
+    ClientToken: xxxxxxxxxxxx
+    EbsOptimized: true
+    EnaSupport: true
+    Hypervisor: xen
+    NetworkInterfaces:
+    - Association:
+        IpOwnerId: '99999999999999'
+        PublicDnsName: ec2-255-255-255-255.ap-northeast-1.compute.amazonaws.com
+        PublicIp: 999.255.255.255
+      Attachment:
+        AttachTime: '2090-06-17T08:21:48+00:00'
+        AttachmentId: eni-attach-99999999
+        DeleteOnTermination: true
+        DeviceIndex: 0
+        Status: attached
+        NetworkCardIndex: 0
+      Description: Primary network interface
+      Groups:
+      - GroupName: security-group-name
+        GroupId: sg-999999999
+      Ipv6Addresses: []
+      MacAddress: 99:99:99:99:99:99
+      NetworkInterfaceId: eni-xxxxxxxxxxxxx
+      OwnerId: '999999999999'
+      PrivateDnsName: ip-255-255-255-255.ap-northeast-1.compute.internal
+      PrivateIpAddress: 255.255.255.255
+      PrivateIpAddresses:
+      - Association:
+          IpOwnerId: '99999999999999'
+          PublicDnsName: ec2-255-255-255-157.ap-northeast-1.compute.amazonaws.com
+          PublicIp: 255.255.255.255
+        Primary: true
+        PrivateDnsName: ip-255-255-255-255.ap-northeast-1.compute.internal
+        PrivateIpAddress: 255.255.255.255
+      SourceDestCheck: true
+      Status: in-use
+      SubnetId: subnet-99999999999
+      VpcId: vpc-99999999999
+      InterfaceType: interface
+    RootDeviceName: "/dev/xvda"
+    RootDeviceType: ebs
+    SecurityGroups:
+    - GroupName: Security-Group-Name
+      GroupId: sg-99999999999
+    SourceDestCheck: true
+    Tags:
+    - Key: HostName
+      Value: HostName
+    - Key: cost-allocation
+      Value: OpCostOption
+    - Key: Name
+      Value: HostName
+    VirtualizationType: hvm
+    CpuOptions:
+      CoreCount: 1
+      ThreadsPerCore: 2
+    CapacityReservationSpecification:
+      CapacityReservationPreference: open
+    HibernationOptions:
+      Configured: false
+    MetadataOptions:
+      State: applied
+      HttpTokens: optional
+      HttpPutResponseHopLimit: 1
+      HttpEndpoint: enabled
+      HttpProtocolIpv6: disabled
+      InstanceMetadataTags: disabled
+    EnclaveOptions:
+      Enabled: false
+    PlatformDetails: Linux/UNIX
+    UsageOperation: RunInstances
+    UsageOperationUpdateTime: '2016-06-17T08:21:48+00:00'
+    PrivateDnsNameOptions: {}
+    MaintenanceOptions:
+      AutoRecovery: default
+  - AmiLaunchIndex: 0
+    ImageId: ami-9999999
+    InstanceId: i-99999999999999998
+    InstanceType: t3.micro
+    KeyName: KEY_Name
+    LaunchTime: '2022-10-18T20:00:09+00:00'
+    Monitoring:
+      State: enabled
+    Placement:
+      AvailabilityZone: ap-northeast-1a
+      GroupName: ''
+      Tenancy: default
+    PrivateDnsName: ip-255-255-255-255.ap-northeast-1.compute.internal
+    PrivateIpAddress: 255.255.255.255
+    ProductCodes: []
+    PublicDnsName: ec2-255-255-255-255.ap-northeast-1.compute.amazonaws.com
+    PublicIpAddress: 255.255.255.255
+    State:
+      Code: 16
+      Name: running
+    StateTransitionReason: ''
+    SubnetId: subnet-99999999999999999
+    VpcId: vpc-99999999999999999
+    Architecture: x86_64
+    BlockDeviceMappings:
+    - DeviceName: "/dev/xvda"
+      Ebs:
+        AttachTime: '2016-06-17T08:21:48+00:00'
+        DeleteOnTermination: true
+        Status: attached
+        VolumeId: vol-99999999999999999
+    ClientToken: xxxxxxxxxxxx
+    EbsOptimized: true
+    EnaSupport: true
+    Hypervisor: xen
+    NetworkInterfaces:
+    - Association:
+        IpOwnerId: '99999999999999'
+        PublicDnsName: ec2-255-255-255-255.ap-northeast-1.compute.amazonaws.com
+        PublicIp: 999.255.255.255
+      Attachment:
+        AttachTime: '2090-06-17T08:21:48+00:00'
+        AttachmentId: eni-attach-99999999
+        DeleteOnTermination: true
+        DeviceIndex: 0
+        Status: attached
+        NetworkCardIndex: 0
+      Description: Primary network interface
+      Groups:
+      - GroupName: security-group-name
+        GroupId: sg-999999999
+      Ipv6Addresses: []
+      MacAddress: 99:99:99:99:99:99
+      NetworkInterfaceId: eni-xxxxxxxxxxxxx
+      OwnerId: '999999999999'
+      PrivateDnsName: ip-255-255-255-255.ap-northeast-1.compute.internal
+      PrivateIpAddress: 255.255.255.255
+      PrivateIpAddresses:
+      - Association:
+          IpOwnerId: '99999999999999'
+          PublicDnsName: ec2-255-255-255-157.ap-northeast-1.compute.amazonaws.com
+          PublicIp: 255.255.255.255
+        Primary: true
+        PrivateDnsName: ip-255-255-255-255.ap-northeast-1.compute.internal
+        PrivateIpAddress: 255.255.255.255
+      SourceDestCheck: true
+      Status: in-use
+      SubnetId: subnet-99999999999
+      VpcId: vpc-99999999999
+      InterfaceType: interface
+    RootDeviceName: "/dev/xvda"
+    RootDeviceType: ebs
+    SecurityGroups:
+    - GroupName: Security-Group-Name
+      GroupId: sg-99999999999
+    SourceDestCheck: true
+    Tags:
+    - Key: HostName
+      Value: HostName
+    - Key: cost-allocation
+      Value: OpCostOption
+    - Key: Name
+      Value: HostName
+    VirtualizationType: hvm
+    CpuOptions:
+      CoreCount: 1
+      ThreadsPerCore: 2
+    CapacityReservationSpecification:
+      CapacityReservationPreference: open
+    HibernationOptions:
+      Configured: false
+    MetadataOptions:
+      State: applied
+      HttpTokens: optional
+      HttpPutResponseHopLimit: 1
+      HttpEndpoint: enabled
+      HttpProtocolIpv6: disabled
+      InstanceMetadataTags: disabled
+    EnclaveOptions:
+      Enabled: false
+    PlatformDetails: Linux/UNIX
+    UsageOperation: RunInstances
+    UsageOperationUpdateTime: '2016-06-17T08:21:48+00:00'
+    PrivateDnsNameOptions: {}
+    MaintenanceOptions:
+      AutoRecovery: default
+  OwnerId: '99999999999'
+  ReservationId: r-99999999999

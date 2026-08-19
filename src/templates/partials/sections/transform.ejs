@@ -1,0 +1,80 @@
+<%
+    // `sectionData` is typically an object where keys are segments (or indices) and values are the transform strings,
+    // due to `preprocessDocument` converting top-level arrays to objects.
+    let transformEntries = [];
+    if (typeof sectionData === 'object' && sectionData !== null && !Array.isArray(sectionData)) {
+        transformEntries = Object.entries(sectionData);
+    } else {
+        const items = Array.isArray(sectionData) ? sectionData : [sectionData];
+        transformEntries = items.map((item, i) => [String(i), item]);
+    }
+%>
+<!-- Transform - Render as Table -->
+<div id="section-<%= sectionIndex %>-content" class="collapsible-wrapper transition-all duration-300 ease-in-out">
+   <div class="p-6 overflow-hidden min-h-0">
+           <!-- Use standard table class matching Properties/Attributes top-level tables but with text-sm -->
+       <div class="table-container-standard">
+           <table class="w-full text-left border-collapse table-fixed top-level-table text-sm">
+               <colgroup>
+                   <col style="width: var(--col-width-level-0);">
+                   <col>
+               </colgroup>
+               <thead>
+                    <tr class="text-xs uppercase tracking-wider text-slate-600 bg-slate-200">
+                       <th class="py-3 px-4 relative">
+                           #
+                           <div class="col-resizer" data-level="0"></div>
+                       </th>
+                       <th class="py-3 px-4">
+                           Value
+                       </th>
+                   </tr>
+               </thead>
+               <tbody>
+                   <% transformEntries.forEach(([key, item], idx) => { %>
+                       <%
+                          const transformGuide = doc.description?.[sectionName];
+                          let itemDesc = undefined;
+                          if (typeof transformGuide === 'object' && transformGuide !== null) {
+                              itemDesc = transformGuide[key];
+                          }
+                          const meta = extractMetadata(itemDesc);
+                          const ctx = createContext([sectionName, String(key)]);
+                          const rowId = ctx.path;
+                          
+                          let displayKey = key;
+                          if (key.startsWith(constants.ReservedKeys.ConditionPrefix)) {
+                              displayKey = key.substring(1);
+                          } else if (!isNaN(Number(key))) {
+                              displayKey = Number(key);
+                          }
+                       %>
+                        <tr id="<%= rowId %>" class="hover-row scroll-mt-20 last:border-0">
+                           <!-- Match top-level property-key-cell styling: py-3 px-4 -->
+                            <td class="property-key-cell py-3 px-4 font-mono text-slate-600 font-medium align-top relative pr-8">
+                               <span class="break-all">
+                                   <%- renderAliasedKey(displayKey, meta.alias) %>
+                               </span>
+                           </td>
+                            <td class="py-3 px-4 font-mono text-slate-700 align-top">
+                                <div class="flex items-start h-full gap-2">
+                                    <div class="flex-grow w-full min-w-0">
+                                        <%= item %>
+                                    </div>
+                                    <%- renderTooltip(meta.description) %>
+                                </div>
+                                <% if (meta.description) { %>
+                                    <div class="elem-inline-desc-wrapper">
+                                        <div class="overflow-hidden">
+                                            <div class="elem-inline-desc text-slate-600 italic text-xs mt-2 border-t border-slate-200 pt-2"><%- renderMarkdownClient(meta.description) %></div>
+                                        </div>
+                                    </div>
+                                <% } %>
+                            </td>
+                       </tr>
+                   <% }); %>
+               </tbody>
+           </table>
+       </div>
+   </div>
+</div>

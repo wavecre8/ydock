@@ -1,0 +1,23 @@
+lang: ja
+index:
+  output: output/index.html
+  title: ydock サンプル
+
+pages:
+  - title: Sample Documentation
+    sources:
+      - sources/ecs.yml
+      - sources/ec2.yml
+    guideDir: guides
+    aliasDir: aliases
+    excludeDir: excludes
+    output: output/ecs-and-ec2.html
+
+  - title: Sample Cfn Documentation
+    mode: cfn
+    sources:
+      - sources/cfn_main.yml
+      - sources/cfn_part.yml
+    guideDir: guides
+    aliasDir: aliases
+    output: output/cfn.html

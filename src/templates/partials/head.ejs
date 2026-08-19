@@ -1,0 +1,27 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- JS Assets extracted to separate files -->
+
+    <style>
+        /* INJECT_CSS_PLACEHOLDER */
+        
+        .copy-cmd-btn {
+            opacity: 0;
+            transition: opacity 0.2s, background-color 0.2s, color 0.2s;
+        }
+        
+        .hover-row.is-hovered > .property-key-cell > .copy-cmd-btn {
+            opacity: 1;
+        }
+        
+        /* Hide copy button when resizer is hovered or resizing */
+        body.resizer-hovered .copy-cmd-btn,
+        body.is-resizing .copy-cmd-btn {
+            opacity: 0 !important;
+        }
+    </style>
+</head>

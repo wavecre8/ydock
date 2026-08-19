@@ -1,0 +1,77 @@
+AWSTemplateFormatVersion: CloudFormation template version. Always 2010-09-09 for current templates.
+Description: Template description displayed in the CloudFormation console. Supports multi-line text.
+Transform:
+  - '=AWS::LanguageExtensions': Enables CloudFormation language extensions like Fn::ForEach for loops and Fn::Length for array manipulation.
+  - '=AWS::Serverless-2016-10-31': AWS SAM (Serverless Application Model) transform. Converts simplified SAM syntax into standard CloudFormation resources.
+  - '=AWS::LanguageExtensions': ''
+  - '=AWS::Serverless-2016-10-31': ''
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      _hidden: true
+    ParameterLabels:
+      VPC:
+        default: ''
+Parameters:
+  EnvType:
+    Type: Parameter type. String is used for text values.
+    Default: Default value used when no value is provided during stack creation.
+    Description: Human-readable description of this parameter shown in the CloudFormation console.
+    AllowedValues: Constraint that limits input to only these values. Referenced by [Rules validation](Rules.ProdCheck) for additional checks.
+    ConstraintDescription: Error message shown when validation fails. Helps users understand what values are acceptable.
+  MyKey:
+    Type: AWS-specific parameter type. Validates that the key pair exists in the region and provides a dropdown in the console.
+    Description: Describes the purpose of this key pair parameter for SSH access.
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: Region-specific AMI ID for us-east-1
+    ap-northeast-1:
+      AMI: |-
+        Region-specific AMI ID for ap-northeast-1
+        Referenced by [EC2Instance MapVal](Resources.EC2Instance.Properties.MapVal) using !FindInMap
+Conditions:
+  IsProd: Evaluates to true when [EnvType](Parameters.EnvType) is prod. Used to conditionally create resources or set properties.
+  IsNotDev: Inverse condition using !Not. True when environment is not dev.
+  IsComplex: |-
+    Demonstrates combining multiple conditions with !And and !Or
+    Shows how complex deployment logic can be built from simpler conditions
+Resources:
+  MainResource:
+    Properties:
+      Name: |-
+        Parameter name using !Sub to interpolate stack name
+        Results in format: {StackName}-Param
+      Type: 'String type for plain text values. Other options: StringList, SecureString for encrypted values.'
+      Value: References the [EnvType parameter](Parameters.EnvType) value using !Ref intrinsic function.
+      Description: |-
+        Conditional value using !If based on [IsProd condition](Conditions.IsProd)
+        Returns different descriptions for production vs development environments
+      Tier: |-
+        Parameter Store tier:
+        Standard = Free, up to 4KB value size
+        Advanced = Paid, up to 8KB, supports parameter policies
+      DataType: Data type validation. text for plain strings, aws:ec2:image for AMI IDs.
+      AllowedPattern: Regex pattern for validation. This pattern allows alphanumeric characters, underscores, dots, and hyphens.
+      Tags:
+        Environment: Tag value dynamically set from [EnvType parameter](Parameters.EnvType). Enables cost allocation and resource filtering.
+    Type: ''
+    Metadata:
+      LocalMeta: ''
+    DeletionPolicy: ''
+    UpdateReplacePolicy: ''
+    DependsOn: ''
+    Condition: ''
+  DependentResource:
+    Properties:
+      Target: |-
+        Uses !GetAtt to reference attributes of other resources
+        See also [EC2Instance](Resources.EC2Instance) for more intrinsic function examples
+    Type: ''
+Outputs:
+  MainOutput:
+    Value: Output the parameter name using !Ref. Can be imported by other stacks using !ImportValue.
+    Export:
+      Name: |-
+        Export name for cross-stack references
+        See [EC2Instance ImportVal](Resources.EC2Instance.Properties.ImportVal) for usage example

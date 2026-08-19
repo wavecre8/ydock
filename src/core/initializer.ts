@@ -1,0 +1,36 @@
+import * as fs from 'fs';
+import * as path from 'path';
+import { Logger } from './logger';
+
+export class Initializer {
+    static async init(): Promise<void> {
+        const configFileName = 'setting.config.yml';
+        const configPath = path.resolve(process.cwd(), configFileName);
+        const altConfigPath = path.resolve(process.cwd(), 'setting.config.yaml');
+
+        if (fs.existsSync(configPath) || fs.existsSync(altConfigPath)) {
+            Logger.info('setting.config.yml (or .yaml) already exists.');
+            return;
+        }
+
+        const defaultConfig = `lang: en
+
+index:
+  output: output/index.html
+  title: Documentation Portal
+
+pages:
+  - title: Sample Documentation
+    mode: generic
+    sources:
+      - src/my-data.yml
+    output: output/index.html
+    guideDir: guides
+    aliasDir: aliases
+    excludeDir: excludes
+`;
+
+        fs.writeFileSync(configPath, defaultConfig);
+        Logger.info(`Generated ${configFileName}`);
+    }
+}
