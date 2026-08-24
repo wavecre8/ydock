@@ -25,12 +25,12 @@
             
             // Build title with optional alias
             const titleHtml = alias 
-                ? `<span class="font-bold text-slate-800">${alias}</span> <span class="text-base text-slate-500 font-normal"></span>` 
-                : logicalId;
+                ? `<span class="font-bold text-slate-800">${escapeHtml(alias)}</span> <span class="text-base text-slate-500 font-normal"></span>` 
+                : escapeHtml(logicalId);
             
             // Extra header HTML (Type Label)
             const extraHeaderHtml = components.typeLabel 
-                ? `<span id="${uniqueId}_Type" class="text-xs font-mono bg-blue-100 text-blue-700 px-2 py-1 rounded ml-2">${components.typeLabel}</span>` 
+                ? `<span id="${uniqueId}_Type" class="text-xs font-mono bg-blue-100 text-blue-700 px-2 py-1 rounded ml-2">${escapeHtml(components.typeLabel)}</span>` 
                 : '';
         %>
 

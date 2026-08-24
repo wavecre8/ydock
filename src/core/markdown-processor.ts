@@ -4,6 +4,15 @@ import { RenderContext } from './render-context';
 export class MarkdownProcessor {
     private static readonly LINK_CLASS = 'text-blue-600 hover:text-blue-800 underline';
 
+    private static escapeAttr(str: string): string {
+        return str
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     static render(text: string): string {
         if (typeof text !== 'string') return text;
 
@@ -11,19 +20,19 @@ export class MarkdownProcessor {
         text = text.replace(
             /\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g,
             (match, label, url) =>
-                `<a href="${url}" target="_blank" rel="noopener noreferrer" class="${this.LINK_CLASS}">${label}</a>`
+                `<a href="${this.escapeAttr(url)}" target="_blank" rel="noopener noreferrer" class="${this.LINK_CLASS}">${label}</a>`
         );
 
         // Protocol links (ftp, mailto, file) or Relative paths
         text = text.replace(
             /\[([^\]]+)\]\(((?:ftp|mailto|file):[^)]+|(?:\.?\.?\/)[^)]+)\)/g,
-            (match, label, url) => `<a href="${url}" class="${this.LINK_CLASS}">${label}</a>`
+            (match, label, url) => `<a href="${this.escapeAttr(url)}" class="${this.LINK_CLASS}">${label}</a>`
         );
 
         // Anchor links (#...)
         text = text.replace(
             /\[([^\]]+)\]\((#[^)]+)\)/g,
-            (match, label, anchor) => `<a href="${anchor}" class="${this.LINK_CLASS}">${label}</a>`
+            (match, label, anchor) => `<a href="${this.escapeAttr(anchor)}" class="${this.LINK_CLASS}">${label}</a>`
         );
 
         // Internal navigation links (JSONPath-like property paths only)

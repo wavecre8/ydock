@@ -1,5 +1,6 @@
 import * as chokidar from 'chokidar';
 import * as path from 'path';
+import * as fs from 'fs';
 import { DocDockBuilder, BuildOptions } from './builder';
 import { Loader } from './loader';
 import { Logger } from './logger';
@@ -14,12 +15,13 @@ export class Watcher {
         Logger.info('Starting watch mode...');
 
         try {
-            await DocDockBuilder.build({ ...options, silent: true });
+            await DocDockBuilder.build({ ...options, silent: false });
         } catch (e) {
             Logger.error('Initial build failed:', e);
         }
 
-        // Determine start page
+        const configDir = path.dirname(path.resolve(options.configPath));
+
         let startPath = '';
         try {
             const config = Loader.loadConfig(options.configPath);
@@ -32,11 +34,12 @@ export class Watcher {
             Logger.warn('Failed to determine start page:', e);
         }
 
-        // Initialize BrowserSync with directory listing enabled
+        startPath = startPath.replace(/\\/g, '/');
+
         this.bs.init(
             {
                 server: {
-                    baseDir: './',
+                    baseDir: [configDir, process.cwd()],
                     directory: true
                 },
                 startPath: startPath,
@@ -46,6 +49,10 @@ export class Watcher {
                 logLevel: 'silent'
             },
             (err: unknown, bs: any) => {
+                if (err) {
+                    Logger.error('BrowserSync failed to start:', err);
+                    return;
+                }
                 const urls = bs.options.getIn(['urls', 'local']);
                 Logger.info(`Server running at: ${urls}`);
             }
@@ -53,13 +60,15 @@ export class Watcher {
 
         const watchPaths = this.getWatchPaths(options.configPath);
 
-        // Watch internal templates as well (useful for development of the tool itself)
         const templateDir = path.resolve(__dirname, '../templates');
-        watchPaths.push(path.join(templateDir, '**/*.ejs'));
+        if (fs.existsSync(templateDir)) {
+            watchPaths.push(templateDir);
+        }
 
-        const watcher = chokidar.watch(watchPaths, {
+        const uniqueWatchPaths = Array.from(new Set(watchPaths));
+
+        const watcher = chokidar.watch(uniqueWatchPaths, {
             ignoreInitial: true,
-            // Wait for writes to finish to avoid partial reads
             awaitWriteFinish: {
                 stabilityThreshold: 300,
                 pollInterval: 100
@@ -69,14 +78,19 @@ export class Watcher {
         watcher.on('all', async (event, filePath) => {
             clearTimeout(this.rebuildTimeout);
             this.rebuildTimeout = setTimeout(async () => {
-                if (filePath === path.resolve(options.configPath)) {
+                if (path.resolve(filePath) === path.resolve(options.configPath)) {
                     Logger.info('Configuration changed. Rebuilding...');
+                } else {
+                    Logger.info(`File changed: ${filePath}. Rebuilding...`);
                 }
 
                 try {
                     await DocDockBuilder.build({ ...options, silent: true });
+                    Logger.setSilent(false);
+                    Logger.info('Rebuild complete.');
                     this.bs.reload();
                 } catch (e) {
+                    Logger.setSilent(false);
                     Logger.error('Build failed:', e);
                 }
             }, 300);
@@ -90,44 +104,35 @@ export class Watcher {
     }
 
     private static getWatchPaths(configPath: string): string[] {
-        const paths = [configPath];
-        const configDir = path.dirname(path.resolve(configPath));
+        const resolvedConfigPath = path.resolve(configPath);
+        const paths = [resolvedConfigPath];
+        const configDir = path.dirname(resolvedConfigPath);
 
         try {
             const config = Loader.loadConfig(configPath);
             config.pages.forEach((page) => {
-                if (page.sources) {
-                    page.sources.forEach((src) => {
-                        if (require('fs').existsSync(src)) {
-                            paths.push(src);
-                        } else {
-                            paths.push(path.join(configDir, src));
-                        }
-                    });
-                }
-                if (page.templates) {
-                    page.templates.forEach((tpl) => {
-                        if (require('fs').existsSync(tpl)) {
-                            paths.push(tpl);
-                        } else {
-                            paths.push(path.join(configDir, tpl));
-                        }
-                    });
-                }
+                const sources = page.sources || page.templates || [];
+                sources.forEach((src) => {
+                    const resolvedSrc = path.isAbsolute(src) ? src : path.join(configDir, src);
+                    paths.push(resolvedSrc);
+                });
 
                 if (page.guideDir) {
-                    // Watch the directory directly instead of using globs
-                    const guidePath = path.join(configDir, page.guideDir);
+                    const guidePath = path.isAbsolute(page.guideDir) ? page.guideDir : path.join(configDir, page.guideDir);
                     paths.push(guidePath);
                 }
                 if (page.aliasDir) {
-                    const aliasPath = path.join(configDir, page.aliasDir);
+                    const aliasPath = path.isAbsolute(page.aliasDir) ? page.aliasDir : path.join(configDir, page.aliasDir);
                     paths.push(aliasPath);
+                }
+                if (page.excludeDir) {
+                    const excludePath = path.isAbsolute(page.excludeDir) ? page.excludeDir : path.join(configDir, page.excludeDir);
+                    paths.push(excludePath);
                 }
             });
         } catch (e) {
             Logger.warn('Failed to extract watch paths from config:', e);
         }
-        return paths.map((p) => path.resolve(p).replace(/\\/g, '/'));
+        return paths.map((p) => path.resolve(p));
     }
 }

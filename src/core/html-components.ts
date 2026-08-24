@@ -2,6 +2,17 @@ import { MarkdownProcessor } from './markdown-processor';
 import { DocDockConstants } from './constants';
 
 export class HtmlComponents {
+    static escape(val: unknown): string {
+        if (val === null || val === undefined) return '';
+        const text = typeof val === 'string' ? val : String(val);
+        return text
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#39;');
+    }
+
     static renderTooltip(descText: string | undefined): string {
         if (!descText) return '';
         return `
@@ -16,21 +27,23 @@ export class HtmlComponents {
     }
 
     static renderAliasedKey(key: string | number, alias: string | undefined): string {
-        if (!alias) return String(key);
-        return `<span class="text-slate-700 block">${key}</span><span class="alias-wrapper grid transition-[grid-template-rows,opacity] duration-500 ease-in-out"><span class="alias-text text-xs text-slate-400 overflow-hidden min-h-0 block">${alias}</span></span>`;
+        const escapedKey = this.escape(key);
+        if (!alias) return escapedKey;
+        const escapedAlias = this.escape(alias);
+        return `<span class="text-slate-700 block">${escapedKey}</span><span class="alias-wrapper grid transition-[grid-template-rows,opacity] duration-500 ease-in-out"><span class="alias-text text-xs text-slate-400 overflow-hidden min-h-0 block">${escapedAlias}</span></span>`;
     }
 
     static renderPrimitive(val: unknown): string {
-        return `<span class="${DocDockConstants.CssClasses.PropertyValue}">${val}</span>`;
+        return `<span class="${DocDockConstants.CssClasses.PropertyValue}">${this.escape(val)}</span>`;
     }
 
     static renderFlowPrimitive(val: unknown): string {
-        return `<span class="${DocDockConstants.CssClasses.PropertyValue} font-mono text-slate-700">${val}</span>`;
+        return `<span class="${DocDockConstants.CssClasses.PropertyValue} font-mono text-slate-700">${this.escape(val)}</span>`;
     }
 
     static renderFlowIntrinsic(key: string, innerHtml: string): string {
         return `<div class="inline-flex items-start gap-1 align-top">
-            <span class="${DocDockConstants.CssClasses.BadgeFn} text-[10px] sm:text-xs">${key}</span>
+            <span class="${DocDockConstants.CssClasses.BadgeFn} text-[10px] sm:text-xs">${this.escape(key)}</span>
             <span>${innerHtml}</span>
         </div>`;
     }
@@ -49,13 +62,13 @@ export class HtmlComponents {
 
     static renderIntrinsicInline(key: string, innerHtml: string): string {
         return `<div class="flex items-start gap-2 flex-wrap">
-            <span class="${DocDockConstants.CssClasses.BadgeFn} flex-shrink-0">${key}</span> 
+            <span class="${DocDockConstants.CssClasses.BadgeFn} flex-shrink-0">${this.escape(key)}</span> 
             ${innerHtml}
         </div>`;
     }
 
     static renderIntrinsicBlock(key: string, innerHtml: string): string {
-        return `<div class="flex items-start gap-2"><span class="${DocDockConstants.CssClasses.BadgeFn}">${key}</span> <span>${innerHtml}</span></div>`;
+        return `<div class="flex items-start gap-2"><span class="${DocDockConstants.CssClasses.BadgeFn}">${this.escape(key)}</span> <span>${innerHtml}</span></div>`;
     }
 
     static renderPrimitiveArrayTable(rowsHtml: string): string {
@@ -80,7 +93,7 @@ export class HtmlComponents {
         return `<tr id="${myPath}" class="${DocDockConstants.CssClasses.HoverRow} scroll-mt-20">
             <td class="align-top">
                 <div class="flex items-start">
-                    <div class="flex-grow"><span class="${DocDockConstants.CssClasses.PropertyValue}">${itemVal}</span></div>
+                    <div class="flex-grow"><span class="${DocDockConstants.CssClasses.PropertyValue}">${this.escape(itemVal)}</span></div>
                     ${tooltipHtml}
                 </div>
                 ${inlineDescHtml}
@@ -97,7 +110,7 @@ export class HtmlComponents {
     static renderComplexArrayItem(myPath: string, indexStr: string, innerHtml: string): string {
         return `<div id="${myPath}" class="border border-slate-200 rounded-md overflow-hidden scroll-mt-20">
             <div class="bg-slate-50 px-3 py-1 text-xs font-bold text-slate-500 border-b border-slate-200">
-                # ${indexStr}
+                # ${this.escape(indexStr)}
             </div>
             <div class="p-2 bg-white">
                 ${innerHtml}
@@ -137,10 +150,11 @@ export class HtmlComponents {
         tooltipHtml: string,
         inlineDescHtml: string
     ): string {
+        const escapedCopyPath = this.escape(myCopyPath);
         return `<tr id="${myPath}" class="${DocDockConstants.CssClasses.HoverRow} scroll-mt-20">
             <td class="${DocDockConstants.CssClasses.PropertyKeyCell} font-mono text-slate-600 relative pr-8 align-top">
                 <span class="break-all">${keyHtml}</span>
-                <button onclick="YdockUI.Clipboard.copyToClipboard('${myCopyPath}', this, event)" class="${DocDockConstants.CssClasses.CopyCmdBtn} absolute right-2 p-1 text-slate-400 hover:text-blue-600 rounded" title="Copy Key">
+                <button data-copy-path="${escapedCopyPath}" onclick="YdockUI.Clipboard.copyToClipboard(this, event)" class="${DocDockConstants.CssClasses.CopyCmdBtn} absolute right-2 p-1 text-slate-400 hover:text-blue-600 rounded" title="Copy Key">
                     <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                 </button>
             </td>

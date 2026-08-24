@@ -30,14 +30,14 @@
                        cardId: cardId,
                        contentId: contentId,
                        iconId: iconId,
-                       title: item.fileName,
+                       title: escapeHtml(item.fileName),
                        contentHtml: contentHtml,
                        extraHeaderHtml: '',
                        isCollapsed: false
                    }) %>
                <% }); %>
            <% } else { %>
-               <div class="bg-white p-4 rounded-lg border border-slate-200 font-mono text-sm text-slate-700 whitespace-pre-wrap"><%- isMainDescription ? renderMarkdownClient(sectionData) : sectionData %></div>
+               <div class="bg-white p-4 rounded-lg border border-slate-200 font-mono text-sm text-slate-700 whitespace-pre-wrap"><%- isMainDescription ? renderMarkdownClient(sectionData) : escapeHtml(sectionData) %></div>
            <% } %>
    </div>
 </div>

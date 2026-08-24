@@ -57,7 +57,8 @@ export class TemplateRenderer {
         if (typeof val === 'object') {
             const pairsHtml = Object.entries(val)
                 .map(([k, v]) => {
-                    return `<span><span class="text-slate-500">${k}:</span> ${this.renderFlow(v, ctx.child(undefined, undefined, true))}</span>`;
+                    const escapedKey = HtmlComponents.escape(k);
+                    return `<span><span class="text-slate-500">${escapedKey}:</span> ${this.renderFlow(v, ctx.child(undefined, undefined, true))}</span>`;
                 })
                 .join('<span class="text-slate-400 mx-1">,</span>');
             return HtmlComponents.renderFlowObject(pairsHtml);

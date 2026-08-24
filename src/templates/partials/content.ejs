@@ -23,7 +23,8 @@
                     sectionName, 
                     sectionIndex, 
                     sectionData, 
-                    renderMarkdownClient 
+                    renderMarkdownClient,
+                    escapeHtml 
                 }) %>
             <% } else if (strategy.getSectionRenderType(sectionName) === 'transform') { %>
                 <%- include('sections/transform', { 
@@ -33,7 +34,8 @@
                     doc, 
                     extractMetadata, 
                     renderTooltip, 
-                    renderMarkdownClient 
+                    renderMarkdownClient,
+                    escapeHtml 
                 }) %>
             <% } else { %>
                 <%- include('sections/resource_list', { 
@@ -47,7 +49,8 @@
                     renderMarkdownClient, 
                     renderFlow, 
                     isIntrinsic, 
-                    renderValue 
+                    renderValue,
+                    escapeHtml 
                 }) %>
             <% } %>
         <% }); %>

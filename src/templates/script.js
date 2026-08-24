@@ -83,16 +83,35 @@ YdockUI.Navigation = {
 };
 
 YdockUI.Clipboard = {
-    copyToClipboard(text, btnElement, event) {
-        event.stopPropagation();
+    copyToClipboard(target, event) {
+        if (event) {
+            event.stopPropagation();
+        }
+        let text = '';
+        let btnElement = null;
+
+        if (typeof target === 'string') {
+            text = target;
+            if (event && event.currentTarget) {
+                btnElement = event.currentTarget;
+            }
+        } else if (target && target.getAttribute) {
+            btnElement = target;
+            text = btnElement.getAttribute('data-copy-path') || '';
+        }
+
+        if (!text) return;
+
         navigator.clipboard.writeText(text).then(() => {
-            const original = btnElement.innerHTML;
-            btnElement.innerHTML = '<svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
-            btnElement.classList.add('bg-green-50');
-            setTimeout(() => {
-                btnElement.innerHTML = original;
-                btnElement.classList.remove('bg-green-50');
-            }, C.UIConstants.Animation.CopyFeedbackDurationMs);
+            if (btnElement) {
+                const original = btnElement.innerHTML;
+                btnElement.innerHTML = '<svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+                btnElement.classList.add('bg-green-50');
+                setTimeout(() => {
+                    btnElement.innerHTML = original;
+                    btnElement.classList.remove('bg-green-50');
+                }, C.UIConstants.Animation.CopyFeedbackDurationMs);
+            }
         });
     }
 };

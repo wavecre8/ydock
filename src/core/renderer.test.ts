@@ -51,7 +51,13 @@ describe('TemplateRenderer', () => {
             expect(html).toMatchSnapshot();
         });
 
-
+        it('should escape regex values and keys in table', () => {
+            const val = { 'pattern?<1>': '(?<group>[a-zA-Z]+)' };
+            const html = renderer.renderValue(val, undefined, new RenderContext(0, 'root'));
+            expect(html).toContain('pattern?&lt;1&gt;');
+            expect(html).toContain('(?&lt;group&gt;[a-zA-Z]+)');
+            expect(html).not.toContain('(?<group>[a-zA-Z]+)');
+        });
     });
 
     describe('renderIntrinsic', () => {
@@ -105,7 +111,8 @@ describe('TemplateRenderer', () => {
             const html = renderer.renderValue(val, desc, new RenderContext(0, 'root', ['root'], 'root'));
 
             expect(html).toContain('id="root___name_web__image"');
-            expect(html).toContain("copyToClipboard('root[=name:web].image', this, event)");
+            expect(html).toContain('data-copy-path="root[=name:web].image"');
+            expect(html).toContain('onclick="YdockUI.Clipboard.copyToClipboard(this, event)"');
         });
 
         it('should generate logical rawPath and sanitized id path for primitive arrays with prefix matching', () => {
@@ -144,10 +151,17 @@ describe('TemplateRenderer', () => {
             const html = rendererWithDoc.renderValue(val, undefined, new RenderContext(0, 'tasks__1__containers', ['tasks', '1', 'containers'], 'tasks[].containers'));
 
             expect(html).toContain('id="tasks__1__containers___name_web__image"');
-            expect(html).toContain("copyToClipboard('tasks[].containers[=name:web].image', this, event)");
+            expect(html).toContain('data-copy-path="tasks[].containers[=name:web].image"');
+            expect(html).toContain('onclick="YdockUI.Clipboard.copyToClipboard(this, event)"');
+        });
+
+        it('should safely escape copyPath containing quotes and symbols in data-copy-path', () => {
+            const val = { "user's_key": 'value' };
+            const html = renderer.renderValue(val, undefined, new RenderContext(0, 'root', ['root'], "root.user's_key"));
+
+            expect(html).toContain('data-copy-path="root.user&#39;s_key.user&#39;s_key"');
+            expect(html).toContain('onclick="YdockUI.Clipboard.copyToClipboard(this, event)"');
         });
     });
-
-
 });
 

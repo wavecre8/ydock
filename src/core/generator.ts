@@ -72,6 +72,7 @@ export class Generator {
                 renderMarkdownClient: MarkdownProcessor.render.bind(MarkdownProcessor),
                 renderTooltip: HtmlComponents.renderTooltip.bind(HtmlComponents),
                 renderAliasedKey: HtmlComponents.renderAliasedKey.bind(HtmlComponents),
+                escapeHtml: HtmlComponents.escape.bind(HtmlComponents),
                 isIntrinsic: renderer.isIntrinsic.bind(renderer),
                 renderFlow: (val: any) => renderer.renderFlow(val, new RenderContext(0)),
                 renderValue: (val: any, desc: any, ctx: RenderContext) => renderer.renderValue(val, desc, ctx),

@@ -142,6 +142,9 @@ export class SkeletonGenerator {
             let appendText = '';
             for (const key of flatKeys) {
                 if (!existingKeys.has(key)) {
+                    if (typeName === 'exclude' && this.isAncestorExcluded(key, doc)) {
+                        continue;
+                    }
                     appendText += `"${key}": ${formattedDefaultValue}\n`;
                 }
             }
@@ -161,6 +164,49 @@ export class SkeletonGenerator {
             fs.writeFileSync(targetPath, newText.trimEnd());
             Logger.info(`Created skeleton ${typeName}: ${targetPath}`);
         }
+    }
+
+    private static isAncestorExcluded(key: string, doc: Record<string, any>): boolean {
+        const ancestors = this.getAncestorPaths(key);
+        for (const ancestor of ancestors) {
+            if (doc[ancestor] === true) {
+                return true;
+            }
+            if (doc[`${ancestor}.*`] === true) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static getAncestorPaths(key: string): string[] {
+        const ancestors: string[] = [];
+        let current = '';
+        let i = 0;
+        while (i < key.length) {
+            if (key[i] === '.') {
+                if (current) {
+                    ancestors.push(current);
+                }
+                current += '.';
+                i++;
+            } else if (key.slice(i, i + 2) === '[]') {
+                if (current) {
+                    ancestors.push(current);
+                }
+                current += '[]';
+                ancestors.push(current);
+                i += 2;
+                if (i < key.length && key[i] === '.') {
+                    current += '.';
+                    i++;
+                }
+            } else {
+                current += key[i];
+                i++;
+            }
+        }
+        return ancestors.filter(a => a !== key && a.length > 0);
     }
 
     private static generateAlias(template: any, templateFileName: string, aliasDir: string, strategy: any): void {

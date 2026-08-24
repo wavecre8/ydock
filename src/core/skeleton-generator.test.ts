@@ -102,18 +102,36 @@ describe('SkeletonGenerator', () => {
         expect(content).toContain('"tasks[].containers[].name": false');
     });
 
-    it('should append missing keys to an existing exclude file as false', async () => {
+    it('should skip appending child keys if parent key is already true in exclude file', async () => {
         const existingExcludePath = path.join(excludeDir, `dummy${DocDockConstants.FileSuffixes.ExcludeYml}`);
         fs.writeFileSync(existingExcludePath, 
-            `"tasks": true\n`
+            `"tasks[].containers": true\n`
         );
 
         await SkeletonGenerator.generate({ configPath, type: 'exclude', silent: true });
 
         const content = fs.readFileSync(existingExcludePath, 'utf8');
         
-        expect(content).toContain('"tasks": true');
+        expect(content).toContain('"tasks[].containers": true');
+        expect(content).toContain('"tasks": false');
         expect(content).toContain('"tasks[].taskArn": false');
+        expect(content).not.toContain('"tasks[].containers[].name"');
+        expect(content).not.toContain('"tasks[].containers[].image"');
+    });
+
+    it('should append child keys if parent key is false in exclude file', async () => {
+        const existingExcludePath = path.join(excludeDir, `dummy${DocDockConstants.FileSuffixes.ExcludeYml}`);
+        fs.writeFileSync(existingExcludePath, 
+            `"tasks": false\n`
+        );
+
+        await SkeletonGenerator.generate({ configPath, type: 'exclude', silent: true });
+
+        const content = fs.readFileSync(existingExcludePath, 'utf8');
+        
+        expect(content).toContain('"tasks": false');
+        expect(content).toContain('"tasks[].taskArn": false');
+        expect(content).toContain('"tasks[].containers": false');
         expect(content).toContain('"tasks[].containers[].name": false');
     });
 

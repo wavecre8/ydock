@@ -21,3 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Guide files for documentation descriptions.
   - Alias files for renaming keys with flat path support.
   - Exclude files for flexibly hiding unnecessary properties.
+
+## [1.0.1] - 2026-08-24
+
+### Fixed
+- **String Parsing & Escaping**: Fixed HTML rendering and clipboard copy issues when handling strings containing regular expressions or special characters.
+- **Watch Mode**: Fixed watch mode startup issues by unsuppressing initial build logs, properly resolving server base directories, and adding `excludeDir` to file watch paths.
+
+### Changed
+- **Skeleton Generation**: Improved exclude skeleton generation to skip appending child keys when an ancestor path is already set to `true`.

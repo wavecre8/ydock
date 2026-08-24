@@ -57,5 +57,11 @@ describe('MarkdownProcessor', () => {
              const input = '[First Container](tasks[].containers[].name)';
              expect(MarkdownProcessor.render(input)).toMatch(/<a\s+href="#tasks__0__containers__0__name".*?>First Container<\/a>/);
         });
+
+        it('should escape url attributes containing quotes or special characters', () => {
+             const input = '[Test Link](https://example.com/search?q="test"&type=1)';
+             const result = MarkdownProcessor.render(input);
+             expect(result).toContain('href="https://example.com/search?q=&quot;test&quot;&amp;type=1"');
+        });
     });
 });
