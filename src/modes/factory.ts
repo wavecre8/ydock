@@ -1,8 +1,9 @@
 import { ModeStrategy } from './types';
 import { GenericStrategy } from './generic';
 import { CfnStrategy } from './cfn';
+import { DocDockConstants } from '../core/constants';
 
-export type ModeName = 'generic' | 'cfn';
+export type ModeName = typeof DocDockConstants.StrategyModes[keyof typeof DocDockConstants.StrategyModes];
 
 /**
  * Factory for creating mode strategies based on configuration.
@@ -15,9 +16,9 @@ export class ModeFactory {
     static getStrategy(modeName: string): ModeStrategy {
         const mode = modeName as ModeName;
         switch (mode) {
-            case 'cfn':
+            case DocDockConstants.StrategyModes.Cfn:
                 return new CfnStrategy();
-            case 'generic':
+            case DocDockConstants.StrategyModes.Generic:
             default:
                 return new GenericStrategy();
         }

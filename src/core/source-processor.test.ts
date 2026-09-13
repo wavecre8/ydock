@@ -50,6 +50,7 @@ describe('SourceProcessor', () => {
                 [],
                 {},
                 {},
+                {},
                 true
             );
         }).toThrow(FileNotFoundError);
@@ -67,6 +68,7 @@ describe('SourceProcessor', () => {
             mockConfigPath,
             new Set(),
             [],
+            {},
             {},
             {},
             true
@@ -94,6 +96,31 @@ describe('SourceProcessor', () => {
                 [],
                 {},
                 {},
+                {},
+                true
+            );
+        }).toThrow(DuplicateKeyError);
+    });
+
+    it('should throw DuplicateKeyError if duplicates found even when customizer exists', () => {
+        vi.mocked(fs.existsSync).mockReturnValue(true);
+        vi.mocked(Loader.loadTemplate).mockReturnValue({ Key1: 'Value' });
+        
+        const strategy = createMockStrategy({ getCustomizer: vi.fn() as any });
+        const seenKeys = new Set(['Key1']);
+
+        // カスタムマイザー存在時における非免除重複キーのエラー検証
+        expect(() => {
+            SourceProcessor.process(
+                'src.yaml',
+                strategy,
+                mockPageConfig,
+                mockConfigPath,
+                seenKeys,
+                [],
+                {},
+                {},
+                {},
                 true
             );
         }).toThrow(DuplicateKeyError);
@@ -117,6 +144,7 @@ describe('SourceProcessor', () => {
             [],
             {},
             {},
+            {},
             true
         );
     });
@@ -132,6 +160,7 @@ describe('SourceProcessor', () => {
             mockConfigPath,
             new Set(),
             [],
+            {},
             {},
             {},
             true
@@ -153,6 +182,7 @@ describe('SourceProcessor', () => {
             customConfigPath,
             new Set(),
             [],
+            {},
             {},
             {},
             true
@@ -178,6 +208,19 @@ describe('SourceProcessor', () => {
             
             expect(mergeSpy).toHaveBeenCalledWith(srcValue, objValue, (SourceProcessor as any).aliasCustomizer);
             expect(result).toEqual({ merged: true });
+        });
+
+        it('should call Merger.mergeAliasObjectWithArray when objValue is Object and srcValue is Array', () => {
+            const mergeSpy = vi.spyOn(Merger, 'mergeAliasObjectWithArray').mockReturnValue({ mergedReverse: true });
+            
+            const objValue = { _alias: 'ExistingAlias' };
+            const srcValue = [{ '=name': 'test' }];
+            
+            // 逆方向衝突時のカスタムマージ呼び出し検証
+            const result = (SourceProcessor as any).aliasCustomizer(objValue, srcValue);
+            
+            expect(mergeSpy).toHaveBeenCalledWith(objValue, srcValue, (SourceProcessor as any).aliasCustomizer);
+            expect(result).toEqual({ mergedReverse: true });
         });
     });
 });

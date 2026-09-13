@@ -4,7 +4,7 @@
 <%- include('partials/head') %>
 <body class="bg-slate-50 min-h-screen flex text-slate-800">
     <script>
-        window.DocDockConstants = JSON.parse('<%- JSON.stringify(constants) %>');
+        window.DocDockConstants = JSON.parse(decodeURIComponent('<%- encodeURIComponent(JSON.stringify(constants)) %>'));
         (function() {
             try {
                 const C = window.DocDockConstants;

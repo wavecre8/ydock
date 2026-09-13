@@ -58,6 +58,24 @@ export class AliasTreeBuilder {
 
     private static applyMatchToken(currentObj: any, token: Extract<PathToken, { type: 'match' }>, processedValue: any, isLast: boolean, terminalKey: string): any {
         const matchKey = DocDockConstants.ReservedKeys.Match;
+        // 直前トークンがmatchでありcurrentObjがマッチャー自身である場合の複合条件処理
+        if (typeof currentObj === 'object' && currentObj !== null && !Array.isArray(currentObj) && !(matchKey in currentObj)) {
+            const hasCondition = Object.keys(currentObj).some(k => k.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix));
+            if (hasCondition) {
+                currentObj[token.key] = token.value;
+                if (isLast) {
+                    if (token.value === '') {
+                        currentObj[token.key] = processedValue;
+                    } else if (typeof processedValue === 'object' && processedValue !== null) {
+                        merge(currentObj, processedValue);
+                    } else {
+                        currentObj[terminalKey] = processedValue;
+                    }
+                }
+                return currentObj;
+            }
+        }
+
         if (!currentObj[matchKey]) currentObj[matchKey] = [];
         
         let matcher = currentObj[matchKey].find((m: any) => m[token.key] === token.value);

@@ -30,3 +30,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 - **Skeleton Generation**: Improved exclude skeleton generation to skip appending child keys when an ancestor path is already set to `true`.
+
+## [1.0.2] - 2026-09-13
+
+### Added
+- **Global Directory Configuration**: Added support for specifying `guideDir`, `aliasDir`, and `excludeDir` at the top level of `setting.config.yml`, removing the need for redundant per-page definitions while maintaining per-page overrides.
+
+### Fixed
+- Bug fixes.

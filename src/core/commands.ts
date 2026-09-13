@@ -1,5 +1,7 @@
+import { DocDockConstants } from './constants';
 import { Logger } from './logger';
 import { PathUtils } from './path-utils';
+import type { SkeletonType } from './skeleton-generator';
 
 export class Commands {
     static async init() {
@@ -33,7 +35,7 @@ export class Commands {
     static async skeleton(options: { config?: string; type?: string }) {
         try {
             let configPath = options.config;
-            const type = (options.type || 'all') as 'alias' | 'guide' | 'exclude' | 'all';
+            const type = (options.type || DocDockConstants.SkeletonTypes.All) as SkeletonType;
 
             if (!configPath) {
                 configPath = PathUtils.findDefaultConfigPath();

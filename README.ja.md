@@ -72,10 +72,14 @@ ydock init
 `setting.config.yml` を編集し、対象のYAMLファイルや出力先を定義します。
 
 > [!NOTE]
-> 設定ファイル内で指定する相対パス（`sources`, `output`, `guideDir`, `aliasDir` など）は、すべて**設定ファイルが配置されているディレクトリを基準**として解決されます。
+> 設定ファイル内で指定する `sources`、`output`、`guideDir`、`aliasDir` などの相対パスは、すべて**設定ファイルが配置されているディレクトリを基準**として解決されます。
 
 ```yaml
 lang: ja
+
+guideDir: guides
+aliasDir: aliases
+excludeDir: excludes
 
 index:
   output: output/index.html
@@ -87,9 +91,6 @@ pages:
     sources:
       - sources/vpc.yml
       - sources/ec2.yml
-    guideDir: guides
-    aliasDir: aliases
-    excludeDir: excludes
     output: output/infrastructure.html
 ```
 
@@ -111,7 +112,7 @@ ydock build -c setting.config.yml
 
 ### `init`
 
-デフォルトの設定ファイル（`setting.config.yml`）をカレントディレクトリに生成します。
+カレントディレクトリにデフォルトの設定ファイル `setting.config.yml` を生成します。
 
 ```bash
 npx @wavecre8/ydock init
@@ -231,6 +232,10 @@ Resources:
 | キー | 説明 | デフォルト |
 |---|---|---|
 | `lang` | 出力HTMLの言語属性 | `ja` |
+| `mode` | 全体のデフォルト解析モード | `generic` |
+| `guideDir` | ガイドファイルの共通ディレクトリ | `guides` |
+| `aliasDir` | エイリアスファイルの共通ディレクトリ | `aliases` |
+| `excludeDir` | Excludeファイルの共通ディレクトリ | `excludes` |
 | `index` | インデックスページの設定。後述を参照 | なし |
 
 ### インデックスページ設定
@@ -251,9 +256,9 @@ Resources:
 | `sources` | ✓ | ソースYAMLファイルのリスト |
 | `output` | ✓ | 出力先HTMLパス |
 | `mode` |  | 解析モードを指定。例: `generic` |
-| `guideDir` |  | ガイドファイルのディレクトリ |
-| `aliasDir` |  | エイリアスファイルのディレクトリ |
-| `excludeDir` |  | Excludeファイルのディレクトリ |
+| `guideDir` |  | ページ個別のガイドファイルディレクトリ。省略時はグローバル設定を適用 |
+| `aliasDir` |  | ページ個別のエイリアスファイルディレクトリ。省略時はグローバル設定を適用 |
+| `excludeDir` |  | ページ個別のExcludeファイルディレクトリ。省略時はグローバル設定を適用 |
 
 ## 高度な使い方
 

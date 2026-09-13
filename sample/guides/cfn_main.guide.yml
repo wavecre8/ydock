@@ -3,15 +3,26 @@ Description: Template description displayed in the CloudFormation console. Suppo
 Transform:
   - '=AWS::LanguageExtensions': Enables CloudFormation language extensions like Fn::ForEach for loops and Fn::Length for array manipulation.
   - '=AWS::Serverless-2016-10-31': AWS SAM (Serverless Application Model) transform. Converts simplified SAM syntax into standard CloudFormation resources.
-  - '=AWS::LanguageExtensions': ''
-  - '=AWS::Serverless-2016-10-31': ''
 Metadata:
   AWS::CloudFormation::Interface:
-    ParameterGroups:
-      _hidden: true
     ParameterLabels:
       VPC:
         default: ''
+    ParameterGroups:
+      - '=Label':
+          default: Network Configuration
+        Label:
+          default: ''
+        Parameters:
+          - '=VPC': ''
+          - '=Subnets': ''
+      - '=Label':
+          default: Server Configuration
+        Label:
+          default: ''
+        Parameters:
+          - '=InstanceType': ''
+          - '=KeyPair': ''
 Parameters:
   EnvType:
     Type: Parameter type. String is used for text values.

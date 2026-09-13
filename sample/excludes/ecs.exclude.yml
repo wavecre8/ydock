@@ -20,7 +20,6 @@
 "tasks[].attachments[].id": false
 "tasks[].attachments[].type": false
 "tasks[].attachments[].status": false
-"tasks[].attachments[].details": false
 "tasks[].attachments[].details[].name": false
 "tasks[].attachments[].details[].value": false
 "tasks[].attributes": false

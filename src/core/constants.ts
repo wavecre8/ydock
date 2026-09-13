@@ -11,12 +11,28 @@ export const DocDockConstants = {
         ExcludeValue: '__value'
     },
     Defaults: {
+        GuideDir: 'guides',
         AliasDir: 'aliases',
         ExcludeDir: 'excludes',
         Mode: 'generic',
         Language: 'ja',
+        Title: 'YAML Documentation',
+        ConfigFile: 'setting.config.yml',
         TemplateLayout: '../templates/layout.ejs',
         TemplateIndex: '../templates/index.ejs'
+    },
+    StrategyModes: {
+        Generic: 'generic',
+        Cfn: 'cfn'
+    },
+    SkeletonTypes: {
+        All: 'all',
+        Alias: 'alias',
+        Guide: 'guide',
+        Exclude: 'exclude'
+    },
+    ConfigFiles: {
+        Candidates: ['setting.config.yml', 'setting.config.yaml']
     },
     FileSuffixes: {
         GuideYaml: '.guide.yaml',

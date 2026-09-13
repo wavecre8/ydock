@@ -74,7 +74,11 @@ YdockUI.Navigation = {
     
     navigateToItem(itemId, sectionIndex, cardIndex) {
         this.expandItem(sectionIndex, cardIndex);
-        document.getElementById(itemId).scrollIntoView({ behavior: 'smooth' });
+        const element = document.getElementById(itemId);
+        // 対象要素が存在する場合のみスクロールを実行
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
     },
     
     onSidebarItemClick(btn) {
@@ -83,6 +87,38 @@ YdockUI.Navigation = {
 };
 
 YdockUI.Clipboard = {
+    // コピー成功時のアイコン演出処理
+    showFeedback(btnElement) {
+        if (!btnElement) return;
+        const original = btnElement.innerHTML;
+        btnElement.innerHTML = '<svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+        btnElement.classList.add('bg-green-50');
+        setTimeout(() => {
+            btnElement.innerHTML = original;
+            btnElement.classList.remove('bg-green-50');
+        }, C.UIConstants.Animation.CopyFeedbackDurationMs);
+    },
+
+    // 非セキュア環境向けフォールバックコピー処理
+    fallbackCopy(text, btnElement) {
+        try {
+            const textArea = document.createElement('textarea');
+            textArea.value = text;
+            textArea.style.position = 'fixed';
+            textArea.style.opacity = '0';
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            const successful = document.execCommand('copy');
+            document.body.removeChild(textArea);
+            if (successful) {
+                this.showFeedback(btnElement);
+            }
+        } catch {
+            // フォールバック失敗時は例外を抑止
+        }
+    },
+
     copyToClipboard(target, event) {
         if (event) {
             event.stopPropagation();
@@ -102,17 +138,17 @@ YdockUI.Clipboard = {
 
         if (!text) return;
 
-        navigator.clipboard.writeText(text).then(() => {
-            if (btnElement) {
-                const original = btnElement.innerHTML;
-                btnElement.innerHTML = '<svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
-                btnElement.classList.add('bg-green-50');
-                setTimeout(() => {
-                    btnElement.innerHTML = original;
-                    btnElement.classList.remove('bg-green-50');
-                }, C.UIConstants.Animation.CopyFeedbackDurationMs);
-            }
-        });
+        // クリップボードAPI利用可能環境でのコピー実行
+        if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+            navigator.clipboard.writeText(text).then(() => {
+                this.showFeedback(btnElement);
+            }).catch(() => {
+                this.fallbackCopy(text, btnElement);
+            });
+        } else {
+            // 非セキュア環境におけるフォールバックコピーの実行
+            this.fallbackCopy(text, btnElement);
+        }
     }
 };
 
@@ -127,33 +163,36 @@ YdockUI.DeepLink = {
         const element = document.getElementById(targetId);
         if (!element) return;
 
-        const parts = targetId.split(C.PathSeparator);
-
-        if (parts[0] === 'section') {
-            const sectionIndex = parts[1];
-            const sectionContent = document.getElementById(`section-${sectionIndex}-content`);
-            const sectionIcon = document.getElementById(`section-${sectionIndex}-content-icon`);
-            if (sectionContent) sectionContent.classList.remove(C.CssClasses.IsCollapsed);
-            if (sectionIcon) sectionIcon.classList.remove(C.CssClasses.IsCollapsed);
+        // 対象要素および祖先ツリーの折りたたみ状態の一括解除
+        let current = element;
+        while (current && current !== document.body) {
+            if (current.classList.contains(C.CssClasses.IsCollapsed)) {
+                current.classList.remove(C.CssClasses.IsCollapsed);
+            }
+            if (current.classList.contains('collapsible-wrapper')) {
+                current.classList.remove(C.CssClasses.IsCollapsed);
+                const icon = document.getElementById(`${current.id}-icon`);
+                if (icon) icon.classList.remove(C.CssClasses.IsCollapsed);
+            }
+            if (current.classList.contains('card-container')) {
+                current.classList.remove(C.CssClasses.IsCollapsed);
+                const cardContent = current.querySelector('.collapsible-wrapper');
+                if (cardContent) {
+                    cardContent.classList.remove(C.CssClasses.IsCollapsed);
+                    const icon = document.getElementById(`${cardContent.id}-icon`);
+                    if (icon) icon.classList.remove(C.CssClasses.IsCollapsed);
+                }
+            }
+            current = current.parentElement;
         }
 
-        if (parts[0] === 'card') {
-            const sectionIndex = parts[1];
-            const cardIndex = parts[2];
-
-            const sectionContent = document.getElementById(`section-${sectionIndex}-content`);
-            const sectionIcon = document.getElementById(`section-${sectionIndex}-content-icon`);
-            if (sectionContent) sectionContent.classList.remove(C.CssClasses.IsCollapsed);
-            if (sectionIcon) sectionIcon.classList.remove(C.CssClasses.IsCollapsed);
-
-            const cardContent = document.getElementById(`card-${sectionIndex}-${cardIndex}-content`);
-            const cardIcon = document.getElementById(`card-${sectionIndex}-${cardIndex}-content-icon`);
-            if (cardContent) cardContent.classList.remove(C.CssClasses.IsCollapsed);
-            if (cardIcon) cardIcon.classList.remove(C.CssClasses.IsCollapsed);
-
+        // 対象要素がカードコンテナ自身である場合の内部展開
+        if (element.classList.contains('card-container')) {
+            const cardContent = element.querySelector('.collapsible-wrapper');
             if (cardContent) {
-                const cardContainer = cardContent.closest('.card-container');
-                if (cardContainer) cardContainer.classList.remove(C.CssClasses.IsCollapsed);
+                cardContent.classList.remove(C.CssClasses.IsCollapsed);
+                const icon = document.getElementById(`${cardContent.id}-icon`);
+                if (icon) icon.classList.remove(C.CssClasses.IsCollapsed);
             }
         }
 

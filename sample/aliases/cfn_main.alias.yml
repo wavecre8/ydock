@@ -39,7 +39,6 @@
 "Resources.MainResource.Properties.Tags.Environment": "Environment Tag"
 "AWSTemplateFormatVersion": ""
 "Description": ""
-"Transform": ""
 "Metadata": ""
 "Metadata.AWS::CloudFormation::Interface.ParameterGroups": ""
 "Metadata.AWS::CloudFormation::Interface.ParameterGroups[].Label": ""

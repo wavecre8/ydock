@@ -1,6 +1,7 @@
 import { YamlValue, DocDockDocument } from '../types';
 import { DocDockConstants } from './constants';
 import { ModeStrategy } from '../modes/types';
+import { ConditionEvaluator } from './condition-evaluator';
 
 export class PathResolver {
     static isPrimitive(val: unknown): val is string | number | boolean | null | undefined {
@@ -37,16 +38,8 @@ export class PathResolver {
                 matchedElement = current[idx];
             }
         } else if (seg.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix)) {
-            const parts = seg.split(':');
-            const cKey = parts[0];
-            const expectedVal = parts.slice(1).join(':');
-            const actualKey = cKey.substring(1);
-
-            matchedElement = current.find(el => {
-                if (typeof el !== 'object' || el === null) return false;
-                const elObj = el as Record<string, YamlValue>;
-                return expectedVal ? String(elObj[actualKey]) === expectedVal : actualKey in elObj;
-            });
+            // シリアライズ条件に基づく合致要素の探索
+            matchedElement = current.find(el => ConditionEvaluator.matchesSerializedCondition(el, seg));
         }
 
         if (matchedElement === undefined && current.length > 0) {

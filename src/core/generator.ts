@@ -21,8 +21,8 @@ export class Generator {
         doc: DocDockDocument,
         templatePath: string,
         strategy: ModeStrategy,
-        title: string = 'YAML Documentation',
-        language: string = 'ja',
+        title: string = DocDockConstants.Defaults.Title,
+        language: string = DocDockConstants.Defaults.Language,
         options?: GeneratorOptions
     ): string {
         const readFile = options?.readFile || ((p) => fs.readFileSync(p, 'utf8'));
@@ -35,11 +35,7 @@ export class Generator {
 
         const IGNORED_SECTIONS = strategy.getIgnoredSections();
         const renderableSections = Object.keys(processedDoc.template).filter((key) => {
-            if (IGNORED_SECTIONS.includes(key)) return false;
-
-            const guideSection = processedDoc.description?.[key];
-            matcher.extractMetadata(guideSection);
-            return true;
+            return !IGNORED_SECTIONS.includes(key);
         });
 
         const SORT_ORDER = strategy.getSectionSortOrder();
@@ -91,12 +87,14 @@ export class Generator {
 
         if (fileExists(cssPath)) {
             const cssContent = readFile(cssPath);
-            finalHtml = finalHtml.replace('/* INJECT_CSS_PLACEHOLDER */', cssContent);
+            // 特殊パターンの展開を防止したCSS埋め込み処理
+            finalHtml = finalHtml.replace('/* INJECT_CSS_PLACEHOLDER */', () => cssContent);
         }
 
         if (fileExists(jsPath)) {
             const jsContent = readFile(jsPath);
-            finalHtml = finalHtml.replace('// INJECT_JS_PLACEHOLDER', jsContent);
+            // 特殊パターンの展開を防止したJavaScript埋め込み処理
+            finalHtml = finalHtml.replace('// INJECT_JS_PLACEHOLDER', () => jsContent);
         }
 
         return finalHtml;

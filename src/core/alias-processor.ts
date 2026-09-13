@@ -62,7 +62,7 @@ export class AliasProcessor {
                 continue;
             }
 
-            // string logic
+            // 単一キー構成のスカラーマッチャー判定
             const isConditionKey = key.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix);
             const hasOnlyOneKey = Object.keys(record).length === 1;
 

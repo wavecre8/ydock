@@ -7,15 +7,20 @@ export class Loader {
     static loadConfig(configPath: string): DocDockConfig {
         const absolutePath = path.resolve(configPath);
         const content = fs.readFileSync(absolutePath, 'utf8');
-        return yaml.load(content) as DocDockConfig;
+        // 空ファイル読み込み時の空オブジェクトフォールバック
+        const loaded = yaml.load(content);
+        return (loaded && typeof loaded === 'object' ? loaded : {}) as DocDockConfig;
     }
 
     static loadTemplate(templatePath: string, schema: yaml.Schema = yaml.DEFAULT_SCHEMA): YamlTemplate {
         const absolutePath = path.resolve(templatePath);
         const content = fs.readFileSync(absolutePath, 'utf8');
         if (templatePath.endsWith('.json')) {
-            return JSON.parse(content);
+            const trimmed = content.trim();
+            return trimmed ? JSON.parse(trimmed) : {};
         }
-        return yaml.load(content, { schema }) as YamlTemplate;
+        // 空ファイル読み込み時の空オブジェクトフォールバック
+        const loaded = yaml.load(content, { schema });
+        return (loaded && typeof loaded === 'object' ? loaded : {}) as YamlTemplate;
     }
 }

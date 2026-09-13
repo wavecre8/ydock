@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 import { Command } from 'commander';
 import { Commands } from './core/commands';
+import { DocDockConstants } from './core/constants';
 import packageJson from '../package.json';
 
 const program = new Command();
@@ -12,7 +13,7 @@ program
 
 program
     .command('init')
-    .description('Generate a default setting.config.yml')
+    .description(`Generate a default ${DocDockConstants.Defaults.ConfigFile}`)
     .action(async () => {
         await Commands.init();
     });
@@ -31,7 +32,7 @@ program
     .command('skeleton')
     .description('Generate skeleton files (alias, guide, exclude) based on setting.config')
     .option('-c, --config <path>', 'Path to setting.config')
-    .option('-t, --type <type>', 'Generate skeleton type: alias, guide, exclude, all', 'all')
+    .option('-t, --type <type>', 'Generate skeleton type: alias, guide, exclude, all', DocDockConstants.SkeletonTypes.All)
     .action(async (options) => {
         await Commands.skeleton(options);
     });

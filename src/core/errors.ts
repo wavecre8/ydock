@@ -35,3 +35,22 @@ export class TemplateProcessingError extends Error {
         }
     }
 }
+
+export class CircularImportError extends Error {
+    constructor(
+        public readonly cyclePath: string[]
+    ) {
+        super(`Circular import detected: ${cyclePath.join(' -> ')}`);
+        this.name = 'CircularImportError';
+    }
+}
+
+export class InvalidImportError extends Error {
+    constructor(
+        public readonly filePath: string,
+        public readonly invalidItem: unknown
+    ) {
+        super(`Invalid import entry '${String(invalidItem)}' in ${filePath}. Imports must be non-empty strings.`);
+        this.name = 'InvalidImportError';
+    }
+}

@@ -1,6 +1,6 @@
 import * as path from 'path';
 import { Loader } from './loader';
-import { DocDockConfig } from '../types';
+import { DocDockConfig, PageConfig } from '../types';
 import { DocDockConstants } from './constants';
 import { Logger } from './logger';
 import { PageBuilder } from './page-builder';
@@ -18,12 +18,29 @@ export class DocDockBuilder {
         Logger.info(`Loading config from ${resolvedConfigPath}...`);
 
         const config = Loader.loadConfig(resolvedConfigPath) as DocDockConfig;
+        // ページ設定の存在および配列判定
+        if (!config || !Array.isArray(config.pages) || config.pages.length === 0) {
+            Logger.warn('No pages defined in configuration.');
+            return;
+        }
+
         const globalMode = config.mode || DocDockConstants.Defaults.Mode;
         const language = config.lang || DocDockConstants.Defaults.Language;
         const layoutPath = path.join(__dirname, DocDockConstants.Defaults.TemplateLayout);
 
+        const defaultGuideDir = config.guideDir || DocDockConstants.Defaults.GuideDir;
+        const defaultAliasDir = config.aliasDir || DocDockConstants.Defaults.AliasDir;
+        const defaultExcludeDir = config.excludeDir || DocDockConstants.Defaults.ExcludeDir;
+
         for (const page of config.pages) {
-            await PageBuilder.build(page, globalMode as 'cfn' | 'generic', language, resolvedConfigPath, layoutPath, options.silent);
+            // ページ設定に対するグローバルおよびデフォルトディレクトリの補完
+            const effectivePage: PageConfig = {
+                ...page,
+                guideDir: page.guideDir || defaultGuideDir,
+                aliasDir: page.aliasDir || defaultAliasDir,
+                excludeDir: page.excludeDir || defaultExcludeDir
+            };
+            await PageBuilder.build(effectivePage, globalMode as 'cfn' | 'generic', language, resolvedConfigPath, layoutPath, options.silent);
         }
 
         if (config.index) {

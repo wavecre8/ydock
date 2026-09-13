@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Documentation Index</title>
+    <title><%= title || 'Documentation Index' %></title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-slate-50 min-h-screen text-slate-800">
@@ -35,7 +35,7 @@
                         <% } %>
                     </div>
                     <h2 class="text-xl font-bold text-slate-800 group-hover:text-blue-600 transition-colors mb-2 flex-grow">
-                        <%= page.title %>
+                        <%= page.title || page.filename %>
                     </h2>
                     <div class="mt-4 flex items-center text-sm text-blue-600 font-medium opacity-0 group-hover:opacity-100 transition-opacity">
                         View Documentation

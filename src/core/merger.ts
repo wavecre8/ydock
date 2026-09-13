@@ -1,4 +1,4 @@
-import { mergeWith, isArray, isObject } from 'lodash';
+import { mergeWith, isArray, isObject, isEqual } from 'lodash';
 import { YamlTemplate, YamlValue } from '../types';
 import { DocDockConstants } from './constants';
 
@@ -30,6 +30,21 @@ export class Merger {
             if (isArray(objValue) && isArray(srcValue)) {
                 return Merger.mergeArrays(objValue, srcValue, defaultCustomizer);
             }
+
+            // 空文字列による既存オブジェクトや非空文字列の上書き防止
+            if (objValue !== undefined && objValue !== null && objValue !== '' && srcValue === '') {
+                return objValue;
+            }
+
+            // 既存オブジェクトに対する非空文字列マージ時のDescription設定
+            if (Merger.isPlainObjectOrRecord(objValue) && typeof srcValue === 'string' && srcValue !== '') {
+                return { ...objValue, [DocDockConstants.ReservedKeys.DescriptionUpper]: srcValue };
+            }
+
+            // 既存非空文字列に対するオブジェクトマージ時のDescription保持
+            if (typeof objValue === 'string' && objValue !== '' && Merger.isPlainObjectOrRecord(srcValue)) {
+                return { [DocDockConstants.ReservedKeys.DescriptionUpper]: objValue, ...srcValue };
+            }
         };
 
         return mergeWith({}, ...sources, defaultCustomizer);
@@ -47,7 +62,40 @@ export class Merger {
     private static findIndexByConditions(array: any[], srcItem: any, conditionKeys: string[]): number {
         return array.findIndex(objItem => {
             if (!Merger.isPlainObjectOrRecord(objItem)) return false;
-            return conditionKeys.every(cKey => (objItem as any)[cKey] === (srcItem as any)[cKey]);
+            const objConditionKeys = Merger.getConditionKeys(objItem);
+            // 条件キー総数の一致検証
+            if (objConditionKeys.length !== conditionKeys.length) return false;
+
+            return conditionKeys.every(cKey => {
+                if (!(cKey in objItem)) return false;
+                const objVal = (objItem as any)[cKey];
+                const srcVal = (srcItem as any)[cKey];
+
+                // 単一キー構成の要素はスカラー値に対するマッチャーであるためキー一致で合致判定
+                const objKeys = Object.keys(objItem);
+                const srcKeys = Object.keys(srcItem);
+                if (objKeys.length === 1 && srcKeys.length === 1 && objKeys[0] === cKey && srcKeys[0] === cKey) {
+                    return true;
+                }
+
+                // 構造化条件値に対する深い等価比較判定
+                if (typeof objVal === 'object' && objVal !== null && typeof srcVal === 'object' && srcVal !== null) {
+                    return isEqual(objVal, srcVal);
+                }
+
+                // 一方のみがオブジェクトである場合の不一致判定
+                if ((typeof objVal === 'object' && objVal !== null) || (typeof srcVal === 'object' && srcVal !== null)) {
+                    return false;
+                }
+
+                // プレースホルダー空文字列を含む場合は合致判定
+                if (objVal === '' || srcVal === '') {
+                    return true;
+                }
+
+                // オブジェクト属性に対する条件指定の場合は条件値の完全一致を検証
+                return objVal === srcVal;
+            });
         });
     }
 
@@ -124,9 +172,19 @@ export class Merger {
             }
             
             if (typeof objValue === 'object' && objValue !== null && !Array.isArray(objValue) && Array.isArray(srcValue)) {
+                // 既存オブジェクトと後続配列の衝突マージ処理
                 return Merger.mergeAliasObjectWithArray(
                     objValue as Record<string, any>,
                     srcValue as any[],
+                    customizer
+                );
+            }
+
+            if (Array.isArray(objValue) && typeof srcValue === 'object' && srcValue !== null && !Array.isArray(srcValue)) {
+                // 既存配列と後続オブジェクトの衝突マージ処理
+                return Merger.mergeAliasObjectWithArray(
+                    srcValue as Record<string, any>,
+                    objValue as any[],
                     customizer
                 );
             }

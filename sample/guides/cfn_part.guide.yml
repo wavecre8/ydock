@@ -12,13 +12,6 @@ Rules:
             - '!Ref': EnvType
         Assert: ''
         AssertDescription: ''
-      - '=Assert':
-          '!Contains':
-            - - prod
-              - stg
-            - '!Ref': EnvType
-        Assert: ''
-        AssertDescription: ''
 Resources:
   FunctionTester:
     Type: ''
@@ -46,15 +39,6 @@ Resources:
     - '0': ''
       '1': ''
       '=0': A
-    - '=Resource${Identifier}':
-        Type: AWS::SNS::Topic
-        Properties:
-          TopicName:
-            '!Sub': Topic-${Identifier}
-      Resource${Identifier}:
-        Type: ''
-        Properties:
-          TopicName: ''
     - '=Resource${Identifier}':
         Type: AWS::SNS::Topic
         Properties:

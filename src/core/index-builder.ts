@@ -30,8 +30,6 @@ export class IndexBuilder {
         const resolvedIndexOutput = PathUtils.resolveRelative(configDir, indexConfig.output);
 
         Logger.info(`Generating Index Page: ${resolvedIndexOutput}...`);
-        const _indexTemplatePath = path.join(__dirname, '..', '..', 'src', 'templates', 'index.ejs'); // Using absolute-like resolution based on previous constants, but DocDockConstants.Defaults.TemplateIndex is relative to __dirname. Wait, I should use DocDockConstants.Defaults.TemplateIndex.
-        
         const resolvedTemplatePath = path.join(__dirname, DocDockConstants.Defaults.TemplateIndex);
         
         const ejs = require('ejs');
@@ -45,9 +43,13 @@ export class IndexBuilder {
                 let relativeLink = path.relative(indexDir, resolvedPageOutput);
                 relativeLink = relativeLink.split(path.sep).join('/');
 
+                const filename = path.basename(resolvedPageOutput);
+                // ページタイトルのフォールバック導出
+                const pageTitle = page.title || path.basename(resolvedPageOutput, path.extname(resolvedPageOutput));
+
                 return {
-                    title: page.title,
-                    filename: path.basename(resolvedPageOutput),
+                    title: pageTitle,
+                    filename: filename,
                     link: relativeLink,
                     mode: page.mode || globalMode
                 };

@@ -4,9 +4,6 @@
         <% 
             const guideDesc = doc.description?.[sectionName]?.[logicalId];
             const meta = extractMetadata(guideDesc);
-            
-            if (meta.hidden) return;
-
             const targetObject = resource?.Properties ? resource.Properties : resource;
             
             const alias = meta.alias;

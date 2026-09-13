@@ -37,4 +37,34 @@ describe('DocumentPreprocessor', () => {
         expect(containers[0].image).toBeUndefined();
         expect(containers[0].networkInterfaces).toBeUndefined();
     });
+
+    it('should retain all array items when multiple items match the same condition', () => {
+        const doc = {
+            template: {
+                tasks: [
+                    { name: 'task1', status: 'active' },
+                    { name: 'task2', status: 'active' }
+                ]
+            },
+            description: {
+                tasks: [
+                    {
+                        '=status': 'active',
+                        Description: 'Active task'
+                    }
+                ]
+            }
+        };
+        const matcher = new ConditionMatcher(new GenericStrategy(), doc);
+        const result = DocumentPreprocessor.process(doc, matcher);
+
+        const tasks = result.template.tasks as Record<string, any>;
+        expect(Object.keys(tasks).length).toBe(2);
+        expect(tasks['=status:active']).toEqual({ name: 'task1', status: 'active' });
+        expect(tasks['=status:active_1']).toEqual({ name: 'task2', status: 'active' });
+
+        const desc = result.description?.tasks as Record<string, any>;
+        expect(desc['=status:active']).toBeDefined();
+        expect(desc['=status:active_1']).toBeDefined();
+    });
 });

@@ -80,6 +80,56 @@ describe('Merger', () => {
                 ]
             });
         });
+
+        it('should retain existing object when subsequent value is empty string', () => {
+            const source1 = {
+                Transform: {
+                    _match: [
+                        { '=AWS::LanguageExtensions': { _alias: 'Language Extensions' } }
+                    ]
+                }
+            };
+            const source2 = {
+                Transform: ''
+            };
+            // 空値による上書き抑止の検証
+            const result = Merger.mergeDescriptions([source1, source2]);
+            expect(result).toEqual({
+                Transform: {
+                    _match: [
+                        { '=AWS::LanguageExtensions': { _alias: 'Language Extensions' } }
+                    ]
+                }
+            });
+        });
+
+        it('should merge alias object and guide string into Description and _alias for condition matcher', () => {
+            const aliasObj = {
+                [DocDockConstants.ReservedKeys.Match]: [
+                    { '=AWS::LanguageExtensions': { _alias: 'Language Extensions' } }
+                ]
+            };
+            const guideArray = [
+                { '=AWS::LanguageExtensions': 'Extensions Description' }
+            ];
+            const customizer = (objValue: unknown, srcValue: unknown): unknown => {
+                const descKey = DocDockConstants.ReservedKeys.DescriptionUpper;
+                if (typeof objValue === 'object' && objValue !== null && !Array.isArray(objValue) && typeof srcValue === 'string') {
+                    return { ...objValue, [descKey]: srcValue };
+                }
+                return undefined;
+            };
+
+            // 条件指定要素に対する別名と説明文のマージ検証
+            const result = Merger.mergeAliasObjectWithArray(aliasObj, guideArray, customizer);
+            expect(result[DocDockConstants.ReservedKeys.Match]).toHaveLength(1);
+            expect(result[DocDockConstants.ReservedKeys.Match][0]).toEqual({
+                '=AWS::LanguageExtensions': {
+                    _alias: 'Language Extensions',
+                    Description: 'Extensions Description'
+                }
+            });
+        });
     });
 
     describe('mergeAliasObjectWithArray', () => {
@@ -136,6 +186,46 @@ describe('Merger', () => {
                     { '=id': '2', status: 'stopped' }
                 ]
             });
+        });
+
+        it('should not overmatch composite condition item when single condition key is merged', () => {
+            const arr1 = [
+                { '=type': 'web', '=env': 'prod', Description: 'Prod Web' }
+            ];
+            const arr2 = [
+                { '=type': 'web', Description: 'General Web' }
+            ];
+            // 複合条件要素と部分一致する単一条件要素の独立性検証
+            const result = Merger.mergeDescriptions([{ items: arr1 }, { items: arr2 }]) as any;
+            expect(result.items).toHaveLength(2);
+            expect(result.items[0]).toEqual({ '=type': 'web', '=env': 'prod', Description: 'Prod Web' });
+            expect(result.items[1]).toEqual({ '=type': 'web', Description: 'General Web' });
+        });
+
+        it('should distinguish structured condition items when condition objects differ', () => {
+            const arr1 = [
+                { '=Assert': { FnEquals: ['prod', 'stg'] }, Description: 'Prod Stg Rule' }
+            ];
+            const arr2 = [
+                { '=Assert': { FnEquals: ['dev', 'test'] }, Description: 'Dev Test Rule' }
+            ];
+            // 異なるオブジェクト条件値を持つ配列要素の独立保持検証
+            const result = Merger.mergeDescriptions([{ rules: arr1 }, { rules: arr2 }]) as any;
+            expect(result.rules).toHaveLength(2);
+            expect(result.rules[0].Description).toBe('Prod Stg Rule');
+            expect(result.rules[1].Description).toBe('Dev Test Rule');
+        });
+
+        it('should merge array and alias object symmetrically in customGuideMerge', () => {
+            const baseObj = { tags: [{ '=name': 'primary', Description: 'Primary Guide' }] };
+            const overrideObj = { tags: { _alias: 'Server Alias' } };
+
+            // 既存配列と後続オブジェクトのマージ実行
+            const result = Merger.customGuideMerge(baseObj, overrideObj);
+
+            // _match配列および_aliasが保持されることを検証
+            expect(result.tags._alias).toBe('Server Alias');
+            expect(result.tags._match).toEqual(baseObj.tags);
         });
     });
 });

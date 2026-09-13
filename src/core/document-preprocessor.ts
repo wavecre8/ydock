@@ -20,7 +20,12 @@ export class DocumentPreprocessor {
 
                 templateVal.forEach((item, index) => {
                     const itemDesc = matcher.findMatchingGuide(item, descVal, index);
-                    const segment = matcher.getMatchingConditionSegment(item, descVal) || String(index);
+                    const baseSegment = matcher.getMatchingConditionSegment(item, descVal);
+                    // キー重複を防止した一意なセグメント識別子の導出
+                    let segment = baseSegment || String(index);
+                    if (segment in newTemplateObj) {
+                        segment = baseSegment ? `${baseSegment}_${index}` : String(index);
+                    }
 
                     newTemplateObj[segment] = item;
                     if (newDescription && itemDesc !== undefined) {

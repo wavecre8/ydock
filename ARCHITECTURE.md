@@ -6,7 +6,7 @@
 It is designed to securely document infrastructure definitions (like CloudFormation) containing sensitive information locally, without sending data to external services.
 
 ### Core Concepts
-*   **3-Way Merge**: Renders by integrating "Source YAML (Structure)", "Guide YAML (Description)", and "Alias YAML (Display Name)".
+*   **Overlay Integration**: Renders by integrating Source YAML, Guide YAML, Alias YAML, and Exclude definitions.
 *   **Mode Driven**: Switches parsing and display logic between `generic` (General purpose) and `cfn` (CloudFormation) modes.
 *   **Single Artifact**: Generates a single HTML file with inlined CSS/JS for easy distribution.
 
@@ -23,6 +23,10 @@ It is designed to securely document infrastructure definitions (like CloudFormat
     *   Wraps `js-yaml` and parses using the appropriate schema via `ModeStrategy`.
 *   **AliasProcessor (`alias-processor.ts`)**:
     *   Handles loading and transformation of alias files. Provides wildcard expansion and import capabilities.
+*   **ExcludeProcessor (`exclude-processor.ts`)**:
+    *   Handles loading of exclude configuration files and transforming them into hierarchical tree structures.
+*   **DocumentPreprocessor (`document-preprocessor.ts`)**:
+    *   Preprocesses documents by pruning unnecessary properties and array items according to the exclude tree.
 *   **Merger (`merger.ts`)**:
     *   Merges Source, Guide, and Alias data using `lodash.mergeWith`.
 *   **Generator (`generator.ts`)**:

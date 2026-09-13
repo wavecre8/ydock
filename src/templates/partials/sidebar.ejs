@@ -66,7 +66,6 @@
                         <%
                             const guideDesc = doc.description?.[sectionName]?.[logicalId];
                             const meta = extractMetadata(guideDesc);
-                            if (meta.hidden) return;
                             const displayName = meta.alias || logicalId;
                             // Build path context
                             const ctx = createContext([sectionName, String(logicalId)]);

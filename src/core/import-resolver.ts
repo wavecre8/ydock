@@ -1,17 +1,17 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { merge } from 'lodash';
 import { GuideData } from '../types';
 import { DocDockConstants } from './constants';
-import { FileNotFoundError } from './errors';
+import { FileNotFoundError, CircularImportError, InvalidImportError } from './errors';
 import { Loader } from './loader';
+import { Merger } from './merger';
 
 export class ImportResolver {
     /**
      * Recursively resolves _imports for GuideData.
      * Imports are merged first (base), then current data overrides them.
      */
-    static resolve(data: GuideData, baseDir: string): GuideData {
+    static resolve(data: GuideData, baseDir: string, visitedStack: string[] = []): GuideData {
         if (!data || typeof data !== 'object') return data;
 
         const inputWithImports = data as GuideData & Record<string, any>;
@@ -27,7 +27,17 @@ export class ImportResolver {
 
         // Resolve each imported file sequentially
         for (const importFile of importFiles) {
+            // インポート指定値の型検証
+            if (typeof importFile !== 'string' || importFile.trim() === '') {
+                throw new InvalidImportError(baseDir, importFile);
+            }
+
             const importPath = path.resolve(baseDir, importFile);
+
+            // 循環インポートの検知
+            if (visitedStack.includes(importPath)) {
+                throw new CircularImportError([...visitedStack, importPath]);
+            }
             
             if (!fs.existsSync(importPath)) {
                 throw new FileNotFoundError(importPath, 'import resolution');
@@ -35,14 +45,17 @@ export class ImportResolver {
 
             // Load and resolve sub-imports recursively
             let subData = Loader.loadTemplate(importPath, undefined) as GuideData;
-            subData = this.resolve(subData, path.dirname(importPath));
+            // 再帰的なインポート解決の実行
+            subData = this.resolve(subData, path.dirname(importPath), [...visitedStack, importPath]);
             
-            importedData = merge(importedData, subData);
+            // 読み込み済みインポートデータに対するガイドマージ処理
+            importedData = Merger.mergeDescriptions([importedData, subData]) as GuideData;
         }
 
         // Destructure to remove _imports from the merged result
         const { [importsKey]: _, ...ownData } = inputWithImports;
         
-        return merge(importedData, ownData as GuideData);
+        // インポート定義に対する個別定義の優先マージ処理
+        return Merger.mergeDescriptions([importedData, ownData as GuideData]) as GuideData;
     }
 }

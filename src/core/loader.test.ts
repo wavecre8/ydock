@@ -32,6 +32,27 @@ describe('Loader', () => {
             expect(template).toEqual({ Key: 'Value' });
         });
 
+        it('should return empty object when YAML content is empty', () => {
+            vi.mocked(fs.readFileSync).mockReturnValue('');
+            // 空YAMLファイル読み込み時のフォールバック検証
+            const template = Loader.loadTemplate('empty.yaml');
+            expect(template).toEqual({});
+        });
+
+        it('should return empty object when JSON content is empty', () => {
+            vi.mocked(fs.readFileSync).mockReturnValue('   ');
+            // 空JSONファイル読み込み時のフォールバック検証
+            const template = Loader.loadTemplate('empty.json');
+            expect(template).toEqual({});
+        });
+
+        it('should return empty object when config content is empty', () => {
+            vi.mocked(fs.readFileSync).mockReturnValue('');
+            // 空設定ファイル読み込み時のフォールバック検証
+            const config = Loader.loadConfig('empty.config.yml');
+            expect(config).toEqual({});
+        });
+
         // The default throw behavior of fs.readFileSync is fine,
         // we mostly want to check if it propagates.
         it('should propagate fs errors', () => {

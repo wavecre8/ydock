@@ -63,14 +63,15 @@ export class SourceProcessor {
         const newKeys = Object.keys(currentTemplate).filter((k) => !exemptKeys.has(k));
         const duplicates = newKeys.filter((k) => seenKeys.has(k));
 
-        const hasCustomizer = !!strategy.getCustomizer;
-        if (!hasCustomizer && duplicates.length > 0) {
+        // 重複キー検出時のエラー送出
+        if (duplicates.length > 0) {
             throw new DuplicateKeyError(sourcePath, duplicates);
         }
 
         newKeys.forEach((k) => seenKeys.add(k));
 
-        const customizer = hasCustomizer ? strategy.getCustomizer!() : undefined;
+        // カスタムマイザー取得
+        const customizer = strategy.getCustomizer ? strategy.getCustomizer() : undefined;
         const mergedTemplate = Merger.mergeDescriptions([masterTemplate, currentTemplate], customizer);
 
         const sourceBaseName = path.basename(sourcePath, path.extname(sourcePath));
@@ -202,6 +203,15 @@ export class SourceProcessor {
             return Merger.mergeAliasObjectWithArray(
                 srcValue as Record<string, any>,
                 objValue as any[],
+                SourceProcessor.aliasCustomizer
+            );
+        }
+
+        if (typeof objValue === 'object' && objValue !== null && !Array.isArray(objValue) && Array.isArray(srcValue)) {
+            // 既存ガイド側がオブジェクトで、後続ガイド側が配列の場合のマージ処理
+            return Merger.mergeAliasObjectWithArray(
+                objValue as Record<string, any>,
+                srcValue as any[],
                 SourceProcessor.aliasCustomizer
             );
         }

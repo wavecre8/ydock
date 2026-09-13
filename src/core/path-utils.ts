@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { DocDockConstants } from './constants';
 
 export class PathUtils {
     /**
@@ -21,13 +22,13 @@ export class PathUtils {
      * Finds the default configuration file in the current working directory.
      */
     static findDefaultConfigPath(): string {
-        const candidates = ['setting.config.yaml', 'setting.config.yml'];
+        const candidates = DocDockConstants.ConfigFiles.Candidates;
         for (const candidate of candidates) {
             if (fs.existsSync(candidate)) {
                 return candidate;
             }
         }
-        return 'setting.config.yaml';
+        return DocDockConstants.Defaults.ConfigFile;
     }
 
     /**

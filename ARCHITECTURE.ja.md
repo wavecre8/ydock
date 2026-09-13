@@ -6,7 +6,7 @@
 機密情報を含むインフラ定義書（CloudFormation等）を、外部サービスに送信することなくローカル環境で安全にドキュメント化することを目的としています。
 
 ### コアコンセプト
-*   **3要素マージ**: 「ソースYAML（構造）」、「ガイドYAML（説明）」、「エイリアスYAML（表示名）」を統合してレンダリングします。
+*   **オーバーレイ統合**: ソースYAML、ガイドYAML、エイリアスYAML、およびExclude除外定義を統合してレンダリングします。
 *   **モード駆動**: `generic`（汎用）と `cfn`（CloudFormation）のモードを持ち、パースや表示ロジックを切り替えます。
 *   **シングルアーティファクト**: CSS/JSをインライン化し、配布容易な単一HTMLファイルを生成します。
 
@@ -23,6 +23,10 @@
     *   `js-yaml` をラップし、`ModeStrategy` を使用して適切なスキーマでパースします。
 *   **AliasProcessor (`alias-processor.ts`)**:
     *   エイリアスファイルの読み込みと変換を担当。ワイルドカード展開やインポート機能を提供します。
+*   **ExcludeProcessor (`exclude-processor.ts`)**:
+    *   除外設定ファイルの読み込みとツリー構造への変換を担当。
+*   **DocumentPreprocessor (`document-preprocessor.ts`)**:
+    *   除外ツリーに基づき、出力不要なプロパティや配列要素を事前に除去する前処理を担当。
 *   **Merger (`merger.ts`)**:
     *   `lodash.mergeWith` を使用し、ソース・ガイド・エイリアスを結合します。
 *   **Generator (`generator.ts`)**:

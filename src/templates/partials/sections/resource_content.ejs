@@ -41,7 +41,6 @@
                         // Guide Mapping for Root Attributes
                         const propDesc = doc.description?.[sectionName]?.[logicalId]?.[propKey];
                         const propMeta = extractMetadata(propDesc);
-                        if (propMeta.hidden) continue;
 
                         const descText = propMeta.description;
                         const propAlias = propMeta.alias;
@@ -115,7 +114,6 @@
                     }
                     
                     const propMeta = extractMetadata(propDesc);
-                    if (propMeta.hidden) continue;
 
                     const descText = propMeta.description;
                     const propAlias = propMeta.alias;
@@ -156,10 +154,14 @@
 <% } %>
 
 <% } else { %>
-    <% /* Primitive value case (e.g. Config: Region: us-west-2 -> Region is card, us-west-2 is content) */ %>
+    <%
+        const rootDesc = resource?.Properties
+            ? doc.description?.[sectionName]?.[logicalId]?.Properties
+            : doc.description?.[sectionName]?.[logicalId];
+    %>
     <div class="bg-white p-4 rounded-lg border border-slate-200">
         <div class="font-mono text-slate-700">
-            <%- renderValue(targetObject, null, createContext([sectionName, String(logicalId)])) %>
+            <%- renderValue(targetObject, rootDesc, createContext([sectionName, String(logicalId)])) %>
         </div>
     </div>
 <% } %>

@@ -37,8 +37,7 @@ Reservations:
             required = Require IMDSv2 only (recommended)
 
             Details: [Use IMDSv2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html)
-    OwnerId:
-      _hidden: true
+    OwnerId: ''
   - '=Groups': []
     Groups: []
     Instances:

@@ -88,12 +88,19 @@ export class HtmlComponents {
         myPath: string,
         itemVal: unknown,
         tooltipHtml: string,
-        inlineDescHtml: string
+        inlineDescHtml: string,
+        alias?: string
     ): string {
+        // 値のHTMLエスケープ処理
+        const escapedVal = this.escape(itemVal);
+        const valHtml = alias
+            ? `<span class="${DocDockConstants.CssClasses.PropertyValue}">${escapedVal}</span><span class="alias-wrapper grid transition-[grid-template-rows,opacity] duration-500 ease-in-out"><span class="alias-text text-xs text-slate-400 overflow-hidden min-h-0 block">${this.escape(alias)}</span></span>`
+            : `<span class="${DocDockConstants.CssClasses.PropertyValue}">${escapedVal}</span>`;
+
         return `<tr id="${myPath}" class="${DocDockConstants.CssClasses.HoverRow} scroll-mt-20">
             <td class="align-top">
                 <div class="flex items-start">
-                    <div class="flex-grow"><span class="${DocDockConstants.CssClasses.PropertyValue}">${this.escape(itemVal)}</span></div>
+                    <div class="flex-grow">${valHtml}</div>
                     ${tooltipHtml}
                 </div>
                 ${inlineDescHtml}
@@ -107,10 +114,23 @@ export class HtmlComponents {
         </div>`;
     }
 
-    static renderComplexArrayItem(myPath: string, indexStr: string, innerHtml: string): string {
+    static renderComplexArrayItem(
+        myPath: string,
+        indexStr: string,
+        innerHtml: string,
+        alias?: string,
+        descText?: string
+    ): string {
+        // ツールチップ表示HTMLの生成
+        const tooltipHtml = this.renderTooltip(descText);
+        const headerTitle = alias
+            ? `# ${this.escape(indexStr)}: ${this.escape(alias)}`
+            : `# ${this.escape(indexStr)}`;
+
         return `<div id="${myPath}" class="border border-slate-200 rounded-md overflow-hidden scroll-mt-20">
-            <div class="bg-slate-50 px-3 py-1 text-xs font-bold text-slate-500 border-b border-slate-200">
-                # ${this.escape(indexStr)}
+            <div class="bg-slate-50 px-3 py-1 text-xs font-bold text-slate-500 border-b border-slate-200 flex items-center justify-between">
+                <span class="break-all">${headerTitle}</span>
+                ${tooltipHtml}
             </div>
             <div class="p-2 bg-white">
                 ${innerHtml}

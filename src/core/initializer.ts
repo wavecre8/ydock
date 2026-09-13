@@ -1,19 +1,26 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import { DocDockConstants } from './constants';
 import { Logger } from './logger';
 
 export class Initializer {
     static async init(): Promise<void> {
-        const configFileName = 'setting.config.yml';
+        const configFileName = DocDockConstants.Defaults.ConfigFile;
         const configPath = path.resolve(process.cwd(), configFileName);
-        const altConfigPath = path.resolve(process.cwd(), 'setting.config.yaml');
+        const alreadyExists = DocDockConstants.ConfigFiles.Candidates.some((name) =>
+            fs.existsSync(path.resolve(process.cwd(), name))
+        );
 
-        if (fs.existsSync(configPath) || fs.existsSync(altConfigPath)) {
-            Logger.info('setting.config.yml (or .yaml) already exists.');
+        if (alreadyExists) {
+            Logger.info('setting.config.yml or setting.config.yaml already exists.');
             return;
         }
 
         const defaultConfig = `lang: en
+
+guideDir: guides
+aliasDir: aliases
+excludeDir: excludes
 
 index:
   output: output/index.html
@@ -24,13 +31,25 @@ pages:
     mode: generic
     sources:
       - src/my-data.yml
-    output: output/index.html
-    guideDir: guides
-    aliasDir: aliases
-    excludeDir: excludes
+    output: output/sample.html
 `;
 
         fs.writeFileSync(configPath, defaultConfig);
         Logger.info(`Generated ${configFileName}`);
+
+        // 規定ディレクトリの初期作成処理
+        const initialDirs = [
+            DocDockConstants.Defaults.GuideDir,
+            DocDockConstants.Defaults.AliasDir,
+            DocDockConstants.Defaults.ExcludeDir
+        ];
+
+        for (const dirName of initialDirs) {
+            const dirPath = path.resolve(process.cwd(), dirName);
+            if (!fs.existsSync(dirPath)) {
+                fs.mkdirSync(dirPath, { recursive: true });
+                Logger.info(`Created directory: ${dirName}`);
+            }
+        }
     }
 }

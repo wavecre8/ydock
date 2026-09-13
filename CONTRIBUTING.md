@@ -17,7 +17,7 @@ npm install
 npm run build
 
 # Development Mode (Watch Mode)
-npm run dev -- -c sample/setting.config.yml --watch
+npm run dev -- build -c sample/setting.config.yml --watch
 
 # Test
 npm test
@@ -40,5 +40,6 @@ npm run format
 ## Directory Structure
 - `src/core/`: Core application logic
 - `src/modes/`: Mode-specific logic (e.g., CloudFormation)
-- `src/templates/`: HTML templates (EJS) and client-side JS
+- `src/templates/`: HTML templates (EJS), CSS, and client-side JS
+- `src/types/`: Type definitions for configuration and document models
 - `sample/`: Sample files for verification

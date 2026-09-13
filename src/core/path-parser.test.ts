@@ -37,4 +37,20 @@ describe('PathParser', () => {
             { type: 'match', key: '=AWS::Type', value: 'Resource' }
         ]);
     });
+
+    it('should parse nested brackets in condition correctly', () => {
+        expect(PathParser.parse('a[=Assert:{"FnEquals":["prod","prod"]}]')).toEqual([
+            { type: 'prop', name: 'a' },
+            { type: 'match', key: '=Assert', value: '{"FnEquals":["prod","prod"]}' }
+        ]);
+    });
+
+    it('should parse composite conditions joined by ampersand', () => {
+        expect(PathParser.parse('a[=type:web&=env:prod].image')).toEqual([
+            { type: 'prop', name: 'a' },
+            { type: 'match', key: '=type', value: 'web' },
+            { type: 'match', key: '=env', value: 'prod' },
+            { type: 'prop', name: 'image' }
+        ]);
+    });
 });

@@ -135,28 +135,45 @@ export class TemplateRenderer {
         desc: YamlValue,
         ctx: RenderContext
     ): string {
+        const seenSegments = new Set<string>();
         const rowsHtml = val
             .map((item, i) => {
+                // ガイド情報の取得
                 const itemDesc = this.matcher.findMatchingGuide(item, desc, i, ctx.rawPath);
-                const descText = typeof itemDesc === 'string' ? itemDesc : '';
+                // ガイド情報からのメタデータ抽出
+                const meta = this.matcher.extractMetadata(itemDesc);
+                const descText = meta.description || '';
 
-                const segment = this.matcher.getMatchingConditionSegment(item, desc, ctx.rawPath) || String(i);
+                // 条件一致セグメントの導出
+                const baseSegment = this.matcher.getMatchingConditionSegment(item, desc, ctx.rawPath);
+                // 同一条件要素に対する一意なDOM IDセグメントの導出
+                let segment = baseSegment || String(i);
+                if (seenSegments.has(segment)) {
+                    segment = baseSegment ? `${baseSegment}_${i}` : String(i);
+                }
+                seenSegments.add(segment);
+                // 子描画コンテキストの生成
                 const itemCtx = ctx.child(segment, undefined, false);
 
+                // ツールチップ表示HTMLの生成
                 const tooltipHtml = this.renderTooltip(descText);
+                // インライン説明表示HTMLの生成
                 const inlineDescHtml = descText
                     ? HtmlComponents.renderPrimitiveInlineDescription(this.renderMarkdownClient(descText))
                     : '';
 
+                // スカラー配列行HTMLの生成
                 return HtmlComponents.renderPrimitiveArrayRow(
                     itemCtx.path || '',
                     item,
                     tooltipHtml,
-                    inlineDescHtml
+                    inlineDescHtml,
+                    meta.alias
                 );
             })
             .join('');
 
+        // スカラー配列テーブル全体の生成
         return HtmlComponents.renderPrimitiveArrayTable(rowsHtml);
     }
 
@@ -165,18 +182,39 @@ export class TemplateRenderer {
         desc: YamlValue,
         ctx: RenderContext
     ): string {
+        const seenSegments = new Set<string>();
         const itemsHtml = val
             .map((item, i) => {
+                // ガイド情報の取得
                 const itemDesc = this.matcher.findMatchingGuide(item, desc, i, ctx.rawPath);
+                // ガイド情報からのメタデータ抽出
+                const meta = this.matcher.extractMetadata(itemDesc);
 
-                const segment = this.matcher.getMatchingConditionSegment(item, desc, ctx.rawPath) || String(i);
-                const itemCtx = ctx.child(segment, segment, false);
+                // 条件一致セグメントの導出
+                const baseSegment = this.matcher.getMatchingConditionSegment(item, desc, ctx.rawPath);
+                // 同一条件要素に対する一意なDOM IDセグメントの導出
+                let segment = baseSegment || String(i);
+                if (seenSegments.has(segment)) {
+                    segment = baseSegment ? `${baseSegment}_${i}` : String(i);
+                }
+                seenSegments.add(segment);
+                // 子描画コンテキストの生成
+                const itemCtx = ctx.child(segment, baseSegment || segment, false);
 
+                // 配列要素値のレンダリング
                 const innerHtml = this.renderValue(item, itemDesc, itemCtx);
-                return HtmlComponents.renderComplexArrayItem(itemCtx.path || '', String(i), innerHtml);
+                // 複合配列要素カードの生成
+                return HtmlComponents.renderComplexArrayItem(
+                    itemCtx.path || '',
+                    String(i),
+                    innerHtml,
+                    meta.alias,
+                    meta.description
+                );
             })
             .join('');
 
+        // 複合配列コンテナ全体の生成
         return HtmlComponents.renderComplexArrayContainer(itemsHtml);
     }
 

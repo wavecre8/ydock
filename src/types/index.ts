@@ -3,6 +3,9 @@ export interface DocDockConfig {
     mode?: 'cfn' | 'generic';
     lang?: string;
     index?: string | IndexConfig;
+    guideDir?: string;
+    aliasDir?: string;
+    excludeDir?: string;
 }
 
 export interface IndexConfig {

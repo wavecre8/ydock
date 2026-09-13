@@ -63,5 +63,39 @@ describe('MarkdownProcessor', () => {
              const result = MarkdownProcessor.render(input);
              expect(result).toContain('href="https://example.com/search?q=&quot;test&quot;&amp;type=1"');
         });
+
+        it('should auto-insert Properties segment for CFn resource property links', () => {
+            const inputWithoutProperties = '[ImageId](Resources.MyInstance.ImageId)';
+            expect(MarkdownProcessor.render(inputWithoutProperties)).toMatch(/<a\s+href="#Resources__MyInstance__Properties__ImageId".*?>ImageId<\/a>/);
+
+            const inputWithProperties = '[ImageId](Resources.MyInstance.Properties.ImageId)';
+            expect(MarkdownProcessor.render(inputWithProperties)).toMatch(/<a\s+href="#Resources__MyInstance__Properties__ImageId".*?>ImageId<\/a>/);
+
+            const inputAttribute = '[Type](Resources.MyInstance.Type)';
+            expect(MarkdownProcessor.render(inputAttribute)).toMatch(/<a\s+href="#Resources__MyInstance__Type".*?>Type<\/a>/);
+        });
+
+        it('should escape malicious html in link labels', () => {
+            const input = '[<script>alert("xss")</script>](https://example.com)';
+            const result = MarkdownProcessor.render(input);
+            // リンク表示テキストのHTMLエスケープ検証
+            expect(result).toContain('&lt;script&gt;alert(&quot;xss&quot;)&lt;/script&gt;');
+            expect(result).not.toContain('<script>');
+        });
+
+        it('should correctly parse links containing nested parentheses in url', () => {
+            const input = '[Wiki](https://en.wikipedia.org/wiki/Function_(mathematics))';
+            const result = MarkdownProcessor.render(input);
+            // ネストされた丸括弧を含むURLのリンク抽出検証
+            expect(result).toContain('href="https://en.wikipedia.org/wiki/Function_(mathematics)"');
+            expect(result).toContain('>Wiki</a>');
+        });
+
+        it('should escape html special characters in non-link plain text', () => {
+            const input = 'Port < 1024 & "privileged" requires root';
+            const result = MarkdownProcessor.render(input);
+            // 平文テキストのHTMLエスケープ検証
+            expect(result).toBe('Port &lt; 1024 &amp; &quot;privileged&quot; requires root');
+        });
     });
 });

@@ -77,6 +77,10 @@ Edit `setting.config.yml` to define your target YAML files and build settings.
 ```yaml
 lang: en
 
+guideDir: guides
+aliasDir: aliases
+excludeDir: excludes
+
 index:
   output: output/index.html
   title: Documentation Portal
@@ -87,9 +91,6 @@ pages:
     sources:
       - sources/vpc.yml
       - sources/ec2.yml
-    guideDir: guides
-    aliasDir: aliases
-    excludeDir: excludes
     output: output/infrastructure.html
 ```
 
@@ -227,6 +228,10 @@ Hide unnecessary properties and array items. Like alias files, it uses a flat, d
 | Key | Description | Default |
 |---|---|---|
 | `lang` | HTML lang attribute | `ja` |
+| `mode` | Default parsing mode | `generic` |
+| `guideDir` | Common directory for guide files | `guides` |
+| `aliasDir` | Common directory for alias files | `aliases` |
+| `excludeDir` | Common directory for exclude files | `excludes` |
 | `index` | Index page settings | None |
 
 ### Index Page Settings
@@ -247,9 +252,9 @@ Hide unnecessary properties and array items. Like alias files, it uses a flat, d
 | `sources` | ✓ | List of source YAML files |
 | `output` | ✓ | Output HTML path |
 | `mode` |  | Parsing mode (e.g., `generic`) |
-| `guideDir` |  | Directory for guide files |
-| `aliasDir` |  | Directory for alias files |
-| `excludeDir` |  | Directory for exclude files |
+| `guideDir` |  | Page-specific directory for guide files (falls back to global setting) |
+| `aliasDir` |  | Page-specific directory for alias files (falls back to global setting) |
+| `excludeDir` |  | Page-specific directory for exclude files (falls back to global setting) |
 
 ## Advanced Usage
 

@@ -18,9 +18,42 @@ describe('PathResolver', () => {
             expect(PathResolver.resolveArraySegment(current, '=name:db')).toEqual({ name: 'db' });
         });
 
+        it('should resolve by condition key when guide array element has prefixed condition key', () => {
+            const current = [
+                { '=name': 'web', Description: 'Web guide' },
+                { '=name': 'db', Description: 'DB guide' }
+            ];
+            // 条件プレフィックス付きキーを持つガイド配列要素の解決検証
+            expect(PathResolver.resolveArraySegment(current, '=name:db')).toEqual({ '=name': 'db', Description: 'DB guide' });
+        });
+
         it('should fallback to first element if not found', () => {
             const current = ['a', 'b'];
             expect(PathResolver.resolveArraySegment(current, '5')).toBe('a');
+        });
+
+        it('should resolve primitive array element by condition matcher containing double colons', () => {
+            const current = ['AWS::LanguageExtensions', 'AWS::Serverless-2016-10-31'];
+            // 二重コロンを含むプリミティブ要素の解決検証
+            const resolved = PathResolver.resolveArraySegment(current, '=AWS::LanguageExtensions');
+            expect(resolved).toBe('AWS::LanguageExtensions');
+        });
+
+        it('should resolve primitive array element by condition matcher', () => {
+            const current = ['dev', 'prod'];
+            // プリミティブ配列要素の解決検証
+            const resolved = PathResolver.resolveArraySegment(current, '=prod');
+            expect(resolved).toBe('prod');
+        });
+
+        it('should resolve by composite condition segment joined with ampersand', () => {
+            const current = [
+                { type: 'Service', name: 'api', Description: 'API Service' },
+                { type: 'Service', name: 'worker', Description: 'Worker Service' }
+            ];
+            // アンパサンド結合された複合条件セグメントの解決検証
+            const resolved = PathResolver.resolveArraySegment(current, '=type:Service&=name:worker');
+            expect(resolved).toEqual({ type: 'Service', name: 'worker', Description: 'Worker Service' });
         });
     });
 
