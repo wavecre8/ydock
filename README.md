@@ -44,7 +44,7 @@ For internal structure and development guidelines, please refer to:
 - 🧩 **Mode-Driven Architecture** - Switch parsing logic based on your use case. See [Supported Modes](#supported-modes).
 - 🎨 **Display Modes** - Toggle between Inline, Tooltip, and the space-saving Compact View mode in the browser.
 - 🏷️ **Alias System** - Rename technical keys to human-readable labels.
-- 📑 **Index Portal** - Automatically generate a portal page for multiple documents.
+- 📑 **Index Portal** - Automatically generate a portal page for multiple documents with customizable grouping, navigation, and filtering.
 - 🛠️ **Deep Linking** - Link directly to deeply nested properties.
 - 📏 **Resizable UI** - Adjust column widths and sidebar width.
 - 🖨️ **Print Friendly** - Automatically hides sidebar for clean printing.
@@ -84,14 +84,26 @@ excludeDir: excludes
 index:
   output: output/index.html
   title: Documentation Portal
+  groups:
+    - id: network
+      name: Network Infrastructure
+    - id: compute
+      name: Compute Infrastructure
 
 pages:
-  - title: EC2 Architecture
+  - title: VPC Architecture
+    group: network
     mode: cfn
     sources:
       - sources/vpc.yml
+    output: output/vpc.html
+
+  - title: EC2 Architecture
+    group: compute
+    mode: cfn
+    sources:
       - sources/ec2.yml
-    output: output/infrastructure.html
+    output: output/ec2.html
 ```
 
 ### 3. Run Build
@@ -240,6 +252,7 @@ Hide unnecessary properties and array items. Like alias files, it uses a flat, d
 |---|---|---|
 | `output` | ✓ | Output path |
 | `title` |  | Page title (default: "Documentation Index") |
+| `groups` |  | List of group definitions with `id` and `name` |
 
 ### Page Settings
 
@@ -252,6 +265,7 @@ Hide unnecessary properties and array items. Like alias files, it uses a flat, d
 | `sources` | ✓ | List of source YAML files |
 | `output` | ✓ | Output HTML path |
 | `mode` |  | Parsing mode (e.g., `generic`) |
+| `group` |  | Group identifier or name for portal categorization |
 | `guideDir` |  | Page-specific directory for guide files (falls back to global setting) |
 | `aliasDir` |  | Page-specific directory for alias files (falls back to global setting) |
 | `excludeDir` |  | Page-specific directory for exclude files (falls back to global setting) |

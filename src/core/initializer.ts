@@ -25,13 +25,26 @@ excludeDir: excludes
 index:
   output: output/index.html
   title: Documentation Portal
+  groups:
+    - id: system
+      name: System Architecture
+    - id: services
+      name: Core Services
 
 pages:
-  - title: Sample Documentation
+  - title: System Overview
+    group: system
     mode: generic
     sources:
-      - src/my-data.yml
-    output: output/sample.html
+      - src/system.yml
+    output: output/system.html
+
+  - title: Service Specification
+    group: services
+    mode: generic
+    sources:
+      - src/service.yml
+    output: output/service.html
 `;
 
         fs.writeFileSync(configPath, defaultConfig);

@@ -38,3 +38,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Bug fixes.
+
+## [1.1.0] - 2026-09-15
+
+### Added
+- **HTML Minification**: Minified generated HTML files to reduce file size.
+- **Portal Site Enhancements**: Added page grouping functionality and adjusted the layout accordingly.
+
+### Fixed
+- Bug fixes.

@@ -8,9 +8,15 @@ export interface DocDockConfig {
     excludeDir?: string;
 }
 
+export interface IndexGroupConfig {
+    id?: string;
+    name: string;
+}
+
 export interface IndexConfig {
     output: string;
     title?: string;
+    groups?: IndexGroupConfig[];
 }
 
 export interface PageConfig {
@@ -18,11 +24,25 @@ export interface PageConfig {
     sources: string[];
     output: string;
     mode?: 'cfn' | 'generic';
+    group?: string;
     guideDir?: string;
     aliasDir?: string;
     excludeDir?: string;
     // Legacy support
     templates?: string[];
+}
+
+export interface IndexPageItem {
+    title: string;
+    filename: string;
+    link: string;
+    mode: string;
+    group?: string;
+}
+
+export interface IndexGroupItem {
+    name: string;
+    pages: IndexPageItem[];
 }
 
 export type YamlValue = string | number | boolean | null | undefined | YamlValue[] | { [key: string]: YamlValue };

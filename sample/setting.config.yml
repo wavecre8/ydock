@@ -5,17 +5,74 @@ excludeDir: excludes
 index:
   output: output/index.html
   title: ydock サンプル
+  groups:
+    - id: network
+      name: ネットワーク基盤
+    - id: compute
+      name: コンピュート基盤
+    - id: cfn
+      name: CloudFormation
 
 pages:
-  - title: Sample Documentation
+  - title: VPC
+    group: network
+    sources:
+      - sources/vpcs.yml
+    output: output/vpcs.html
+
+  - title: サブネット
+    group: network
+    sources:
+      - sources/subnets.yml
+    output: output/subnets.html
+
+  - title: フローログ
+    group: network
+    sources:
+      - sources/flow_logs.yml
+    output: output/flow_logs.html
+
+  - title: ルートテーブル
+    group: network
+    sources:
+      - sources/route_tables.yml
+    output: output/route_tables.html
+
+  - title: セキュリティグループ
+    group: network
+    sources:
+      - sources/security_groups.yml
+    output: output/security_groups.html
+
+  - title: ECS
+    group: compute
+    sources:
+      - sources/ecs.yml
+    output: output/ecs.html
+
+  - title: EC2
+    group: compute
+    sources:
+      - sources/ec2.yml
+    output: output/ec2.html
+
+  - title: コンピュート統合仕様
+    group: compute
     sources:
       - sources/ecs.yml
       - sources/ec2.yml
     output: output/ecs-and-ec2.html
 
-  - title: Sample Cfn Documentation
+  - title: CloudFormation メインスタック
+    group: cfn
     mode: cfn
     sources:
       - sources/cfn_main.yml
+    output: output/cfn-main.html
+
+  - title: CloudFormation サブスタック
+    group: cfn
+    mode: cfn
+    sources:
       - sources/cfn_part.yml
-    output: output/cfn.html
+    output: output/cfn-part.html

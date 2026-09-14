@@ -17,6 +17,8 @@ export const DocDockConstants = {
         Mode: 'generic',
         Language: 'ja',
         Title: 'YAML Documentation',
+        IndexTitle: 'Documentation Index',
+        UncategorizedGroup: 'Other',
         ConfigFile: 'setting.config.yml',
         TemplateLayout: '../templates/layout.ejs',
         TemplateIndex: '../templates/index.ejs'
@@ -74,7 +76,10 @@ export const DocDockConstants = {
         ElemInlineDesc: 'elem-inline-desc',
         PropertyKeyCell: 'property-key-cell',
         CopyCmdBtn: 'copy-cmd-btn',
-        ColResizer: 'col-resizer'
+        ColResizer: 'col-resizer',
+        GroupNavBtn: 'group-nav-btn',
+        GroupSection: 'group-section',
+        PageCard: 'page-card'
     },
     UIConstants: {
         Resizing: {
