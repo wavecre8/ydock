@@ -4,6 +4,7 @@ import { DocDockConfig, PageConfig } from '../types';
 import { DocDockConstants } from './constants';
 import { Logger } from './logger';
 import { PathUtils } from './path-utils';
+import { HtmlMinifier } from './html-minifier';
 
 export class IndexBuilder {
     /**
@@ -65,7 +66,8 @@ export class IndexBuilder {
                 fs.mkdirSync(indexDir, { recursive: true });
             }
 
-            fs.writeFileSync(resolvedIndexOutput, indexHtml, 'utf8');
+            // 生成インデックスHTMLに対する空白および改行の安全な圧縮処理
+            fs.writeFileSync(resolvedIndexOutput, HtmlMinifier.minify(indexHtml), 'utf8');
             Logger.info(`  Preview Index: ${path.resolve(resolvedIndexOutput)}`);
         } else {
             Logger.warn('Index template not found at ' + resolvedTemplatePath);

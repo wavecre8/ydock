@@ -6,13 +6,15 @@ window.YdockUI = window.YdockUI || {};
 const C = window.DocDockConstants;
 
 YdockUI.Utils = {
-    toggleClassOnSelectors(selectors, className, shouldAdd) {
-        selectors.forEach((selector) => {
-            document.querySelectorAll(selector).forEach((el) => {
-                el.classList[shouldAdd ? 'add' : 'remove'](className);
-            });
-        });
+    // 複合セレクタに該当する全要素のクラス一括切り替え処理
+    toggleClassOnSelector(selector, className, shouldAdd) {
+        const elements = document.querySelectorAll(selector);
+        const action = shouldAdd ? 'add' : 'remove';
+        for (let i = 0; i < elements.length; i++) {
+            elements[i].classList[action](className);
+        }
     },
+    // 単一ID要素のクラストグル処理
     toggleClassById(elementId, className) {
         const element = document.getElementById(elementId);
         if (element) {
@@ -23,7 +25,8 @@ YdockUI.Utils = {
 };
 
 YdockUI.Navigation = {
-    COLLAPSIBLE_SELECTORS: ['.collapsible-wrapper', '.rotate-icon', '.card-container'],
+    COLLAPSIBLE_SELECTOR: '.collapsible-wrapper, .rotate-icon, .card-container',
+    SECTION_HEADER_SELECTOR: '[id^="section-"][id$="-content"], [id^="section-"][id$="-content-icon"]',
     
     toggleSection(contentId, iconId) {
         const content = YdockUI.Utils.toggleClassById(contentId, C.CssClasses.IsCollapsed);
@@ -38,17 +41,25 @@ YdockUI.Navigation = {
     },
     
     expandAll() {
-        YdockUI.Utils.toggleClassOnSelectors(this.COLLAPSIBLE_SELECTORS, C.CssClasses.IsCollapsed, false);
+        // 全展開時の一時的トランジション無効化設定
+        document.body.classList.add('disable-transitions');
+        YdockUI.Utils.toggleClassOnSelector(this.COLLAPSIBLE_SELECTOR, C.CssClasses.IsCollapsed, false);
+        window.requestAnimationFrame(() => {
+            // トランジション無効化の解除処理
+            document.body.classList.remove('disable-transitions');
+        });
     },
     
     collapseAll() {
-        YdockUI.Utils.toggleClassOnSelectors(this.COLLAPSIBLE_SELECTORS, C.CssClasses.IsCollapsed, true);
+        // 全折りたたみ時の一時的トランジション無効化設定
+        document.body.classList.add('disable-transitions');
+        YdockUI.Utils.toggleClassOnSelector(this.COLLAPSIBLE_SELECTOR, C.CssClasses.IsCollapsed, true);
         
-        document.querySelectorAll('[id^="section-"][id$="-content"]').forEach(el => {
-            el.classList.remove(C.CssClasses.IsCollapsed);
-        });
-        document.querySelectorAll('[id^="section-"][id$="-content-icon"]').forEach(el => {
-            el.classList.remove(C.CssClasses.IsCollapsed);
+        // 最上位セクションの展開状態維持処理
+        YdockUI.Utils.toggleClassOnSelector(this.SECTION_HEADER_SELECTOR, C.CssClasses.IsCollapsed, false);
+        window.requestAnimationFrame(() => {
+            // トランジション無効化の解除処理
+            document.body.classList.remove('disable-transitions');
         });
     },
     
@@ -149,6 +160,16 @@ YdockUI.Clipboard = {
             // 非セキュア環境におけるフォールバックコピーの実行
             this.fallbackCopy(text, btnElement);
         }
+    },
+
+    // コピーボタン押下時のイベント委譲リスナー登録
+    init() {
+        document.body.addEventListener('click', (e) => {
+            const btn = e.target.closest(`.${C.CssClasses.CopyCmdBtn}`);
+            if (btn) {
+                this.copyToClipboard(btn, e);
+            }
+        });
     }
 };
 
@@ -318,14 +339,8 @@ YdockUI.Tooltip = {
                 let container = null;
 
                 if (row.tagName === 'TR') {
-                    const tds = row.querySelectorAll(':scope > td');
-                    for (let td of tds) {
-                        const directChild = td.querySelector('.tooltip-container');
-                        if (directChild) {
-                            container = directChild;
-                            break;
-                        }
-                    }
+                    // 対象行直下のツールチップコンテナのみを検索
+                    container = row.querySelector(':scope > td > div > .tooltip-container, :scope > td > .tooltip-container');
                 }
 
                 if (container) {
@@ -352,16 +367,29 @@ YdockUI.ColumnResizer = {
     startWidth: 0,
     tableWidth: 0,
 
+    // 全リサイザーの高さ同期処理
     updateResizerHeights() {
-        document.querySelectorAll('.col-resizer').forEach((resizer) => {
+        const resizers = document.querySelectorAll('.col-resizer');
+        const updates = [];
+
+        // 読み取り処理
+        for (let i = 0; i < resizers.length; i++) {
+            const resizer = resizers[i];
             const th = resizer.closest('th');
-            if (th) {
-                const table = th.closest('table');
-                if (table) {
-                    resizer.style.height = `${table.offsetHeight}px`;
-                }
+            if (!th) continue;
+            const table = th.closest('table');
+            if (!table) continue;
+
+            const height = table.offsetHeight;
+            if (height > 0) {
+                updates.push({ resizer, height });
             }
-        });
+        }
+
+        // スタイル適用処理
+        for (let i = 0; i < updates.length; i++) {
+            updates[i].resizer.style.height = `${updates[i].height}px`;
+        }
     },
 
     init() {
@@ -406,15 +434,10 @@ YdockUI.ColumnResizer = {
             );
 
             const varName = this.currentLevel !== null ? `--col-width-level-${this.currentLevel}` : '--col-width-level-default';
-            if (window.requestAnimationFrame) {
-                window.requestAnimationFrame(() => {
-                    document.documentElement.style.setProperty(varName, `${newWidthPercent}%`);
-                    this.updateResizerHeights();
-                });
-            } else {
+            // 列幅CSS変数の更新処理
+            window.requestAnimationFrame(() => {
                 document.documentElement.style.setProperty(varName, `${newWidthPercent}%`);
-                this.updateResizerHeights();
-            }
+            });
         });
 
         document.documentElement.addEventListener('mouseup', () => {
@@ -430,24 +453,12 @@ YdockUI.ColumnResizer = {
             });
 
             this.currentLevel = null;
+            // リサイズ確定後のリサイザー高さ同期処理
+            this.updateResizerHeights();
         });
 
         window.addEventListener('resize', () => this.updateResizerHeights());
         setTimeout(() => this.updateResizerHeights(), 100);
-
-        document.body.addEventListener('mouseover', (e) => {
-            const container = e.target.closest('.hover-row, .nested-table');
-            if (container && container.classList.contains('hover-row')) {
-                container.classList.add(C.CssClasses.IsHovered);
-            }
-        });
-
-        document.body.addEventListener('mouseout', (e) => {
-            const container = e.target.closest('.hover-row, .nested-table');
-            if (container && container.classList.contains('hover-row')) {
-                container.classList.remove(C.CssClasses.IsHovered);
-            }
-        });
     }
 };
 
@@ -498,6 +509,7 @@ YdockUI.SidebarResizer = {
 
 // Initialize all modules on DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
+    YdockUI.Clipboard.init();
     YdockUI.DisplayMode.init();
     YdockUI.DeepLink.init();
     YdockUI.Tooltip.init();

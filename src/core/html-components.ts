@@ -15,22 +15,15 @@ export class HtmlComponents {
 
     static renderTooltip(descText: string | undefined): string {
         if (!descText) return '';
-        return `
-        <span class="elem-tooltip tooltip-container flex-shrink-0 pt-1">
-            <div class="tooltip-wrapper">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-blue-500">
-                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z" clip-rule="evenodd" />
-                </svg>
-            </div>
-            <div class="tooltip-content">${MarkdownProcessor.render(descText)}<div class="tooltip-arrow"></div></div>
-        </span>`;
+        // 共通SVGシンボルを参照するツールチップ構造の生成
+        return `<span class="elem-tooltip tooltip-container flex-shrink-0 pt-1"><div class="tooltip-wrapper"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-blue-500"><use href="#icon-info"></use></svg></div><div class="tooltip-content">${MarkdownProcessor.render(descText)}<div class="tooltip-arrow"></div></div></span>`;
     }
 
     static renderAliasedKey(key: string | number, alias: string | undefined): string {
         const escapedKey = this.escape(key);
         if (!alias) return escapedKey;
         const escapedAlias = this.escape(alias);
-        return `<span class="text-slate-700 block">${escapedKey}</span><span class="alias-wrapper grid transition-[grid-template-rows,opacity] duration-500 ease-in-out"><span class="alias-text text-xs text-slate-400 overflow-hidden min-h-0 block">${escapedAlias}</span></span>`;
+        return `<span class="text-slate-700 block">${escapedKey}</span><span class="alias-wrapper"><span class="alias-text">${escapedAlias}</span></span>`;
     }
 
     static renderPrimitive(val: unknown): string {
@@ -94,7 +87,7 @@ export class HtmlComponents {
         // 値のHTMLエスケープ処理
         const escapedVal = this.escape(itemVal);
         const valHtml = alias
-            ? `<span class="${DocDockConstants.CssClasses.PropertyValue}">${escapedVal}</span><span class="alias-wrapper grid transition-[grid-template-rows,opacity] duration-500 ease-in-out"><span class="alias-text text-xs text-slate-400 overflow-hidden min-h-0 block">${this.escape(alias)}</span></span>`
+            ? `<span class="${DocDockConstants.CssClasses.PropertyValue}">${escapedVal}</span><span class="alias-wrapper"><span class="alias-text">${this.escape(alias)}</span></span>`
             : `<span class="${DocDockConstants.CssClasses.PropertyValue}">${escapedVal}</span>`;
 
         return `<tr id="${myPath}" class="${DocDockConstants.CssClasses.HoverRow} scroll-mt-20">
@@ -172,10 +165,10 @@ export class HtmlComponents {
     ): string {
         const escapedCopyPath = this.escape(myCopyPath);
         return `<tr id="${myPath}" class="${DocDockConstants.CssClasses.HoverRow} scroll-mt-20">
-            <td class="${DocDockConstants.CssClasses.PropertyKeyCell} font-mono text-slate-600 relative pr-8 align-top">
+            <td class="${DocDockConstants.CssClasses.PropertyKeyCell}">
                 <span class="break-all">${keyHtml}</span>
-                <button data-copy-path="${escapedCopyPath}" onclick="YdockUI.Clipboard.copyToClipboard(this, event)" class="${DocDockConstants.CssClasses.CopyCmdBtn} absolute right-2 p-1 text-slate-400 hover:text-blue-600 rounded" title="Copy Key">
-                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                <button data-copy-path="${escapedCopyPath}" class="${DocDockConstants.CssClasses.CopyCmdBtn}" title="Copy Key">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-copy"></use></svg>
                 </button>
             </td>
             <td class="align-top">

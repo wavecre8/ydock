@@ -10,6 +10,7 @@ import { HtmlComponents } from './html-components';
 import { DocumentPreprocessor } from './document-preprocessor';
 import { ConditionMatcher } from './condition-matcher';
 import { RenderContext } from './render-context';
+import { HtmlMinifier } from './html-minifier';
 
 export interface GeneratorOptions {
     readFile?: (filePath: string) => string;
@@ -97,6 +98,7 @@ export class Generator {
             finalHtml = finalHtml.replace('// INJECT_JS_PLACEHOLDER', () => jsContent);
         }
 
-        return finalHtml;
+        // 生成HTMLに対する空白および改行の安全な圧縮処理
+        return HtmlMinifier.minify(finalHtml);
     }
 }

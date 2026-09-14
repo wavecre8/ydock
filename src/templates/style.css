@@ -164,21 +164,26 @@ body.is-sidebar-resizing iframe {
     * - Tooltip Icon: "max-width" + "opacity" + "margin" to collapse/expand horizontally.
     */
 
-/* Deep Alias Hiding Logic */
+/* エイリアス表示切り替え設定 */
 .alias-wrapper {
-    grid-template-rows: 1fr;
-    opacity: 1;
+    display: block;
+}
+.alias-text {
+    display: block;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    color: #94a3b8;
 }
 body.hide-deep-aliases .alias-wrapper {
-    grid-template-rows: 0fr;
-    opacity: 0;
+    display: none;
 }
 
 .elem-inline-desc-wrapper {
     display: grid;
     grid-template-rows: 0fr;
     opacity: 0;
-    transition: grid-template-rows 0.3s ease-in-out, opacity 0.3s ease-in-out;
+    visibility: hidden;
+    transition: grid-template-rows 0.3s ease-in-out, opacity 0.3s ease-in-out, visibility 0.3s;
 }
 
 .elem-tooltip {
@@ -214,6 +219,7 @@ body.hide-deep-aliases .alias-wrapper {
 .mode-inline .elem-inline-desc-wrapper {
     grid-template-rows: 1fr;
     opacity: 1;
+    visibility: visible;
 }
 
 /* BUTTON STATES (CSS Driven) */
@@ -275,14 +281,20 @@ body.hide-deep-aliases .alias-wrapper {
 }
 .tooltip-content a:hover { color: var(--color-link-lighter); }
 
-/* Tooltip visibility on hover */
+/* ツールチップホバー時の表示制御 */
 .tooltip-container:hover .tooltip-content {
     opacity: 1;
     visibility: visible;
 }
 
-/* Pinned tooltip - stays visible even without hover */
+/* ピン留め時のツールチップ表示制御 */
 .tooltip-container.pinned .tooltip-content {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* ツールチップモード時の行ホバーによる表示制御 */
+.mode-tooltip .hover-row:hover:not(:has(.hover-row:hover)) > td > div > .tooltip-container .tooltip-content {
     opacity: 1;
     visibility: visible;
 }
@@ -305,10 +317,14 @@ body.hide-deep-aliases .alias-wrapper {
     text-align: left;
 }
 
-/* Property Key Cell Merchandising (C) */
+/* プロパティキーセルの基本スタイリング */
 .property-key-cell {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
     font-weight: 600 !important;
     color: var(--color-text-header) !important;
+    position: relative;
+    padding-right: 2rem;
+    vertical-align: top;
 }
 
 /* Exclusive Hover Logic */
@@ -338,31 +354,27 @@ body.hide-deep-aliases .alias-wrapper {
     transform: scaleY(1);
 }
 
-/* Prevent double hover effect on nested rows */
+/* ネスト行ホバー時の親行強調表示抑制 */
 .hover-row:hover:has(.hover-row:hover) { background-color: transparent; }
 .hover-row:hover:has(.hover-row:hover) > td:first-child::before { transform: scaleY(0); }
-/* Prevent hover effect when hovering over column resizer */
+
+/* カラムリサイザーホバー時の行強調表示抑制 */
 .hover-row:hover:has(.col-resizer:hover) { background-color: transparent; }
 .hover-row:hover:has(.col-resizer:hover) > td:first-child::before { transform: scaleY(0); }
 
-/* Explicit Tooltip Icon Visibility on Row Hover is maintained in JS logic context or existing CSS */
-.hover-row:hover:not(:has(.hover-row:hover)) > td > div > .tooltip-container .tooltip-content { 
-    opacity: 1;
-    visibility: visible;
-}
-
-/* Accordion Transitions */
+/* アコーディオン開閉アニメーション設定 */
 .collapsible-wrapper {
     display: grid;
     grid-template-rows: 1fr;
     opacity: 1;
-    /* Height smooth, opacity waits then drops (easeInExpo 0.95, 0.05, 0.795, 0.035) */
-    transition: grid-template-rows 0.3s ease-in-out, opacity 0.3s cubic-bezier(0.95, 0.05, 0.795, 0.035);
+    visibility: visible;
+    transition: grid-template-rows 0.3s ease-in-out, opacity 0.3s cubic-bezier(0.95, 0.05, 0.795, 0.035), visibility 0.3s;
 }
 
 .collapsible-wrapper.is-collapsed {
     grid-template-rows: 0fr;
     opacity: 0;
+    visibility: hidden;
 }
 
 .collapsible-inner {
@@ -377,6 +389,19 @@ body.hide-deep-aliases .alias-wrapper {
 
 .rotate-icon.is-collapsed {
     transform: rotate(-90deg);
+}
+
+/* 画面外描画最適化 */
+.card-container {
+    content-visibility: auto;
+    contain-intrinsic-size: 0 400px;
+}
+
+/* トランジション一時無効化設定 */
+body.disable-transitions *,
+body.disable-transitions *::before,
+body.disable-transitions *::after {
+    transition: none !important;
 }
 
 /* Card Collapsed State Styling */
@@ -408,14 +433,7 @@ body.hide-deep-aliases .alias-wrapper {
     }
 }
 
-/* Compact Mode Transition & Animation */
-main, main * {
-    transition-property: padding, margin, gap, font-size, line-height;
-    transition-duration: 0.3s;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* Compact Mode Styling (Main Content Only) */
+/* コンパクト表示スタイリング */
 body.compact-mode main .p-8 { padding: 1rem !important; }
 body.compact-mode main .p-6 { padding: 0.75rem !important; }
 body.compact-mode main .p-4 { padding: 0.5rem !important; }
@@ -481,13 +499,24 @@ body.compact-mode main .nested-table .copy-cmd-btn {
     top: 0.125rem !important; /* Matches compact nested padding-top */
 }
 
+/* コピーボタンの基本スタイリング */
 .copy-cmd-btn {
+    position: absolute;
+    right: 0.5rem;
+    padding: 0.25rem;
+    color: #94a3b8;
+    border-radius: 0.25rem;
     opacity: 0;
     transition: opacity 0.2s, background-color 0.2s, color 0.2s;
 }
 
+.copy-cmd-btn:hover {
+    color: #2563eb;
+}
+
+/* コピーボタンのホバー時表示制御 */
 .hover-row.is-hovered > .property-key-cell > .copy-cmd-btn,
-.hover-row:hover:not(:has(.hover-row:hover)) > .property-key-cell > .copy-cmd-btn {
+.hover-row:hover > .property-key-cell > .copy-cmd-btn {
     opacity: 1;
 }
 
