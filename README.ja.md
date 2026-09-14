@@ -44,7 +44,7 @@ npx @wavecre8/ydock build
 - 🧩 **モード駆動アーキテクチャ** - 用途に合わせて最適な解析ロジックを切り替え可能。 [詳細はこちら](#対応モード)
 - 🎨 **表示モード切替** - Inline/Tooltipモード、および画面を広く使えるコンパクトビューモードをブラウザで切り替え可能
 - 🏷️ **エイリアス機能** - 難解なキー名に分かりやすい別名を設定
-- 📑 **インデックスページ** - 複数ドキュメントへのポータルページを自動生成
+- 📑 **インデックスページ** - グループ分け、ナビゲーション、および絞り込み検索を備えた複数ドキュメントのポータルページを自動生成
 - 🛠️ **ディープリンク** - 深い階層のプロパティに直接リンク可能
 - 📏 **リサイズ機能** - テーブルのカラム境目やサイドバー右端をドラッグして幅を調整可能
 - 🖨️ **印刷対応** - ブラウザの印刷機能で、自動的にサイドバーを隠してメインコンテンツのみを綺麗に出力
@@ -84,14 +84,26 @@ excludeDir: excludes
 index:
   output: output/index.html
   title: ドキュメントポータル
+  groups:
+    - id: network
+      name: ネットワーク基盤
+    - id: compute
+      name: コンピュート基盤
 
 pages:
-  - title: EC2インスタンス設計図
+  - title: VPC設計図
+    group: network
     mode: cfn
     sources:
       - sources/vpc.yml
+    output: output/vpc.html
+
+  - title: EC2インスタンス設計図
+    group: compute
+    mode: cfn
+    sources:
       - sources/ec2.yml
-    output: output/infrastructure.html
+    output: output/ec2.html
 ```
 
 ### 3. ビルドの実行
@@ -244,6 +256,7 @@ Resources:
 |---|---|---|
 | `output` | ✓ | 出力先パス |
 | `title` |  | ページタイトル。省略時は "Documentation Index" |
+| `groups` |  | グループ定義のリスト。`id` と `name` を指定 |
 
 ### ページ設定
 
@@ -256,6 +269,7 @@ Resources:
 | `sources` | ✓ | ソースYAMLファイルのリスト |
 | `output` | ✓ | 出力先HTMLパス |
 | `mode` |  | 解析モードを指定。例: `generic` |
+| `group` |  | 所属するグループの識別子またはグループ名称 |
 | `guideDir` |  | ページ個別のガイドファイルディレクトリ。省略時はグローバル設定を適用 |
 | `aliasDir` |  | ページ個別のエイリアスファイルディレクトリ。省略時はグローバル設定を適用 |
 | `excludeDir` |  | ページ個別のExcludeファイルディレクトリ。省略時はグローバル設定を適用 |

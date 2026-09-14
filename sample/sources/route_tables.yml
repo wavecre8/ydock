@@ -1,0 +1,83 @@
+RouteTables:
+  - RouteTableId: rtb-0123456789abcdef0
+    VpcId: vpc-0123456789abcdef0
+    OwnerId: '111122223333'
+    Associations:
+      - RouteTableAssociationId: rtbassoc-0111111111111111a
+        RouteTableId: rtb-0123456789abcdef0
+        SubnetId: subnet-0111111111111111a
+        Main: false
+        AssociationState:
+          State: associated
+      - RouteTableAssociationId: rtbassoc-0111111111111111c
+        RouteTableId: rtb-0123456789abcdef0
+        SubnetId: subnet-0111111111111111c
+        Main: false
+        AssociationState:
+          State: associated
+    Routes:
+      - DestinationCidrBlock: 10.0.0.0/16
+        GatewayId: local
+        Origin: CreateRouteTable
+        State: active
+      - DestinationCidrBlock: 0.0.0.0/0
+        GatewayId: igw-0123456789abcdef0
+        Origin: CreateRoute
+        State: active
+    PropagatingVgws: []
+    Tags:
+      - Key: Name
+        Value: prd-public-rt
+      - Key: Environment
+        Value: production
+      - Key: Tier
+        Value: public
+
+  - RouteTableId: rtb-0123456789abcdef1
+    VpcId: vpc-0123456789abcdef0
+    OwnerId: '111122223333'
+    Associations:
+      - RouteTableAssociationId: rtbassoc-0222222222222222a
+        RouteTableId: rtb-0123456789abcdef1
+        SubnetId: subnet-0222222222222222a
+        Main: false
+        AssociationState:
+          State: associated
+    Routes:
+      - DestinationCidrBlock: 10.0.0.0/16
+        GatewayId: local
+        Origin: CreateRouteTable
+        State: active
+      - DestinationCidrBlock: 0.0.0.0/0
+        NatGatewayId: nat-0123456789abcdef0
+        Origin: CreateRoute
+        State: active
+    PropagatingVgws: []
+    Tags:
+      - Key: Name
+        Value: prd-private-rt-1a
+      - Key: Environment
+        Value: production
+      - Key: Tier
+        Value: private
+
+  - RouteTableId: rtb-0fedcba9876543210
+    VpcId: vpc-0fedcba9876543210
+    OwnerId: '111122223333'
+    Associations:
+      - RouteTableAssociationId: rtbassoc-0fedcba9876543210
+        RouteTableId: rtb-0fedcba9876543210
+        Main: true
+        AssociationState:
+          State: associated
+    Routes:
+      - DestinationCidrBlock: 172.16.0.0/16
+        GatewayId: local
+        Origin: CreateRouteTable
+        State: active
+    PropagatingVgws: []
+    Tags:
+      - Key: Name
+        Value: stg-default-rt
+      - Key: Environment
+        Value: staging

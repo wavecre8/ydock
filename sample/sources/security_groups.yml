@@ -1,0 +1,108 @@
+SecurityGroups:
+  - GroupId: sg-01111111111111111
+    GroupName: prd-alb-sg
+    Description: Security group for public ALB
+    VpcId: vpc-0123456789abcdef0
+    OwnerId: '111122223333'
+    IpPermissions:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        IpRanges:
+          - CidrIp: 0.0.0.0/0
+            Description: Allow HTTP from anywhere
+        Ipv6Ranges:
+          - CidrIpv6: ::/0
+            Description: Allow HTTP from anywhere IPv6
+        PrefixListIds: []
+        UserIdGroupPairs: []
+      - IpProtocol: tcp
+        FromPort: 443
+        ToPort: 443
+        IpRanges:
+          - CidrIp: 0.0.0.0/0
+            Description: Allow HTTPS from anywhere
+        Ipv6Ranges:
+          - CidrIpv6: ::/0
+            Description: Allow HTTPS from anywhere IPv6
+        PrefixListIds: []
+        UserIdGroupPairs: []
+    IpPermissionsEgress:
+      - IpProtocol: '-1'
+        IpRanges:
+          - CidrIp: 0.0.0.0/0
+            Description: Allow all outbound traffic
+        Ipv6Ranges: []
+        PrefixListIds: []
+        UserIdGroupPairs: []
+    Tags:
+      - Key: Name
+        Value: prd-alb-sg
+      - Key: Environment
+        Value: production
+      - Key: Tier
+        Value: public
+
+  - GroupId: sg-02222222222222222
+    GroupName: prd-ecs-service-sg
+    Description: Security group for ECS backend service
+    VpcId: vpc-0123456789abcdef0
+    OwnerId: '111122223333'
+    IpPermissions:
+      - IpProtocol: tcp
+        FromPort: 8080
+        ToPort: 8080
+        UserIdGroupPairs:
+          - GroupId: sg-01111111111111111
+            UserId: '111122223333'
+            Description: Allow traffic from public ALB
+        IpRanges: []
+        Ipv6Ranges: []
+        PrefixListIds: []
+    IpPermissionsEgress:
+      - IpProtocol: '-1'
+        IpRanges:
+          - CidrIp: 0.0.0.0/0
+            Description: Allow all outbound traffic
+        Ipv6Ranges: []
+        PrefixListIds: []
+        UserIdGroupPairs: []
+    Tags:
+      - Key: Name
+        Value: prd-ecs-service-sg
+      - Key: Environment
+        Value: production
+      - Key: Tier
+        Value: app
+
+  - GroupId: sg-03333333333333333
+    GroupName: prd-database-sg
+    Description: Security group for Aurora PostgreSQL cluster
+    VpcId: vpc-0123456789abcdef0
+    OwnerId: '111122223333'
+    IpPermissions:
+      - IpProtocol: tcp
+        FromPort: 5432
+        ToPort: 5432
+        UserIdGroupPairs:
+          - GroupId: sg-02222222222222222
+            UserId: '111122223333'
+            Description: Allow PostgreSQL access from ECS service
+        IpRanges: []
+        Ipv6Ranges: []
+        PrefixListIds: []
+    IpPermissionsEgress:
+      - IpProtocol: '-1'
+        IpRanges:
+          - CidrIp: 0.0.0.0/0
+            Description: Allow all outbound traffic
+        Ipv6Ranges: []
+        PrefixListIds: []
+        UserIdGroupPairs: []
+    Tags:
+      - Key: Name
+        Value: prd-database-sg
+      - Key: Environment
+        Value: production
+      - Key: Tier
+        Value: database

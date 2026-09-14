@@ -5,6 +5,7 @@ import { DocDockConstants } from './constants';
 import { Logger } from './logger';
 import { PageBuilder } from './page-builder';
 import { IndexBuilder } from './index-builder';
+import { ConfigValidator } from './config-validator';
 
 export interface BuildOptions {
     configPath: string;
@@ -17,12 +18,9 @@ export class DocDockBuilder {
         if (options.silent) Logger.setSilent(true);
         Logger.info(`Loading config from ${resolvedConfigPath}...`);
 
-        const config = Loader.loadConfig(resolvedConfigPath) as DocDockConfig;
-        // ページ設定の存在および配列判定
-        if (!config || !Array.isArray(config.pages) || config.pages.length === 0) {
-            Logger.warn('No pages defined in configuration.');
-            return;
-        }
+        const rawConfig = Loader.loadConfig(resolvedConfigPath);
+        // 設定スキーマおよび出力パス整合性の検証
+        const config: DocDockConfig = ConfigValidator.validate(rawConfig, resolvedConfigPath);
 
         const globalMode = config.mode || DocDockConstants.Defaults.Mode;
         const language = config.lang || DocDockConstants.Defaults.Language;

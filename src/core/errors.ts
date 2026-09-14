@@ -54,3 +54,13 @@ export class InvalidImportError extends Error {
         this.name = 'InvalidImportError';
     }
 }
+
+export class ConfigValidationError extends Error {
+    constructor(
+        message: string,
+        public readonly details?: string[]
+    ) {
+        super(message);
+        this.name = 'ConfigValidationError';
+    }
+}
