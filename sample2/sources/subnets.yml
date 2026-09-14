@@ -1,0 +1,460 @@
+Subnets:
+  - SubnetId: subnet-0111111111111111a
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.1.0/24
+    AvailabilityZone: ap-northeast-1a
+    AvailabilityZoneId: apne1-az4
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: true
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0111111111111111a
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-public-subnet-1a
+      - Key: Tier
+        Value: public
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0111111111111111c
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.2.0/24
+    AvailabilityZone: ap-northeast-1c
+    AvailabilityZoneId: apne1-az1
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: true
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0111111111111111c
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-public-subnet-1c
+      - Key: Tier
+        Value: public
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0222222222222222a
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.11.0/24
+    AvailabilityZone: ap-northeast-1a
+    AvailabilityZoneId: apne1-az4
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0222222222222222a
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-app-subnet-1a
+      - Key: Tier
+        Value: application
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0222222222222222c
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.12.0/24
+    AvailabilityZone: ap-northeast-1c
+    AvailabilityZoneId: apne1-az1
+    AvailableIpAddressCount: 250
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0222222222222222c
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-app-subnet-1c
+      - Key: Tier
+        Value: application
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0333333333333333a
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.21.0/24
+    AvailabilityZone: ap-northeast-1a
+    AvailabilityZoneId: apne1-az4
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0333333333333333a
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-db-subnet-1a
+      - Key: Tier
+        Value: database
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0333333333333333c
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.22.0/24
+    AvailabilityZone: ap-northeast-1c
+    AvailabilityZoneId: apne1-az1
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0333333333333333c
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-db-subnet-1c
+      - Key: Tier
+        Value: database
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0444444444444444a
+    VpcId: vpc-0fedcba9876543210
+    CidrBlock: 172.16.1.0/24
+    AvailabilityZone: ap-northeast-1a
+    AvailabilityZoneId: apne1-az4
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: true
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0444444444444444a
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: stg-public-subnet-1a
+      - Key: Tier
+        Value: public
+      - Key: Environment
+        Value: staging
+  - SubnetId: subnet-0444444444444444c
+    VpcId: vpc-0fedcba9876543210
+    CidrBlock: 172.16.2.0/24
+    AvailabilityZone: ap-northeast-1c
+    AvailabilityZoneId: apne1-az1
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: true
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0444444444444444c
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: stg-public-subnet-1c
+      - Key: Tier
+        Value: public
+      - Key: Environment
+        Value: staging
+  - SubnetId: subnet-0555555555555555a
+    VpcId: vpc-0fedcba9876543210
+    CidrBlock: 172.16.11.0/24
+    AvailabilityZone: ap-northeast-1a
+    AvailabilityZoneId: apne1-az4
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0555555555555555a
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: stg-app-subnet-1a
+      - Key: Tier
+        Value: application
+      - Key: Environment
+        Value: staging
+  - SubnetId: subnet-0555555555555555c
+    VpcId: vpc-0fedcba9876543210
+    CidrBlock: 172.16.12.0/24
+    AvailabilityZone: ap-northeast-1c
+    AvailabilityZoneId: apne1-az1
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0555555555555555c
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: stg-app-subnet-1c
+      - Key: Tier
+        Value: application
+      - Key: Environment
+        Value: staging
+  - SubnetId: subnet-0111111111111111d
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.3.0/24
+    AvailabilityZone: ap-northeast-1d
+    AvailabilityZoneId: apne1-az2
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: true
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0111111111111111d
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-public-subnet-1d
+      - Key: Tier
+        Value: public
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0222222222222222d
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.13.0/24
+    AvailabilityZone: ap-northeast-1d
+    AvailabilityZoneId: apne1-az2
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0222222222222222d
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-app-subnet-1d
+      - Key: Tier
+        Value: application
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0333333333333333d
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.23.0/24
+    AvailabilityZone: ap-northeast-1d
+    AvailabilityZoneId: apne1-az2
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0333333333333333d
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-db-subnet-1d
+      - Key: Tier
+        Value: database
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0666666666666666a
+    VpcId: vpc-0fedcba9876543210
+    CidrBlock: 172.16.21.0/24
+    AvailabilityZone: ap-northeast-1a
+    AvailabilityZoneId: apne1-az4
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0666666666666666a
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: stg-db-subnet-1a
+      - Key: Tier
+        Value: database
+      - Key: Environment
+        Value: staging
+  - SubnetId: subnet-0666666666666666c
+    VpcId: vpc-0fedcba9876543210
+    CidrBlock: 172.16.22.0/24
+    AvailabilityZone: ap-northeast-1c
+    AvailabilityZoneId: apne1-az1
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0666666666666666c
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: stg-db-subnet-1c
+      - Key: Tier
+        Value: database
+      - Key: Environment
+        Value: staging
+  - SubnetId: subnet-0777777777777777a
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.31.0/24
+    AvailabilityZone: ap-northeast-1a
+    AvailabilityZoneId: apne1-az4
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0777777777777777a
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-egress-subnet-1a
+      - Key: Tier
+        Value: egress
+      - Key: Environment
+        Value: production
+  - SubnetId: subnet-0777777777777777c
+    VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.32.0/24
+    AvailabilityZone: ap-northeast-1c
+    AvailabilityZoneId: apne1-az1
+    AvailableIpAddressCount: 251
+    DefaultForAz: false
+    MapPublicIpOnLaunch: false
+    MapCustomerOwnedIpOnLaunch: false
+    State: available
+    OwnerId: '111122223333'
+    AssignIpv6AddressOnCreation: false
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: arn:aws:ec2:ap-northeast-1:111122223333:subnet/subnet-0777777777777777c
+    EnableDns64: false
+    Ipv6Native: false
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ip-name
+      EnableResourceNameDnsARecord: false
+      EnableResourceNameDnsAAAARecord: false
+    Tags:
+      - Key: Name
+        Value: prd-egress-subnet-1c
+      - Key: Tier
+        Value: egress
+      - Key: Environment
+        Value: production

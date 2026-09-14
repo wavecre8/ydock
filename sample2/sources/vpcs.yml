@@ -1,0 +1,69 @@
+Vpcs:
+  - VpcId: vpc-0123456789abcdef0
+    CidrBlock: 10.0.0.0/16
+    DhcpOptionsId: dopt-0123456789abcdef0
+    State: available
+    OwnerId: '111122223333'
+    InstanceTenancy: default
+    IsDefault: false
+    CidrBlockAssociationSet:
+      - AssociationId: vpc-cidr-assoc-0123456789abcdef0
+        CidrBlock: 10.0.0.0/16
+        CidrBlockState:
+          State: associated
+      - AssociationId: vpc-cidr-assoc-0123456789abcdef1
+        CidrBlock: 100.64.0.0/16
+        CidrBlockState:
+          State: associated
+    Ipv6CidrBlockAssociationSet:
+      - AssociationId: vpc-cidr-assoc-0123456789abcdef2
+        Ipv6CidrBlock: 2406:da14:0100:0000::/56
+        Ipv6CidrBlockState:
+          State: associated
+        Ipv6Pool: Amazon
+        NetworkBorderGroup: ap-northeast-1
+    Tags:
+      - Key: Name
+        Value: prd-main-vpc
+      - Key: Environment
+        Value: production
+      - Key: CostCenter
+        Value: system-core
+      - Key: ManagedBy
+        Value: terraform
+      - Key: Compliance
+        Value: pci-dss
+      - Key: SecurityTier
+        Value: tier-1
+  - VpcId: vpc-0fedcba9876543210
+    CidrBlock: 172.16.0.0/16
+    DhcpOptionsId: dopt-0fedcba9876543210
+    State: available
+    OwnerId: '111122223333'
+    InstanceTenancy: default
+    IsDefault: false
+    CidrBlockAssociationSet:
+      - AssociationId: vpc-cidr-assoc-0fedcba9876543210
+        CidrBlock: 172.16.0.0/16
+        CidrBlockState:
+          State: associated
+    Ipv6CidrBlockAssociationSet:
+      - AssociationId: vpc-cidr-assoc-0fedcba9876543212
+        Ipv6CidrBlock: 2406:da14:0200:0000::/56
+        Ipv6CidrBlockState:
+          State: associated
+        Ipv6Pool: Amazon
+        NetworkBorderGroup: ap-northeast-1
+    Tags:
+      - Key: Name
+        Value: stg-main-vpc
+      - Key: Environment
+        Value: staging
+      - Key: CostCenter
+        Value: system-core
+      - Key: ManagedBy
+        Value: terraform
+      - Key: Compliance
+        Value: internal-standard
+      - Key: SecurityTier
+        Value: tier-2

@@ -1,0 +1,245 @@
+FlowLogs:
+  - FlowLogId: fl-01111111111111111
+    FlowLogStatus: ACTIVE
+    ResourceId: vpc-0123456789abcdef0
+    TrafficType: ALL
+    LogDestinationType: s3
+    LogDestination: arn:aws:s3:::prd-vpc-flow-logs-bucket-111122223333
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: ''
+    DeliverCrossAccountRole: ''
+    LogGroupName: ''
+    MaxAggregationInterval: 60
+    CreationTime: '2024-01-15T09:00:00+00:00'
+    DestinationOptions:
+      FileFormat: parquet
+      HiveCompatiblePartitions: true
+      PerHourPartition: true
+    TagFieldSpecifications:
+      - ResourceType: network-interface
+        TagKeys:
+          - Name
+          - Environment
+    Tags:
+      - Key: Name
+        Value: prd-vpc-all-traffic-s3
+      - Key: Environment
+        Value: production
+  - FlowLogId: fl-02222222222222222
+    FlowLogStatus: ACTIVE
+    ResourceId: vpc-0123456789abcdef0
+    TrafficType: REJECT
+    LogDestinationType: cloud-watch-logs
+    LogDestination: arn:aws:logs:ap-northeast-1:111122223333:log-group:/aws/vpc/prd-vpc-rejects
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: arn:aws:iam::111122223333:role/prd-vpc-flow-log-cw-role
+    DeliverCrossAccountRole: ''
+    LogGroupName: /aws/vpc/prd-vpc-rejects
+    MaxAggregationInterval: 60
+    CreationTime: '2024-01-15T09:15:00+00:00'
+    DestinationOptions:
+      FileFormat: plain-text
+      HiveCompatiblePartitions: false
+      PerHourPartition: false
+    TagFieldSpecifications: []
+    Tags:
+      - Key: Name
+        Value: prd-vpc-reject-cw-logs
+      - Key: Environment
+        Value: production
+  - FlowLogId: fl-03333333333333333
+    FlowLogStatus: ACTIVE
+    ResourceId: vpc-0fedcba9876543210
+    TrafficType: ALL
+    LogDestinationType: s3
+    LogDestination: arn:aws:s3:::stg-vpc-flow-logs-bucket-111122223333
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: ''
+    DeliverCrossAccountRole: ''
+    LogGroupName: ''
+    MaxAggregationInterval: 600
+    CreationTime: '2024-02-01T10:00:00+00:00'
+    DestinationOptions:
+      FileFormat: parquet
+      HiveCompatiblePartitions: true
+      PerHourPartition: true
+    TagFieldSpecifications: []
+    Tags:
+      - Key: Name
+        Value: stg-vpc-all-traffic-s3
+      - Key: Environment
+        Value: staging
+  - FlowLogId: fl-04444444444444444
+    FlowLogStatus: ACTIVE
+    ResourceId: subnet-0111111111111111a
+    TrafficType: REJECT
+    LogDestinationType: cloud-watch-logs
+    LogDestination: arn:aws:logs:ap-northeast-1:111122223333:log-group:/aws/vpc/prd-public-1a-rejects
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: arn:aws:iam::111122223333:role/prd-vpc-flow-log-cw-role
+    DeliverCrossAccountRole: ''
+    LogGroupName: /aws/vpc/prd-public-1a-rejects
+    MaxAggregationInterval: 60
+    CreationTime: '2024-03-10T14:00:00+00:00'
+    DestinationOptions:
+      FileFormat: plain-text
+      HiveCompatiblePartitions: false
+      PerHourPartition: false
+    TagFieldSpecifications: []
+    Tags:
+      - Key: Name
+        Value: prd-public-1a-reject-cw-logs
+      - Key: Environment
+        Value: production
+  - FlowLogId: fl-05555555555555555
+    FlowLogStatus: ACTIVE
+    ResourceId: subnet-0333333333333333a
+    TrafficType: ALL
+    LogDestinationType: cloud-watch-logs
+    LogDestination: arn:aws:logs:ap-northeast-1:111122223333:log-group:/aws/vpc/prd-db-1a-audit
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status} ${tcp-flags}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: arn:aws:iam::111122223333:role/prd-vpc-flow-log-cw-role
+    DeliverCrossAccountRole: ''
+    LogGroupName: /aws/vpc/prd-db-1a-audit
+    MaxAggregationInterval: 60
+    CreationTime: '2024-03-12T11:30:00+00:00'
+    DestinationOptions:
+      FileFormat: plain-text
+      HiveCompatiblePartitions: false
+      PerHourPartition: false
+    TagFieldSpecifications: []
+    Tags:
+      - Key: Name
+        Value: prd-db-1a-audit-cw-logs
+      - Key: Environment
+        Value: production
+  - FlowLogId: fl-06666666666666666
+    FlowLogStatus: ACTIVE
+    ResourceId: subnet-0444444444444444a
+    TrafficType: REJECT
+    LogDestinationType: cloud-watch-logs
+    LogDestination: arn:aws:logs:ap-northeast-1:111122223333:log-group:/aws/vpc/stg-public-1a-rejects
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: arn:aws:iam::111122223333:role/stg-vpc-flow-log-cw-role
+    DeliverCrossAccountRole: ''
+    LogGroupName: /aws/vpc/stg-public-1a-rejects
+    MaxAggregationInterval: 600
+    CreationTime: '2024-04-01T08:00:00+00:00'
+    DestinationOptions:
+      FileFormat: plain-text
+      HiveCompatiblePartitions: false
+      PerHourPartition: false
+    TagFieldSpecifications: []
+    Tags:
+      - Key: Name
+        Value: stg-public-1a-reject-cw-logs
+      - Key: Environment
+        Value: staging
+  - FlowLogId: fl-07777777777777777
+    FlowLogStatus: ACTIVE
+    ResourceId: subnet-0222222222222222a
+    TrafficType: ALL
+    LogDestinationType: cloud-watch-logs
+    LogDestination: arn:aws:logs:ap-northeast-1:111122223333:log-group:/aws/vpc/prd-app-1a-traffic
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: arn:aws:iam::111122223333:role/prd-vpc-flow-log-cw-role
+    DeliverCrossAccountRole: ''
+    LogGroupName: /aws/vpc/prd-app-1a-traffic
+    MaxAggregationInterval: 60
+    CreationTime: '2024-04-10T09:00:00+00:00'
+    DestinationOptions:
+      FileFormat: plain-text
+      HiveCompatiblePartitions: false
+      PerHourPartition: false
+    TagFieldSpecifications: []
+    Tags:
+      - Key: Name
+        Value: prd-app-1a-traffic-cw-logs
+      - Key: Environment
+        Value: production
+  - FlowLogId: fl-08888888888888888
+    FlowLogStatus: ACTIVE
+    ResourceId: subnet-0222222222222222c
+    TrafficType: ALL
+    LogDestinationType: cloud-watch-logs
+    LogDestination: arn:aws:logs:ap-northeast-1:111122223333:log-group:/aws/vpc/prd-app-1c-traffic
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: arn:aws:iam::111122223333:role/prd-vpc-flow-log-cw-role
+    DeliverCrossAccountRole: ''
+    LogGroupName: /aws/vpc/prd-app-1c-traffic
+    MaxAggregationInterval: 60
+    CreationTime: '2024-04-10T09:30:00+00:00'
+    DestinationOptions:
+      FileFormat: plain-text
+      HiveCompatiblePartitions: false
+      PerHourPartition: false
+    TagFieldSpecifications: []
+    Tags:
+      - Key: Name
+        Value: prd-app-1c-traffic-cw-logs
+      - Key: Environment
+        Value: production
+  - FlowLogId: fl-09999999999999999
+    FlowLogStatus: ACTIVE
+    ResourceId: subnet-0111111111111111d
+    TrafficType: REJECT
+    LogDestinationType: cloud-watch-logs
+    LogDestination: arn:aws:logs:ap-northeast-1:111122223333:log-group:/aws/vpc/prd-public-1d-rejects
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: arn:aws:iam::111122223333:role/prd-vpc-flow-log-cw-role
+    DeliverCrossAccountRole: ''
+    LogGroupName: /aws/vpc/prd-public-1d-rejects
+    MaxAggregationInterval: 60
+    CreationTime: '2024-04-15T10:00:00+00:00'
+    DestinationOptions:
+      FileFormat: plain-text
+      HiveCompatiblePartitions: false
+      PerHourPartition: false
+    TagFieldSpecifications: []
+    Tags:
+      - Key: Name
+        Value: prd-public-1d-reject-cw-logs
+      - Key: Environment
+        Value: production
+  - FlowLogId: fl-0aaaaaaaaaaaaaaaa
+    FlowLogStatus: ACTIVE
+    ResourceId: subnet-0333333333333333c
+    TrafficType: ALL
+    LogDestinationType: cloud-watch-logs
+    LogDestination: arn:aws:logs:ap-northeast-1:111122223333:log-group:/aws/vpc/prd-db-1c-audit
+    LogFormat: '${version} ${account-id} ${interface-id} ${srcaddr} ${dstaddr} ${srcport} ${dstport} ${protocol} ${packets} ${bytes} ${start} ${end} ${action} ${log-status} ${tcp-flags}'
+    DeliverLogsStatus: SUCCESS
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: arn:aws:iam::111122223333:role/prd-vpc-flow-log-cw-role
+    DeliverCrossAccountRole: ''
+    LogGroupName: /aws/vpc/prd-db-1c-audit
+    MaxAggregationInterval: 60
+    CreationTime: '2024-04-15T10:30:00+00:00'
+    DestinationOptions:
+      FileFormat: plain-text
+      HiveCompatiblePartitions: false
+      PerHourPartition: false
+    TagFieldSpecifications: []
+    Tags:
+      - Key: Name
+        Value: prd-db-1c-audit-cw-logs
+      - Key: Environment
+        Value: production
