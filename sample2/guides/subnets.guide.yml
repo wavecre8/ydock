@@ -1,0 +1,311 @@
+Subnets:
+  - '=SubnetId': subnet-0111111111111111a
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=SubnetId': subnet-0111111111111111c
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=SubnetId': subnet-0222222222222222a
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=SubnetId': subnet-0222222222222222c
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=SubnetId': subnet-0333333333333333a
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=SubnetId': subnet-0333333333333333c
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=SubnetId': subnet-0444444444444444a
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=SubnetId': subnet-0444444444444444c
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=SubnetId': subnet-0555555555555555a
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=SubnetId': subnet-0555555555555555c
+    SubnetId: ''
+    VpcId: ''
+    CidrBlock: ''
+    AvailabilityZone: ''
+    AvailabilityZoneId: ''
+    AvailableIpAddressCount: ''
+    DefaultForAz: ''
+    MapPublicIpOnLaunch: ''
+    MapCustomerOwnedIpOnLaunch: ''
+    State: ''
+    OwnerId: ''
+    AssignIpv6AddressOnCreation: ''
+    Ipv6CidrBlockAssociationSet: []
+    SubnetArn: ''
+    EnableDns64: ''
+    Ipv6Native: ''
+    PrivateDnsNameOptionsOnLaunch:
+      HostnameType: ''
+      EnableResourceNameDnsARecord: ''
+      EnableResourceNameDnsAAAARecord: ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Tier
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''

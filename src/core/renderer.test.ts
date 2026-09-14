@@ -128,7 +128,7 @@ describe('TemplateRenderer', () => {
 
             expect(html).toContain('id="root___name_web__image"');
             expect(html).toContain('data-copy-path="root[=name:web].image"');
-            expect(html).toContain('onclick="YdockUI.Clipboard.copyToClipboard(this, event)"');
+            expect(html).toContain('class="copy-cmd-btn"');
         });
 
         it('should generate logical rawPath and sanitized id path for primitive arrays with prefix matching', () => {
@@ -168,7 +168,7 @@ describe('TemplateRenderer', () => {
 
             expect(html).toContain('id="tasks__1__containers___name_web__image"');
             expect(html).toContain('data-copy-path="tasks[].containers[=name:web].image"');
-            expect(html).toContain('onclick="YdockUI.Clipboard.copyToClipboard(this, event)"');
+            expect(html).toContain('class="copy-cmd-btn"');
         });
 
         it('should safely escape copyPath containing quotes and symbols in data-copy-path', () => {
@@ -176,7 +176,7 @@ describe('TemplateRenderer', () => {
             const html = renderer.renderValue(val, undefined, new RenderContext(0, 'root', ['root'], "root.user's_key"));
 
             expect(html).toContain('data-copy-path="root.user&#39;s_key.user&#39;s_key"');
-            expect(html).toContain('onclick="YdockUI.Clipboard.copyToClipboard(this, event)"');
+            expect(html).toContain('class="copy-cmd-btn"');
         });
 
         it('should assign unique DOM IDs when multiple items in array match the same condition', () => {

@@ -1,0 +1,168 @@
+FlowLogs:
+  - '=FlowLogId': fl-01111111111111111
+    FlowLogId: ''
+    FlowLogStatus: ''
+    ResourceId: ''
+    TrafficType: ''
+    LogDestinationType: ''
+    LogDestination: ''
+    LogFormat: ''
+    DeliverLogsStatus: ''
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: ''
+    DeliverCrossAccountRole: ''
+    LogGroupName: ''
+    MaxAggregationInterval: ''
+    CreationTime: ''
+    DestinationOptions:
+      FileFormat: ''
+      HiveCompatiblePartitions: ''
+      PerHourPartition: ''
+    TagFieldSpecifications:
+      - '=ResourceType': network-interface
+        ResourceType: ''
+        TagKeys:
+          - '=Name': ''
+          - '=Environment': ''
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=FlowLogId': fl-02222222222222222
+    FlowLogId: ''
+    FlowLogStatus: ''
+    ResourceId: ''
+    TrafficType: ''
+    LogDestinationType: ''
+    LogDestination: ''
+    LogFormat: ''
+    DeliverLogsStatus: ''
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: ''
+    DeliverCrossAccountRole: ''
+    LogGroupName: ''
+    MaxAggregationInterval: ''
+    CreationTime: ''
+    DestinationOptions:
+      FileFormat: ''
+      HiveCompatiblePartitions: ''
+      PerHourPartition: ''
+    TagFieldSpecifications: []
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=FlowLogId': fl-03333333333333333
+    FlowLogId: ''
+    FlowLogStatus: ''
+    ResourceId: ''
+    TrafficType: ''
+    LogDestinationType: ''
+    LogDestination: ''
+    LogFormat: ''
+    DeliverLogsStatus: ''
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: ''
+    DeliverCrossAccountRole: ''
+    LogGroupName: ''
+    MaxAggregationInterval: ''
+    CreationTime: ''
+    DestinationOptions:
+      FileFormat: ''
+      HiveCompatiblePartitions: ''
+      PerHourPartition: ''
+    TagFieldSpecifications: []
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=FlowLogId': fl-04444444444444444
+    FlowLogId: ''
+    FlowLogStatus: ''
+    ResourceId: ''
+    TrafficType: ''
+    LogDestinationType: ''
+    LogDestination: ''
+    LogFormat: ''
+    DeliverLogsStatus: ''
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: ''
+    DeliverCrossAccountRole: ''
+    LogGroupName: ''
+    MaxAggregationInterval: ''
+    CreationTime: ''
+    DestinationOptions:
+      FileFormat: ''
+      HiveCompatiblePartitions: ''
+      PerHourPartition: ''
+    TagFieldSpecifications: []
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=FlowLogId': fl-05555555555555555
+    FlowLogId: ''
+    FlowLogStatus: ''
+    ResourceId: ''
+    TrafficType: ''
+    LogDestinationType: ''
+    LogDestination: ''
+    LogFormat: ''
+    DeliverLogsStatus: ''
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: ''
+    DeliverCrossAccountRole: ''
+    LogGroupName: ''
+    MaxAggregationInterval: ''
+    CreationTime: ''
+    DestinationOptions:
+      FileFormat: ''
+      HiveCompatiblePartitions: ''
+      PerHourPartition: ''
+    TagFieldSpecifications: []
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''
+  - '=FlowLogId': fl-06666666666666666
+    FlowLogId: ''
+    FlowLogStatus: ''
+    ResourceId: ''
+    TrafficType: ''
+    LogDestinationType: ''
+    LogDestination: ''
+    LogFormat: ''
+    DeliverLogsStatus: ''
+    DeliverLogsErrorMessage: ''
+    DeliverLogsPermissionArn: ''
+    DeliverCrossAccountRole: ''
+    LogGroupName: ''
+    MaxAggregationInterval: ''
+    CreationTime: ''
+    DestinationOptions:
+      FileFormat: ''
+      HiveCompatiblePartitions: ''
+      PerHourPartition: ''
+    TagFieldSpecifications: []
+    Tags:
+      - '=Key': Name
+        Key: ''
+        Value: ''
+      - '=Key': Environment
+        Key: ''
+        Value: ''

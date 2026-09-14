@@ -1,0 +1,60 @@
+Vpcs:
+  - '=VpcId': vpc-0123456789abcdef0
+    VpcId: 本番環境のメインネットワークを構成する仮想プライベートクラウド。
+    CidrBlock: プライマリCIDRとして /16 を割り当て。
+    DhcpOptionsId: 標準のAmazonProvidedDNSを含むDHCP設定。
+    State: 利用可能状態。
+    OwnerId: 本番アカウント。
+    InstanceTenancy: 共有テナンシー。
+    IsDefault: カスタム作成VPC。
+    CidrBlockAssociationSet:
+      - '=AssociationId': vpc-cidr-assoc-0123456789abcdef0
+        AssociationId: プライマリCIDRの関連付け。
+        CidrBlock: 10.0.0.0/16
+        CidrBlockState:
+          State: 関連付け完了。
+      - '=AssociationId': vpc-cidr-assoc-0123456789abcdef1
+        AssociationId: セカンダリCIDR（EKS Podネットワーク用）。
+        CidrBlock: 100.64.0.0/16
+        CidrBlockState:
+          State: 関連付け完了。
+    Tags:
+      - '=Key': Name
+        Key: リソース識別名。
+        Value: prd-main-vpc
+      - '=Key': Environment
+        Key: 運用環境種別。
+        Value: production
+      - '=Key': CostCenter
+        Key: 費用負担部門コード。
+        Value: system-core
+      - '=Key': ManagedBy
+        Key: 構成管理ツール。
+        Value: terraform
+  - '=VpcId': vpc-0fedcba9876543210
+    VpcId: ステージング検証用の仮想プライベートクラウド。
+    CidrBlock: 検証環境用CIDR。
+    DhcpOptionsId: DHCPオプション設定。
+    State: 利用可能状態。
+    OwnerId: 検証アカウント。
+    InstanceTenancy: 共有テナンシー。
+    IsDefault: カスタム作成VPC。
+    CidrBlockAssociationSet:
+      - '=AssociationId': vpc-cidr-assoc-0fedcba9876543210
+        AssociationId: プライマリCIDR関連付け。
+        CidrBlock: 172.16.0.0/16
+        CidrBlockState:
+          State: 関連付け完了。
+    Tags:
+      - '=Key': Name
+        Key: リソース識別名。
+        Value: stg-main-vpc
+      - '=Key': Environment
+        Key: 運用環境種別。
+        Value: staging
+      - '=Key': CostCenter
+        Key: 費用負担部門。
+        Value: system-core
+      - '=Key': ManagedBy
+        Key: 構成管理ツール。
+        Value: terraform

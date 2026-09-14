@@ -10,7 +10,7 @@
     <div class="card-header bg-slate-100 px-6 py-4 border-b border-slate-200 flex justify-between items-center cursor-pointer hover:bg-slate-200" 
          onclick="YdockUI.Navigation.toggleSection('<%= contentId %>', '<%= iconId %>')">
         <h2 class="text-xl font-bold text-slate-800 flex items-center gap-2">
-            <span id="<%= iconId %>" class="text-slate-400 flex-shrink-0 rotate-icon <%= collapsedClass %>"><svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg></span>
+            <span id="<%= iconId %>" class="text-slate-400 flex-shrink-0 rotate-icon <%= collapsedClass %>"><svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-chevron-down"></use></svg></span>
             <span><%- title %></span>
             <% if (typeof extraHeaderHtml !== 'undefined' && extraHeaderHtml) { %>
                 <%- extraHeaderHtml %>

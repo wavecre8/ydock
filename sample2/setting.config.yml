@@ -1,0 +1,15 @@
+lang: ja
+guideDir: guides
+aliasDir: aliases
+excludeDir: excludes
+index:
+  output: output/index.html
+  title: AWS 大規模インフラストラクチャ サンプル
+
+pages:
+  - title: VPC・ネットワーク設定一覧
+    sources:
+      - sources/vpcs.yml
+      - sources/subnets.yml
+      - sources/flow_logs.yml
+    output: output/network.html
