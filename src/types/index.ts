@@ -1,6 +1,6 @@
 export interface DocDockConfig {
     pages: PageConfig[];
-    mode?: 'cfn' | 'generic';
+    mode?: string;
     lang?: string;
     index?: string | IndexConfig;
     guideDir?: string;
@@ -23,7 +23,7 @@ export interface PageConfig {
     title: string;
     sources: string[];
     output: string;
-    mode?: 'cfn' | 'generic';
+    mode?: string;
     group?: string;
     guideDir?: string;
     aliasDir?: string;
@@ -48,9 +48,6 @@ export interface IndexGroupItem {
 export type YamlValue = string | number | boolean | null | undefined | YamlValue[] | { [key: string]: YamlValue };
 
 export interface YamlTemplate {
-    AWSTemplateFormatVersion?: string;
-    Description?: string | Array<{ fileName: string; content: string }>;
-    Resources?: Record<string, YamlValue>;
     [key: string]: YamlValue;
 }
 
@@ -63,10 +60,22 @@ export interface GuideMeta {
     alias?: string;
 }
 
-// The Structure + Semantics overlay model
+// 単一ソースファイルの構造およびメタデータ
+export interface SingleDocument {
+    sourcePath?: string;
+    sourceBaseName?: string;
+    template: TemplateData;
+    description?: GuideData;
+    excludeTree?: ExcludeTree;
+}
+
+// 構造と意味論の統合ドキュメントモデル
 export interface DocDockDocument {
     template: TemplateData;
     description?: GuideData;
     excludeTree?: ExcludeTree;
-    mode?: 'cfn' | 'generic';
+    mode?: string;
+    sourcePath?: string;
+    sourceBaseName?: string;
+    documents?: SingleDocument[];
 }

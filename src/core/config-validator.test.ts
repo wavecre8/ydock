@@ -18,9 +18,7 @@ describe('ConfigValidator', () => {
                 index: {
                     output: 'output/index.html',
                     title: 'Portal Index',
-                    groups: [
-                        { id: 'grp1', name: 'Group 1' }
-                    ]
+                    groups: [{ id: 'grp1', name: 'Group 1' }]
                 }
             };
 
@@ -205,9 +203,7 @@ describe('ConfigValidator', () => {
             const whitespaceGroupNameConfig = {
                 index: {
                     output: 'output/index.html',
-                    groups: [
-                        { name: '   ' }
-                    ]
+                    groups: [{ name: '   ' }]
                 },
                 pages: [
                     {
@@ -227,9 +223,7 @@ describe('ConfigValidator', () => {
             const whitespaceGroupIdConfig = {
                 index: {
                     output: 'output/index.html',
-                    groups: [
-                        { id: '   ', name: 'Valid Group' }
-                    ]
+                    groups: [{ id: '   ', name: 'Valid Group' }]
                 },
                 pages: [
                     {

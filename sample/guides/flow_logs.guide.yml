@@ -1,5 +1,5 @@
 FlowLogs:
-  - '=FlowLogId': fl-01111111111111111
+  - '[FlowLogId=fl-01111111111111111]': ''
     FlowLogId: ''
     FlowLogStatus: ''
     ResourceId: ''
@@ -19,19 +19,19 @@ FlowLogs:
       HiveCompatiblePartitions: ''
       PerHourPartition: ''
     TagFieldSpecifications:
-      - '=ResourceType': network-interface
+      - '[ResourceType=network-interface]': ''
         ResourceType: ''
         TagKeys:
-          - '=Name': ''
-          - '=Environment': ''
+          - '[Name]': ''
+          - '[Environment]': ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=FlowLogId': fl-02222222222222222
+  - '[FlowLogId=fl-02222222222222222]': ''
     FlowLogId: ''
     FlowLogStatus: ''
     ResourceId: ''
@@ -52,13 +52,13 @@ FlowLogs:
       PerHourPartition: ''
     TagFieldSpecifications: []
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=FlowLogId': fl-03333333333333333
+  - '[FlowLogId=fl-03333333333333333]': ''
     FlowLogId: ''
     FlowLogStatus: ''
     ResourceId: ''
@@ -79,13 +79,13 @@ FlowLogs:
       PerHourPartition: ''
     TagFieldSpecifications: []
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=FlowLogId': fl-04444444444444444
+  - '[FlowLogId=fl-04444444444444444]': ''
     FlowLogId: ''
     FlowLogStatus: ''
     ResourceId: ''
@@ -106,13 +106,13 @@ FlowLogs:
       PerHourPartition: ''
     TagFieldSpecifications: []
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=FlowLogId': fl-05555555555555555
+  - '[FlowLogId=fl-05555555555555555]': ''
     FlowLogId: ''
     FlowLogStatus: ''
     ResourceId: ''
@@ -133,13 +133,13 @@ FlowLogs:
       PerHourPartition: ''
     TagFieldSpecifications: []
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=FlowLogId': fl-06666666666666666
+  - '[FlowLogId=fl-06666666666666666]': ''
     FlowLogId: ''
     FlowLogStatus: ''
     ResourceId: ''
@@ -160,9 +160,9 @@ FlowLogs:
       PerHourPartition: ''
     TagFieldSpecifications: []
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''

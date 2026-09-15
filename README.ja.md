@@ -190,6 +190,7 @@ npx @wavecre8/ydock build -c setting.config.yml --watch
 
 ソースファイルの構造に沿って、説明文を記述します。
 リンク記法 `[表示文](URL)` を使用して、内部参照や外部URLを含めることができます。
+別ページへのリンクを指定する場合は、`ページID::プロパティパス` の形式を使用します。
 
 ```yaml
 Resources:
@@ -199,7 +200,7 @@ Resources:
       CidrBlock: VPC全体のIPv4アドレス範囲 (e.g. 10.0.0.0/16)。詳細は[サブネット設計](Resources.MySubnet)を参照してください。
       Tags:
         0:
-          Value: コスト管理用のプロジェクトタグ
+          Value: コスト管理用のプロジェクトタグ。共通タグの仕様は[共通設定リファレンス](common::Tags)を参照してください。
 ```
 
 ### エイリアスファイルの例
@@ -212,9 +213,10 @@ Resources:
 "Resources.MyVPC.Properties.Tags[]": "リソースタグ"
 "Resources.MyVPC.Properties.Tags[].Key": "タグキー"
 "Resources.MyVPC.Properties.Tags[].Value": "タグ値"
+"Resources.MyVPC.Properties.Tags[Key=Project].Value": "プロジェクトタグ値 (条件付き)"
 ```
 
-配列の全要素に対して同じエイリアスを一括適用する場合は、`[]` を使用します。
+配列の全要素に対して同じエイリアスを一括適用する場合は、`[]` を使用します。特定の条件に一致する要素のみを指定する場合は `[key=value]` を使用します。
 
 ### Excludeファイルの例
 
@@ -228,7 +230,10 @@ Resources:
 "tasks[].overrides": true
 
 # 配列要素の条件一致。特定のプロパティを持つ要素だけを隠します
-"tasks[].attachments[].details[=name:subnetId]": true
+"tasks[].attachments[].details[name=subnetId]": true
+
+# 複数の条件を組み合わせた指定
+"tasks[].containers[name=web&image=nginx]": true
 
 # ワイルドカードと個別表示の組み合わせ
 # containers以下のプロパティを全て隠し、nameとimageだけを表示させる

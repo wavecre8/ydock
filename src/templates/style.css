@@ -52,6 +52,7 @@ pre { margin: 0; white-space: pre-wrap; }
 
     /* Sidebar Width */
     --sidebar-width: 16rem;
+    --sidebar-collapsed-width: 3.5rem;
 }
 
 /* Common Table Classes - Consolidation */
@@ -133,26 +134,54 @@ body.is-resizing .hover-row {
     pointer-events: none; 
 }
 
-/* Sidebar Resizer */
-.sidebar-resizer {
-    position: absolute;
-    top: 0;
-    right: -8px;
-    width: 16px;
-    height: 100%;
-    background: transparent;
-    cursor: ew-resize;
-    z-index: 100;
-    touch-action: none;
+/* サイドバーの基本幅と開閉アニメーション設定 */
+#sidebar {
+    min-width: var(--sidebar-collapsed-width);
+    transition: width 0.2s ease-in-out;
 }
 
-/* Ensure body pointer events when sidebar resizing */
-body.is-sidebar-resizing {
-    cursor: ew-resize;
-    user-select: none;
-}
-body.is-sidebar-resizing iframe {
+/* 通常コンテンツと開閉ボタンの重ね合わせおよびフェード遷移制御 */
+.sidebar-collapsed-content {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    opacity: 0;
+    visibility: hidden;
     pointer-events: none;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+.sidebar-expanded-content {
+    width: 100%;
+    max-width: 100%;
+    opacity: 1;
+    visibility: visible;
+    overflow: hidden;
+    transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+}
+
+/* アニメーション時における内部要素幅の固定と領域外クリッピング設定 */
+.sidebar-expanded-content > header,
+.sidebar-expanded-content > nav,
+.sidebar-expanded-content > footer {
+    width: 100%;
+    min-width: var(--sidebar-width);
+}
+
+/* 折りたたみ時における幅強制上書きと各コンテナの状態遷移 */
+body.sidebar-collapsed #sidebar {
+    width: var(--sidebar-collapsed-width) !important;
+}
+body.sidebar-collapsed .sidebar-collapsed-content {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+}
+body.sidebar-collapsed .sidebar-expanded-content {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 0.15s ease-in-out, visibility 0.15s ease-in-out;
 }
 
 /* Display Modes CSS */
@@ -414,7 +443,7 @@ body.disable-transitions *::after {
 }
 
 @media print {
-    #sidebar, .sidebar-resizer, .col-resizer, .copy-cmd-btn, .tooltip-container, .mode-btn {
+    #sidebar, .col-resizer, .copy-cmd-btn, .tooltip-container, .mode-btn {
         display: none !important;
     }
     main {
@@ -526,3 +555,23 @@ body.is-resizing .copy-cmd-btn {
     opacity: 0 !important;
 }
 
+/* サイドバー目次項目の基本スタイルとトランジション定義 */
+.sidebar-item-btn {
+    position: relative;
+    transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+                color 0.2s ease;
+    transform-origin: left center;
+}
+
+/* 目次項目のホバー時表示制御 */
+.sidebar-item-btn:hover {
+    color: var(--color-primary);
+    transform: translateX(10px);
+}
+
+/* 目次項目のアクティブ時右シフトおよび文字強調 */
+.sidebar-item-btn.is-active {
+    color: var(--color-primary);
+    font-weight: 600;
+    transform: translateX(10px);
+}

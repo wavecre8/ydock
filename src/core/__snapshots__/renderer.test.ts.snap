@@ -28,7 +28,7 @@ exports[`TemplateRenderer > renderValue (Table) > should render object as table 
                 </tr>
             </thead>
             <tbody>
-                <tr id="root__key1" class="hover-row scroll-mt-20">
+                <tr id="root.key1" class="hover-row scroll-mt-20">
             <td class="property-key-cell">
                 <span class="break-all">key1</span>
                 <button data-copy-path="key1" class="copy-cmd-btn" title="Copy Key">

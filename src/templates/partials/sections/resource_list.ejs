@@ -4,7 +4,7 @@
         <% 
             const guideDesc = doc.description?.[sectionName]?.[logicalId];
             const meta = extractMetadata(guideDesc);
-            const targetObject = resource?.Properties ? resource.Properties : resource;
+            const targetObject = strategy && strategy.getTargetObject ? strategy.getTargetObject(resource) : (resource?.Properties ? resource.Properties : resource);
             
             const alias = meta.alias;
             // Build path context
@@ -47,12 +47,14 @@
                 components: components,
                 targetObject: targetObject,
                 uniqueId: uniqueId,
+                strategy: strategy,
                 isIntrinsic: isIntrinsic,
                 extractMetadata: extractMetadata,
                 renderFlow: renderFlow,
                 renderValue: renderValue,
                 renderMarkdownClient: renderMarkdownClient,
                 renderTooltip: renderTooltip,
+                renderAliasedKey: renderAliasedKey,
                 createContext: createContext
             }
         }) %>

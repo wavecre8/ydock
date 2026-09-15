@@ -1,20 +1,21 @@
 import * as ejs from 'ejs';
 import * as fs from 'fs';
 import * as path from 'path';
-import { DocDockDocument } from '../types';
+import { DocDockDocument, SingleDocument } from '../types';
 import { ModeStrategy } from '../modes/types';
 import { TemplateRenderer } from './renderer';
 import { DocDockConstants } from './constants';
-import { MarkdownProcessor } from './markdown-processor';
+import { MarkdownProcessor, DocPrefixOption } from './markdown-processor';
 import { HtmlComponents } from './html-components';
-import { DocumentPreprocessor } from './document-preprocessor';
-import { ConditionMatcher } from './condition-matcher';
 import { RenderContext } from './render-context';
 import { HtmlMinifier } from './html-minifier';
+import { DocumentIndex } from './document-index';
+import { CrossDocLinkResolver } from './cross-doc-link-resolver';
 
 export interface GeneratorOptions {
     readFile?: (filePath: string) => string;
     fileExists?: (filePath: string) => boolean;
+    pageRouteMap?: Map<string, string>;
 }
 
 export class Generator {
@@ -30,28 +31,72 @@ export class Generator {
         const fileExists = options?.fileExists || ((p) => fs.existsSync(p));
 
         const templateContent = readFile(templatePath);
-        const matcher = new ConditionMatcher(strategy, doc);
-        const processedDoc = DocumentPreprocessor.process(doc, matcher);
-        const renderer = new TemplateRenderer(strategy, processedDoc, matcher);
 
-        const IGNORED_SECTIONS = strategy.getIgnoredSections();
-        const renderableSections = Object.keys(processedDoc.template).filter((key) => {
-            return !IGNORED_SECTIONS.includes(key);
-        });
-
+        const IGNORED_SECTIONS = (strategy.getIgnoredSections && strategy.getIgnoredSections()) || [];
         const SORT_ORDER = strategy.getSectionSortOrder();
-        if (SORT_ORDER) {
-            renderableSections.sort((a, b) => {
+
+        // セクションの表示順序ソート関数
+        const sortSections = (sections: string[]): string[] => {
+            if (!SORT_ORDER) return sections;
+            return [...sections].sort((a, b) => {
                 const indexA = SORT_ORDER.indexOf(a);
                 const indexB = SORT_ORDER.indexOf(b);
-
                 if (indexA !== -1 && indexB !== -1) return indexA - indexB;
                 if (indexA !== -1) return -1;
                 if (indexB !== -1) return 1;
-
                 return 0;
             });
-        }
+        };
+
+        // 直列ドキュメント配列の正規化
+        const rawDocuments: SingleDocument[] =
+            doc.documents && doc.documents.length > 0
+                ? doc.documents
+                : [
+                      {
+                          sourcePath: '',
+                          sourceBaseName: '',
+                          template: doc.template,
+                          description: doc.description,
+                          excludeTree: doc.excludeTree
+                      }
+                  ];
+
+        // 全ドキュメントのトップレベルキー情報の収集と複数ドキュメント判定
+        const isMultiDoc = rawDocuments.length > 1;
+
+        // ドキュメントごとのインデックス構築
+        const preparedDocs = rawDocuments.map((rawDoc, docIndex) =>
+            DocumentIndex.indexDocument(rawDoc, docIndex, isMultiDoc, doc, strategy, sortSections, IGNORED_SECTIONS)
+        );
+
+        // ドキュメント横断リンク解決器の初期化
+        const crossDocResolver = new CrossDocLinkResolver(preparedDocs, isMultiDoc, strategy, options?.pageRouteMap);
+
+        // 各ドキュメントに対するレンダラーおよびリンク解決関数のバインド
+        const processedDocuments = preparedDocs.map((item) => {
+            // 単一ドキュメント用リンク解決関数の取得
+            const linkResolver = crossDocResolver.createLinkResolver(item);
+            const docRenderer = new TemplateRenderer(strategy, item.processedSingleDoc, item.docMatcher, linkResolver);
+
+            return {
+                docIndex: item.docIndex,
+                docPrefix: item.currentDocPrefix,
+                linkResolver,
+                sourcePath: item.rawDoc.sourcePath,
+                sourceBaseName: item.rawDoc.sourceBaseName,
+                doc: item.processedSingleDoc,
+                renderableSections: item.singleSections,
+                matcher: item.docMatcher,
+                renderer: docRenderer
+            };
+        });
+
+        // 先頭ドキュメントに基づく互換用変数の参照
+        const primaryDoc = processedDocuments[0];
+        const processedDoc = primaryDoc.doc;
+        const renderableSections = primaryDoc.renderableSections;
+        const primaryRenderer = primaryDoc.renderer;
 
         // Normalize path for Windows compatibility with ejs
         const templateDir = path.dirname(templatePath).replace(/\\/g, '/');
@@ -60,19 +105,23 @@ export class Generator {
             templateContent,
             {
                 doc: processedDoc,
+                processedDocuments,
                 title,
                 language,
                 constants: DocDockConstants,
                 strategy,
                 renderableSections,
-                extractMetadata: matcher.extractMetadata.bind(matcher),
-                renderMarkdownClient: MarkdownProcessor.render.bind(MarkdownProcessor),
-                renderTooltip: HtmlComponents.renderTooltip.bind(HtmlComponents),
+                extractMetadata: primaryDoc.matcher.extractMetadata.bind(primaryDoc.matcher),
+                renderMarkdownClient: (text: string, docPrefix?: DocPrefixOption) =>
+                    MarkdownProcessor.render(text, docPrefix, strategy),
+                renderTooltip: (descText: string | undefined, docPrefix?: DocPrefixOption) =>
+                    HtmlComponents.renderTooltip(descText, docPrefix),
                 renderAliasedKey: HtmlComponents.renderAliasedKey.bind(HtmlComponents),
                 escapeHtml: HtmlComponents.escape.bind(HtmlComponents),
-                isIntrinsic: renderer.isIntrinsic.bind(renderer),
-                renderFlow: (val: any) => renderer.renderFlow(val, new RenderContext(0)),
-                renderValue: (val: any, desc: any, ctx: RenderContext) => renderer.renderValue(val, desc, ctx),
+                isIntrinsic: primaryRenderer.isIntrinsic.bind(primaryRenderer),
+                renderFlow: (val: any) => primaryRenderer.renderFlow(val, new RenderContext(0)),
+                renderValue: (val: any, desc: any, ctx: RenderContext) => primaryRenderer.renderValue(val, desc, ctx),
+                RenderContext,
                 createContext: RenderContext.create
             },
             {

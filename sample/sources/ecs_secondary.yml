@@ -1,0 +1,18 @@
+tasks:
+- availabilityZone: us-east-1a
+  clusterArn: arn:aws:ecs:us-east-1:123456789012:cluster/StagingCluster
+  cpu: '512'
+  memory: '1024'
+  taskArn: arn:aws:ecs:us-east-1:123456789012:task/StagingCluster/staging-task-001
+  containers:
+  - name: api
+    image: node:18-alpine
+    cpu: '256'
+    memory: '512'
+  overrides:
+    containerOverrides:
+    - name: api
+  attachments:
+  - id: staging-eni-001
+    type: ElasticNetworkInterface
+    status: ATTACHED

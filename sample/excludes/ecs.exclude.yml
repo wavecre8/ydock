@@ -8,12 +8,12 @@
 "tasks[].createdAt": true
 
 "tasks[].overrides": true
-"tasks[].attachments[].details[=name:subnetId]": true
-"tasks[].attachments[].details[=name:macAddress]": true
+"tasks[].attachments[].details[name=subnetId]": true
+"tasks[].attachments[].details[name=macAddress]": true
 "tasks[].containers[].name": false
 "tasks[].containers[].image": false
 "tasks[].attachments[].attributes": true
-"tasks[].attachments[].attributes[=name:ecs.cpu-architecture]": false
+"tasks[].attachments[].attributes[name=ecs.cpu-architecture]": false
 "failures": true
 "tasks": false
 "tasks[].attachments": false

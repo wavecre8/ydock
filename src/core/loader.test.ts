@@ -9,7 +9,7 @@ describe('Loader', () => {
         it('should load YAML config', () => {
             const yamlContent = 'title: MyConfig\npages: []';
             vi.mocked(fs.readFileSync).mockReturnValue(yamlContent);
-            
+
             const config = Loader.loadConfig('config.yaml');
             expect(config).toEqual({ title: 'MyConfig', pages: [] });
         });
@@ -19,7 +19,7 @@ describe('Loader', () => {
         it('should load YAML template', () => {
             const yamlContent = 'Key: Value';
             vi.mocked(fs.readFileSync).mockReturnValue(yamlContent);
-            
+
             const template = Loader.loadTemplate('template.yaml');
             expect(template).toEqual({ Key: 'Value' });
         });

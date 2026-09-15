@@ -1,5 +1,5 @@
 import { ModeStrategy } from '../modes/types';
-import { MarkdownProcessor } from './markdown-processor';
+import { MarkdownProcessor, DocPrefixOption } from './markdown-processor';
 import { HtmlComponents } from './html-components';
 import { YamlValue, DocDockDocument } from '../types';
 import { ConditionMatcher } from './condition-matcher';
@@ -9,11 +9,18 @@ export class TemplateRenderer {
     private strategy: ModeStrategy;
     private doc?: DocDockDocument;
     private matcher: ConditionMatcher;
+    private docPrefix?: DocPrefixOption;
 
-    constructor(strategy: ModeStrategy, doc?: DocDockDocument, matcher?: ConditionMatcher) {
+    constructor(
+        strategy: ModeStrategy,
+        doc?: DocDockDocument,
+        matcher?: ConditionMatcher,
+        docPrefix?: DocPrefixOption
+    ) {
         this.strategy = strategy;
         this.doc = doc;
         this.matcher = matcher || new ConditionMatcher(strategy, doc);
+        this.docPrefix = docPrefix;
     }
 
     isIntrinsic(val: unknown): boolean {
@@ -21,11 +28,11 @@ export class TemplateRenderer {
     }
 
     renderMarkdownClient(text: string): string {
-        return MarkdownProcessor.render(text);
+        return MarkdownProcessor.render(text, this.docPrefix);
     }
 
     renderTooltip(descText: string | undefined): string {
-        return HtmlComponents.renderTooltip(descText);
+        return HtmlComponents.renderTooltip(descText, this.docPrefix);
     }
 
     renderAliasedKey(key: string | number, alias: string | undefined): string {
@@ -67,11 +74,7 @@ export class TemplateRenderer {
         return JSON.stringify(val);
     }
 
-    renderValue(
-        val: YamlValue,
-        desc: YamlValue,
-        ctx: RenderContext
-    ): string {
+    renderValue(val: YamlValue, desc: YamlValue, ctx: RenderContext): string {
         if (val === undefined || val === null) return '';
 
         if (this.matcher.isPrimitive(val)) {
@@ -97,10 +100,7 @@ export class TemplateRenderer {
         return HtmlComponents.renderPrimitive(val);
     }
 
-    private renderIntrinsic(
-        val: Record<string, YamlValue>,
-        ctx: RenderContext
-    ): string {
+    private renderIntrinsic(val: Record<string, YamlValue>, ctx: RenderContext): string {
         const key = Object.keys(val)[0];
         const innerVal = val[key];
 
@@ -114,11 +114,7 @@ export class TemplateRenderer {
         return HtmlComponents.renderIntrinsicBlock(key, innerHtml);
     }
 
-    private renderArray(
-        val: YamlValue[],
-        desc: YamlValue,
-        ctx: RenderContext
-    ): string {
+    private renderArray(val: YamlValue[], desc: YamlValue, ctx: RenderContext): string {
         if (val.length === 0) return '';
 
         const allPrimitives = val.every((item) => this.matcher.isPrimitive(item));
@@ -130,11 +126,7 @@ export class TemplateRenderer {
         }
     }
 
-    private renderPrimitiveArray(
-        val: YamlValue[],
-        desc: YamlValue,
-        ctx: RenderContext
-    ): string {
+    private renderPrimitiveArray(val: YamlValue[], desc: YamlValue, ctx: RenderContext): string {
         const seenSegments = new Set<string>();
         const rowsHtml = val
             .map((item, i) => {
@@ -144,16 +136,17 @@ export class TemplateRenderer {
                 const meta = this.matcher.extractMetadata(itemDesc);
                 const descText = meta.description || '';
 
-                // 条件一致セグメントの導出
-                const baseSegment = this.matcher.getMatchingConditionSegment(item, desc, ctx.rawPath);
-                // 同一条件要素に対する一意なDOM IDセグメントの導出
-                let segment = baseSegment || String(i);
-                if (seenSegments.has(segment)) {
-                    segment = baseSegment ? `${baseSegment}_${i}` : String(i);
-                }
+                // 一意なセグメント識別子の導出
+                const { segment, baseSegment } = this.matcher.deriveUniqueSegment(
+                    item,
+                    desc,
+                    i,
+                    (s) => seenSegments.has(s),
+                    ctx.rawPath
+                );
                 seenSegments.add(segment);
                 // 子描画コンテキストの生成
-                const itemCtx = ctx.child(segment, undefined, false);
+                const itemCtx = ctx.child(segment, baseSegment || segment, false);
 
                 // ツールチップ表示HTMLの生成
                 const tooltipHtml = this.renderTooltip(descText);
@@ -177,11 +170,7 @@ export class TemplateRenderer {
         return HtmlComponents.renderPrimitiveArrayTable(rowsHtml);
     }
 
-    private renderComplexArray(
-        val: YamlValue[],
-        desc: YamlValue,
-        ctx: RenderContext
-    ): string {
+    private renderComplexArray(val: YamlValue[], desc: YamlValue, ctx: RenderContext): string {
         const seenSegments = new Set<string>();
         const itemsHtml = val
             .map((item, i) => {
@@ -190,13 +179,14 @@ export class TemplateRenderer {
                 // ガイド情報からのメタデータ抽出
                 const meta = this.matcher.extractMetadata(itemDesc);
 
-                // 条件一致セグメントの導出
-                const baseSegment = this.matcher.getMatchingConditionSegment(item, desc, ctx.rawPath);
-                // 同一条件要素に対する一意なDOM IDセグメントの導出
-                let segment = baseSegment || String(i);
-                if (seenSegments.has(segment)) {
-                    segment = baseSegment ? `${baseSegment}_${i}` : String(i);
-                }
+                // 一意なセグメント識別子の導出
+                const { segment, baseSegment } = this.matcher.deriveUniqueSegment(
+                    item,
+                    desc,
+                    i,
+                    (s) => seenSegments.has(s),
+                    ctx.rawPath
+                );
                 seenSegments.add(segment);
                 // 子描画コンテキストの生成
                 const itemCtx = ctx.child(segment, baseSegment || segment, false);
@@ -209,7 +199,8 @@ export class TemplateRenderer {
                     String(i),
                     innerHtml,
                     meta.alias,
-                    meta.description
+                    meta.description,
+                    this.docPrefix
                 );
             })
             .join('');
@@ -218,11 +209,7 @@ export class TemplateRenderer {
         return HtmlComponents.renderComplexArrayContainer(itemsHtml);
     }
 
-    private renderObjectAsTable(
-        val: Record<string, YamlValue>,
-        desc: YamlValue,
-        ctx: RenderContext
-    ): string {
+    private renderObjectAsTable(val: Record<string, YamlValue>, desc: YamlValue, ctx: RenderContext): string {
         const keys = Object.keys(val);
         if (keys.length === 0) return '{}';
 
@@ -237,7 +224,7 @@ export class TemplateRenderer {
 
                 const descText = meta.description;
                 const alias = meta.alias;
-                
+
                 const itemCtx = ctx.child(key, key, true);
 
                 const keyHtml = this.renderAliasedKey(key, alias);

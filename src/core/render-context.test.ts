@@ -21,9 +21,9 @@ describe('RenderContext', () => {
     it('should derive child context and increment level by default', () => {
         const ctx = new RenderContext(0, 'root', ['root'], 'root');
         const childCtx = ctx.child('child-seg', 'child-raw');
-        
+
         expect(childCtx.level).toBe(1);
-        expect(childCtx.path).toBe('root__child-seg'); // '-' is allowed
+        expect(childCtx.path).toBe('root.child-seg');
         expect(childCtx.rawPath).toEqual(['root', 'child-raw']);
         expect(childCtx.copyPath).toBe('root.child-raw');
     });
@@ -31,23 +31,23 @@ describe('RenderContext', () => {
     it('should derive copyPath correctly for numeric segments', () => {
         const ctx = new RenderContext(0, 'root', ['root'], 'root');
         const childCtx = ctx.child('0', '0');
-        
-        expect(childCtx.copyPath).toBe('root[]');
+
+        expect(childCtx.copyPath).toBe('root[0]');
     });
 
     it('should derive copyPath correctly for condition segments', () => {
         const ctx = new RenderContext(0, 'root', ['root'], 'root');
-        const childCtx = ctx.child('=name:web', '=name:web');
-        
-        expect(childCtx.copyPath).toBe('root[=name:web]');
+        const childCtx = ctx.child('[name=web]', '[name=web]');
+
+        expect(childCtx.copyPath).toBe('root[name=web]');
     });
 
     it('should derive child context without incrementing level if specified', () => {
         const ctx = new RenderContext(1, 'root', ['root'], 'root');
         const childCtx = ctx.child('seg', 'raw', false);
-        
+
         expect(childCtx.level).toBe(1);
-        expect(childCtx.path).toBe('root__seg');
+        expect(childCtx.path).toBe('root.seg');
         expect(childCtx.rawPath).toEqual(['root', 'raw']);
         expect(childCtx.copyPath).toBe('root.raw');
     });
@@ -55,14 +55,19 @@ describe('RenderContext', () => {
     it('should handle deriving path when current path is undefined', () => {
         const ctx = new RenderContext();
         const childCtx = ctx.child('seg', 'raw');
-        
+
         expect(childCtx.path).toBe('seg');
         expect(childCtx.rawPath).toEqual(['raw']);
         expect(childCtx.copyPath).toBe('raw');
     });
 
     it('should derive copyPath correctly in RenderContext.create for condition segments', () => {
-        const ctx = RenderContext.create(['tasks', '=taskArn:arn:aws...', 'attachments']);
-        expect(ctx.copyPath).toBe('tasks[=taskArn:arn:aws...].attachments');
+        const ctx = RenderContext.create(['tasks', '[taskArn=arn:aws...]', 'attachments']);
+        expect(ctx.copyPath).toBe('tasks[taskArn=arn:aws...].attachments');
+    });
+
+    it('should derive copyPath correctly for segments containing dots', () => {
+        const ctx = RenderContext.create(['Resources', 'v1.0', 'Properties']);
+        expect(ctx.copyPath).toBe('Resources[v1.0].Properties');
     });
 });

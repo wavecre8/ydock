@@ -1,7 +1,7 @@
 Reservations:
-  - '=ReservationId': r-99999999999
+  - '[ReservationId=r-99999999999]': ''
     Instances:
-      - '=InstanceId': i-99999999999999999
+      - '[InstanceId=i-99999999999999999]': ''
         ImageId: AMI ID to use. Region-specific. Check [AWS Systems Manager Parameter Store](https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-public-parameters-ami.html) for latest IDs.
         InstanceType: Instance type. t3.micro is eligible for free tier.
         State:
@@ -12,22 +12,22 @@ Reservations:
             80 = stopped
           Name: Current state name
         BlockDeviceMappings:
-          - '=DeviceName': /dev/xvda
+          - '[DeviceName=/dev/xvda]': ''
             Ebs:
               DeleteOnTermination: |-
                 Whether to delete the volume when instance is terminated
-                (See [ECS RuntimeID](tasks[=taskArn:arn:aws:ecs:us-east-1:123456789012:task/MyCluster/74de0355a10a4f979ac495c14EXAMPLE].containers[=name:web].runtimeId))
+                (See [ECS RuntimeID](ecs::tasks[taskArn=arn:aws:ecs:us-east-1:123456789012:task/MyCluster/74de0355a10a4f979ac495c14EXAMPLE].containers[name=web].runtimeId))
               VolumeId: EBS volume ID
         NetworkInterfaces:
-          - '=NetworkInterfaceId': eni-xxxxxxxxxxxxx
+          - '[NetworkInterfaceId=eni-xxxxxxxxxxxxx]': ''
             Association:
               PublicIp: Elastic IP or auto-assigned public IP
             Groups:
-              - '=GroupId': sg-999999999
+              - '[GroupId=sg-999999999]': ''
                 GroupId: Security group ID (e.g. sg-xxxxx)
             PrivateIpAddresses: null
         Tags:
-          - '=Key': HostName
+          - '[Key=HostName]': ''
             Key: Tag key
             Value: Tag value. Used for cost allocation and automation.
         MetadataOptions:
@@ -38,10 +38,10 @@ Reservations:
 
             Details: [Use IMDSv2](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html)
     OwnerId: ''
-  - '=Groups': []
+  - '[Groups]': ''
     Groups: []
     Instances:
-      - '=AmiLaunchIndex': 0
+      - '[AmiLaunchIndex=0]': ''
         AmiLaunchIndex: ''
         ImageId: ''
         InstanceId: ''
@@ -67,7 +67,7 @@ Reservations:
         VpcId: ''
         Architecture: ''
         BlockDeviceMappings:
-          - '=DeviceName': /dev/xvda
+          - '[DeviceName=/dev/xvda]': ''
             DeviceName: ''
             Ebs:
               AttachTime: ''
@@ -79,7 +79,7 @@ Reservations:
         EnaSupport: ''
         Hypervisor: ''
         NetworkInterfaces:
-          - '=Association':
+          - '[Association]':
               IpOwnerId: '99999999999999'
               PublicDnsName: ec2-255-255-255-255.ap-northeast-1.compute.amazonaws.com
               PublicIp: 999.255.255.255
@@ -96,7 +96,7 @@ Reservations:
               NetworkCardIndex: ''
             Description: ''
             Groups:
-              - '=GroupName': security-group-name
+              - '[GroupName=security-group-name]': ''
                 GroupName: ''
                 GroupId: ''
             Ipv6Addresses: []
@@ -106,7 +106,7 @@ Reservations:
             PrivateDnsName: ''
             PrivateIpAddress: ''
             PrivateIpAddresses:
-              - '=Association':
+              - '[Association]':
                   IpOwnerId: '99999999999999'
                   PublicDnsName: ec2-255-255-255-157.ap-northeast-1.compute.amazonaws.com
                   PublicIp: 255.255.255.255
@@ -125,18 +125,18 @@ Reservations:
         RootDeviceName: ''
         RootDeviceType: ''
         SecurityGroups:
-          - '=GroupName': Security-Group-Name
+          - '[GroupName=Security-Group-Name]': ''
             GroupName: ''
             GroupId: ''
         SourceDestCheck: ''
         Tags:
-          - '=Key': HostName
+          - '[Key=HostName]': ''
             Key: ''
             Value: ''
-          - '=Key': cost-allocation
+          - '[Key=cost-allocation]': ''
             Key: ''
             Value: ''
-          - '=Key': Name
+          - '[Key=Name]': ''
             Key: ''
             Value: ''
         VirtualizationType: ''
@@ -162,7 +162,7 @@ Reservations:
         PrivateDnsNameOptions: {}
         MaintenanceOptions:
           AutoRecovery: ''
-      - '=AmiLaunchIndex': 0
+      - '[AmiLaunchIndex=0]': ''
         AmiLaunchIndex: ''
         ImageId: ''
         InstanceId: ''
@@ -188,7 +188,7 @@ Reservations:
         VpcId: ''
         Architecture: ''
         BlockDeviceMappings:
-          - '=DeviceName': /dev/xvda
+          - '[DeviceName=/dev/xvda]': ''
             DeviceName: ''
             Ebs:
               AttachTime: ''
@@ -200,7 +200,7 @@ Reservations:
         EnaSupport: ''
         Hypervisor: ''
         NetworkInterfaces:
-          - '=Association':
+          - '[Association]':
               IpOwnerId: '99999999999999'
               PublicDnsName: ec2-255-255-255-255.ap-northeast-1.compute.amazonaws.com
               PublicIp: 999.255.255.255
@@ -217,7 +217,7 @@ Reservations:
               NetworkCardIndex: ''
             Description: ''
             Groups:
-              - '=GroupName': security-group-name
+              - '[GroupName=security-group-name]': ''
                 GroupName: ''
                 GroupId: ''
             Ipv6Addresses: []
@@ -227,7 +227,7 @@ Reservations:
             PrivateDnsName: ''
             PrivateIpAddress: ''
             PrivateIpAddresses:
-              - '=Association':
+              - '[Association]':
                   IpOwnerId: '99999999999999'
                   PublicDnsName: ec2-255-255-255-157.ap-northeast-1.compute.amazonaws.com
                   PublicIp: 255.255.255.255
@@ -246,18 +246,18 @@ Reservations:
         RootDeviceName: ''
         RootDeviceType: ''
         SecurityGroups:
-          - '=GroupName': Security-Group-Name
+          - '[GroupName=Security-Group-Name]': ''
             GroupName: ''
             GroupId: ''
         SourceDestCheck: ''
         Tags:
-          - '=Key': HostName
+          - '[Key=HostName]': ''
             Key: ''
             Value: ''
-          - '=Key': cost-allocation
+          - '[Key=cost-allocation]': ''
             Key: ''
             Value: ''
-          - '=Key': Name
+          - '[Key=Name]': ''
             Key: ''
             Value: ''
         VirtualizationType: ''
@@ -285,10 +285,10 @@ Reservations:
           AutoRecovery: ''
     OwnerId: ''
     ReservationId: ''
-  - '=Groups': []
+  - '[Groups]': ''
     Groups: []
     Instances:
-      - '=AmiLaunchIndex': 0
+      - '[AmiLaunchIndex=0]': ''
         AmiLaunchIndex: ''
         ImageId: ''
         InstanceId: ''
@@ -314,7 +314,7 @@ Reservations:
         VpcId: ''
         Architecture: ''
         BlockDeviceMappings:
-          - '=DeviceName': /dev/xvda
+          - '[DeviceName=/dev/xvda]': ''
             DeviceName: ''
             Ebs:
               AttachTime: ''
@@ -326,7 +326,7 @@ Reservations:
         EnaSupport: ''
         Hypervisor: ''
         NetworkInterfaces:
-          - '=Association':
+          - '[Association]':
               IpOwnerId: '99999999999999'
               PublicDnsName: ec2-255-255-255-255.ap-northeast-1.compute.amazonaws.com
               PublicIp: 999.255.255.255
@@ -343,7 +343,7 @@ Reservations:
               NetworkCardIndex: ''
             Description: ''
             Groups:
-              - '=GroupName': security-group-name
+              - '[GroupName=security-group-name]': ''
                 GroupName: ''
                 GroupId: ''
             Ipv6Addresses: []
@@ -353,7 +353,7 @@ Reservations:
             PrivateDnsName: ''
             PrivateIpAddress: ''
             PrivateIpAddresses:
-              - '=Association':
+              - '[Association]':
                   IpOwnerId: '99999999999999'
                   PublicDnsName: ec2-255-255-255-157.ap-northeast-1.compute.amazonaws.com
                   PublicIp: 255.255.255.255
@@ -372,18 +372,18 @@ Reservations:
         RootDeviceName: ''
         RootDeviceType: ''
         SecurityGroups:
-          - '=GroupName': Security-Group-Name
+          - '[GroupName=Security-Group-Name]': ''
             GroupName: ''
             GroupId: ''
         SourceDestCheck: ''
         Tags:
-          - '=Key': HostName
+          - '[Key=HostName]': ''
             Key: ''
             Value: ''
-          - '=Key': cost-allocation
+          - '[Key=cost-allocation]': ''
             Key: ''
             Value: ''
-          - '=Key': Name
+          - '[Key=Name]': ''
             Key: ''
             Value: ''
         VirtualizationType: ''
@@ -409,7 +409,7 @@ Reservations:
         PrivateDnsNameOptions: {}
         MaintenanceOptions:
           AutoRecovery: ''
-      - '=AmiLaunchIndex': 0
+      - '[AmiLaunchIndex=0]': ''
         AmiLaunchIndex: ''
         ImageId: ''
         InstanceId: ''
@@ -435,7 +435,7 @@ Reservations:
         VpcId: ''
         Architecture: ''
         BlockDeviceMappings:
-          - '=DeviceName': /dev/xvda
+          - '[DeviceName=/dev/xvda]': ''
             DeviceName: ''
             Ebs:
               AttachTime: ''
@@ -447,7 +447,7 @@ Reservations:
         EnaSupport: ''
         Hypervisor: ''
         NetworkInterfaces:
-          - '=Association':
+          - '[Association]':
               IpOwnerId: '99999999999999'
               PublicDnsName: ec2-255-255-255-255.ap-northeast-1.compute.amazonaws.com
               PublicIp: 999.255.255.255
@@ -464,7 +464,7 @@ Reservations:
               NetworkCardIndex: ''
             Description: ''
             Groups:
-              - '=GroupName': security-group-name
+              - '[GroupName=security-group-name]': ''
                 GroupName: ''
                 GroupId: ''
             Ipv6Addresses: []
@@ -474,7 +474,7 @@ Reservations:
             PrivateDnsName: ''
             PrivateIpAddress: ''
             PrivateIpAddresses:
-              - '=Association':
+              - '[Association]':
                   IpOwnerId: '99999999999999'
                   PublicDnsName: ec2-255-255-255-157.ap-northeast-1.compute.amazonaws.com
                   PublicIp: 255.255.255.255
@@ -493,18 +493,18 @@ Reservations:
         RootDeviceName: ''
         RootDeviceType: ''
         SecurityGroups:
-          - '=GroupName': Security-Group-Name
+          - '[GroupName=Security-Group-Name]': ''
             GroupName: ''
             GroupId: ''
         SourceDestCheck: ''
         Tags:
-          - '=Key': HostName
+          - '[Key=HostName]': ''
             Key: ''
             Value: ''
-          - '=Key': cost-allocation
+          - '[Key=cost-allocation]': ''
             Key: ''
             Value: ''
-          - '=Key': Name
+          - '[Key=Name]': ''
             Key: ''
             Value: ''
         VirtualizationType: ''

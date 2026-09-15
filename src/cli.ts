@@ -6,10 +6,7 @@ import packageJson from '../package.json';
 
 const program = new Command();
 
-program
-    .name('ydock')
-    .description('Generate human-readable documentation from YAML files')
-    .version(packageJson.version);
+program.name('ydock').description('Generate human-readable documentation from YAML files').version(packageJson.version);
 
 program
     .command('init')
@@ -32,7 +29,11 @@ program
     .command('skeleton')
     .description('Generate skeleton files (alias, guide, exclude) based on setting.config')
     .option('-c, --config <path>', 'Path to setting.config')
-    .option('-t, --type <type>', 'Generate skeleton type: alias, guide, exclude, all', DocDockConstants.SkeletonTypes.All)
+    .option(
+        '-t, --type <type>',
+        'Generate skeleton type: alias, guide, exclude, all',
+        DocDockConstants.SkeletonTypes.All
+    )
     .action(async (options) => {
         await Commands.skeleton(options);
     });

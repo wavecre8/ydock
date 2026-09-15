@@ -100,7 +100,7 @@ export class IndexBuilder {
         uncategorizedGroupName: string
     ): { groups: IndexGroupItem[]; hasGroups: boolean } {
         // 全ページにおけるグループ指定の有無判定
-        const anyPageHasGroup = pages.some(page => typeof page.group === 'string' && page.group.trim().length > 0);
+        const anyPageHasGroup = pages.some((page) => typeof page.group === 'string' && page.group.trim().length > 0);
         const hasConfiguredGroups = Array.isArray(configuredGroups) && configuredGroups.length > 0;
         const hasGroups = anyPageHasGroup || hasConfiguredGroups;
 
@@ -131,9 +131,10 @@ export class IndexBuilder {
 
                 // グループ識別子および名称双方のキー登録
                 if (groupConfig.id && groupConfig.id.trim().length > 0) {
-                    groupMap.set(groupConfig.id.trim(), groupItem);
+                    const trimmedId = groupConfig.id.trim();
+                    groupMap.set(trimmedId.toLowerCase(), groupItem);
                 }
-                groupMap.set(groupName, groupItem);
+                groupMap.set(groupName.toLowerCase(), groupItem);
             }
 
             const uncategorizedPages: IndexPageItem[] = [];
@@ -141,8 +142,10 @@ export class IndexBuilder {
             for (const page of pages) {
                 const targetKey = typeof page.group === 'string' ? page.group.trim() : '';
                 if (targetKey.length > 0) {
-                    if (groupMap.has(targetKey)) {
-                        groupMap.get(targetKey)!.pages.push(page);
+                    // 小文字統一キーによるグループ照合判定
+                    const matchedGroup = groupMap.get(targetKey.toLowerCase());
+                    if (matchedGroup) {
+                        matchedGroup.pages.push(page);
                     } else {
                         // 設定外のグループ名が指定された場合の動的グループ追加
                         const dynamicGroupItem: IndexGroupItem = {
@@ -150,6 +153,7 @@ export class IndexBuilder {
                             pages: [page]
                         };
                         groupMap.set(targetKey, dynamicGroupItem);
+                        groupMap.set(targetKey.toLowerCase(), dynamicGroupItem);
                         groupList.push(dynamicGroupItem);
                     }
                 } else {
@@ -167,7 +171,8 @@ export class IndexBuilder {
 
             // 未分類ページ群の既存同名グループへの合流または新規追加処理
             if (uncategorizedPages.length > 0) {
-                const existingGroup = resultGroups.find(group => group.name === uncategorizedGroupName);
+                const targetLower = uncategorizedGroupName.toLowerCase();
+                const existingGroup = resultGroups.find((group) => group.name.toLowerCase() === targetLower);
                 if (existingGroup) {
                     existingGroup.pages.push(...uncategorizedPages);
                 } else {
@@ -191,13 +196,15 @@ export class IndexBuilder {
         for (const page of pages) {
             const groupKey = typeof page.group === 'string' ? page.group.trim() : '';
             if (groupKey.length > 0) {
-                if (!orderMap.has(groupKey)) {
-                    orderMap.set(groupKey, {
+                // 大文字小文字を同一視した正規化キーによる順序管理
+                const normalizedKey = groupKey.toLowerCase();
+                if (!orderMap.has(normalizedKey)) {
+                    orderMap.set(normalizedKey, {
                         name: groupKey,
                         pages: []
                     });
                 }
-                orderMap.get(groupKey)!.pages.push(page);
+                orderMap.get(normalizedKey)!.pages.push(page);
             } else {
                 uncategorizedPages.push(page);
             }
@@ -206,7 +213,8 @@ export class IndexBuilder {
         const resultGroups = Array.from(orderMap.values());
         // 未分類ページ群の既存同名グループへの合流または新規追加処理
         if (uncategorizedPages.length > 0) {
-            const existingGroup = resultGroups.find(group => group.name === uncategorizedGroupName);
+            const targetLower = uncategorizedGroupName.toLowerCase();
+            const existingGroup = resultGroups.find((group) => group.name.toLowerCase() === targetLower);
             if (existingGroup) {
                 existingGroup.pages.push(...uncategorizedPages);
             } else {

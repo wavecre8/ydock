@@ -1,18 +1,22 @@
 import * as chokidar from 'chokidar';
 import * as path from 'path';
 import * as fs from 'fs';
+import * as yaml from 'js-yaml';
 import { DocDockBuilder, BuildOptions } from './builder';
 import { Loader } from './loader';
 import { Logger } from './logger';
 import { DocDockConstants } from './constants';
+import { ConfigUtils } from './config-utils';
 
 const browserSync = require('browser-sync');
 
 export class Watcher {
-    private static bs = browserSync.create();
-    private static rebuildTimeout: NodeJS.Timeout;
-
     static async start(options: BuildOptions & { open?: boolean }) {
+        const bs = browserSync.create();
+        let rebuildTimeout: NodeJS.Timeout;
+        let isBuilding = false;
+        let pendingRebuild = false;
+        let latestFilePath: string = '';
         Logger.info('Starting watch mode...');
 
         try {
@@ -40,7 +44,7 @@ export class Watcher {
 
         startPath = startPath.replace(/\\/g, '/');
 
-        this.bs.init(
+        bs.init(
             {
                 server: {
                     baseDir: [configDir, process.cwd()],
@@ -52,12 +56,12 @@ export class Watcher {
                 open: options.open ?? true,
                 logLevel: 'silent'
             },
-            (err: unknown, bs: any) => {
+            (err: unknown, bsInstance: any) => {
                 if (err) {
                     Logger.error('BrowserSync failed to start:', err);
                     return;
                 }
-                const urls = bs.options.getIn(['urls', 'local']);
+                const urls = bsInstance.options.getIn(['urls', 'local']);
                 Logger.info(`Server running at: ${urls}`);
             }
         );
@@ -69,9 +73,9 @@ export class Watcher {
             watchPaths.push(templateDir);
         }
 
-        const uniqueWatchPaths = Array.from(new Set(watchPaths));
+        let currentWatchPaths = new Set<string>(watchPaths);
 
-        const watcher = chokidar.watch(uniqueWatchPaths, {
+        const watcher = chokidar.watch(Array.from(currentWatchPaths), {
             ignoreInitial: true,
             awaitWriteFinish: {
                 stabilityThreshold: 300,
@@ -79,30 +83,76 @@ export class Watcher {
             }
         });
 
-        watcher.on('all', async (event, filePath) => {
-            clearTimeout(this.rebuildTimeout);
-            this.rebuildTimeout = setTimeout(async () => {
-                if (path.resolve(filePath) === path.resolve(options.configPath)) {
-                    Logger.info('Configuration changed. Rebuilding...');
-                } else {
-                    Logger.info(`File changed: ${filePath}. Rebuilding...`);
-                }
+        const executeBuild = async (changedPath: string) => {
+            if (isBuilding) {
+                pendingRebuild = true;
+                latestFilePath = changedPath;
+                return;
+            }
 
-                try {
-                    await DocDockBuilder.build({ ...options, silent: true });
-                    Logger.setSilent(false);
-                    Logger.info('Rebuild complete.');
-                    this.bs.reload();
-                } catch (e) {
-                    Logger.setSilent(false);
-                    Logger.error('Build failed:', e);
+            isBuilding = true;
+            const targetPath = changedPath;
+
+            const isConfigChanged =
+                path.resolve(targetPath).toLowerCase() === path.resolve(options.configPath).toLowerCase();
+            if (isConfigChanged) {
+                Logger.info('Configuration changed. Rebuilding...');
+            } else {
+                Logger.info(`File changed: ${targetPath}. Rebuilding...`);
+            }
+
+            try {
+                await DocDockBuilder.build({ ...options, silent: true });
+                Logger.setSilent(false);
+                Logger.info('Rebuild complete.');
+                if (isConfigChanged) {
+                    // 最新設定に基づく監視対象パスの再取得および追加
+                    const latestWatchPaths = this.getWatchPaths(options.configPath);
+                    if (fs.existsSync(templateDir)) {
+                        latestWatchPaths.push(templateDir);
+                    }
+                    const newWatchPathsSet = new Set(latestWatchPaths);
+
+                    // 不要になった古い監視パスの解除
+                    const removedPaths = Array.from(currentWatchPaths).filter((p) => !newWatchPathsSet.has(p));
+                    if (removedPaths.length > 0) {
+                        watcher.unwatch(removedPaths);
+                    }
+
+                    // 新規パスの監視追加
+                    const addedPaths = Array.from(newWatchPathsSet).filter((p) => !currentWatchPaths.has(p));
+                    if (addedPaths.length > 0) {
+                        watcher.add(addedPaths);
+                    }
+
+                    currentWatchPaths = newWatchPathsSet;
                 }
+                bs.reload();
+            } catch (e) {
+                Logger.setSilent(false);
+                Logger.error('Build failed:', e);
+            } finally {
+                isBuilding = false;
+                if (pendingRebuild) {
+                    pendingRebuild = false;
+                    const nextPath = latestFilePath;
+                    // 保留中ビルドの即時実行
+                    setTimeout(() => executeBuild(nextPath), 0);
+                }
+            }
+        };
+
+        watcher.on('all', async (event, filePath) => {
+            clearTimeout(rebuildTimeout);
+            latestFilePath = filePath;
+            rebuildTimeout = setTimeout(() => {
+                executeBuild(latestFilePath);
             }, 300);
         });
 
         process.on('SIGINT', () => {
             watcher.close();
-            this.bs.exit();
+            bs.exit();
             process.exit(0);
         });
     }
@@ -114,32 +164,31 @@ export class Watcher {
 
         try {
             const config = Loader.loadConfig(configPath);
-            const defaultGuideDir = config?.guideDir || DocDockConstants.Defaults.GuideDir;
-            const defaultAliasDir = config?.aliasDir || DocDockConstants.Defaults.AliasDir;
-            const defaultExcludeDir = config?.excludeDir || DocDockConstants.Defaults.ExcludeDir;
-
-            // ページ設定配列の安全な取得
-            const pages = Array.isArray(config?.pages) ? config.pages : [];
-            pages.forEach((page) => {
+            // 補完済みページ設定一覧の取得
+            const effectivePages = ConfigUtils.getEffectivePages(config);
+            effectivePages.forEach((page) => {
                 const sources = page.sources || page.templates || [];
                 sources.forEach((src) => {
                     const resolvedSrc = path.isAbsolute(src) ? src : path.join(configDir, src);
                     paths.push(resolvedSrc);
                 });
 
-                const guideDir = page.guideDir || defaultGuideDir;
-                if (guideDir) {
-                    const guidePath = path.isAbsolute(guideDir) ? guideDir : path.join(configDir, guideDir);
+                if (page.guideDir) {
+                    const guidePath = path.isAbsolute(page.guideDir)
+                        ? page.guideDir
+                        : path.join(configDir, page.guideDir);
                     paths.push(guidePath);
                 }
-                const aliasDir = page.aliasDir || defaultAliasDir;
-                if (aliasDir) {
-                    const aliasPath = path.isAbsolute(aliasDir) ? aliasDir : path.join(configDir, aliasDir);
+                if (page.aliasDir) {
+                    const aliasPath = path.isAbsolute(page.aliasDir)
+                        ? page.aliasDir
+                        : path.join(configDir, page.aliasDir);
                     paths.push(aliasPath);
                 }
-                const excludeDir = page.excludeDir || defaultExcludeDir;
-                if (excludeDir) {
-                    const excludePath = path.isAbsolute(excludeDir) ? excludeDir : path.join(configDir, excludeDir);
+                if (page.excludeDir) {
+                    const excludePath = path.isAbsolute(page.excludeDir)
+                        ? page.excludeDir
+                        : path.join(configDir, page.excludeDir);
                     paths.push(excludePath);
                 }
             });
@@ -168,10 +217,9 @@ export class Watcher {
 
         try {
             const content = fs.readFileSync(resolvedPath, 'utf8');
-            const yaml = require('js-yaml');
             const data = yaml.load(content);
             if (data && typeof data === 'object' && !Array.isArray(data)) {
-                const imports = data[DocDockConstants.ReservedKeys.Imports];
+                const imports = (data as Record<string, unknown>)[DocDockConstants.ReservedKeys.Imports];
                 if (Array.isArray(imports)) {
                     for (const importItem of imports) {
                         if (typeof importItem === 'string') {

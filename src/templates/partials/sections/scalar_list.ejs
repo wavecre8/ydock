@@ -43,9 +43,9 @@
                           const rowId = ctx.path;
                           
                           let displayKey = key;
-                          if (key.startsWith(constants.ReservedKeys.ConditionPrefix)) {
-                              displayKey = key.substring(1);
-                          } else if (!isNaN(Number(key))) {
+                          if (key.startsWith('[') && key.endsWith(']')) {
+                              displayKey = key.slice(1, -1);
+                          } else if (typeof key === 'string' && key.trim().length > 0 && !isNaN(Number(key))) {
                               displayKey = Number(key);
                           }
                        %>
@@ -58,9 +58,9 @@
                            </td>
                             <td class="py-3 px-4 font-mono text-slate-700 align-top">
                                 <div class="flex items-start h-full gap-2">
-                                    <div class="flex-grow w-full min-w-0">
-                                        <%= item %>
-                                    </div>
+                                     <div class="flex-grow w-full min-w-0">
+                                         <%- renderValue(item, itemDesc, ctx.child(undefined, undefined, true)) %>
+                                     </div>
                                     <%- renderTooltip(meta.description) %>
                                 </div>
                                 <% if (meta.description) { %>

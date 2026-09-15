@@ -1,4 +1,4 @@
-import { MarkdownProcessor } from './markdown-processor';
+import { MarkdownProcessor, DocPrefixOption } from './markdown-processor';
 import { DocDockConstants } from './constants';
 
 export class HtmlComponents {
@@ -13,10 +13,14 @@ export class HtmlComponents {
             .replace(/'/g, '&#39;');
     }
 
-    static renderTooltip(descText: string | undefined): string {
+    static renderTooltip(descText: string | undefined, docPrefix?: DocPrefixOption): string {
         if (!descText) return '';
         // 共通SVGシンボルを参照するツールチップ構造の生成
-        return `<span class="elem-tooltip tooltip-container flex-shrink-0 pt-1"><div class="tooltip-wrapper"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-blue-500"><use href="#icon-info"></use></svg></div><div class="tooltip-content">${MarkdownProcessor.render(descText)}<div class="tooltip-arrow"></div></div></span>`;
+        const content =
+            docPrefix !== undefined
+                ? MarkdownProcessor.render(descText, docPrefix)
+                : MarkdownProcessor.render(descText);
+        return `<span class="elem-tooltip tooltip-container flex-shrink-0 pt-1"><div class="tooltip-wrapper"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 text-blue-500"><use href="#icon-info"></use></svg></div><div class="tooltip-content">${content}<div class="tooltip-arrow"></div></div></span>`;
     }
 
     static renderAliasedKey(key: string | number, alias: string | undefined): string {
@@ -112,13 +116,12 @@ export class HtmlComponents {
         indexStr: string,
         innerHtml: string,
         alias?: string,
-        descText?: string
+        descText?: string,
+        docPrefix?: DocPrefixOption
     ): string {
         // ツールチップ表示HTMLの生成
-        const tooltipHtml = this.renderTooltip(descText);
-        const headerTitle = alias
-            ? `# ${this.escape(indexStr)}: ${this.escape(alias)}`
-            : `# ${this.escape(indexStr)}`;
+        const tooltipHtml = this.renderTooltip(descText, docPrefix);
+        const headerTitle = alias ? `# ${this.escape(indexStr)}: ${this.escape(alias)}` : `# ${this.escape(indexStr)}`;
 
         return `<div id="${myPath}" class="border border-slate-200 rounded-md overflow-hidden scroll-mt-20">
             <div class="bg-slate-50 px-3 py-1 text-xs font-bold text-slate-500 border-b border-slate-200 flex items-center justify-between">
@@ -131,10 +134,7 @@ export class HtmlComponents {
         </div>`;
     }
 
-    static renderObjectTable(
-        level: number,
-        rowsHtml: string
-    ): string {
+    static renderObjectTable(level: number, rowsHtml: string): string {
         return `<table class="${DocDockConstants.CssClasses.TableBase} ${DocDockConstants.CssClasses.NestedTable} text-sm bg-white">
             <colgroup>
                 <col style="width: var(--col-width-level-${level}, var(--col-width-level-default));">

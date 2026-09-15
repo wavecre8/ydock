@@ -2,7 +2,13 @@ import { merge } from 'lodash';
 import { DocDockConstants } from './constants';
 import { PathParser, PathToken } from './path-parser';
 
-export class AliasTreeBuilder {
+/**
+ * フラットなパスキー構造を階層ツリー構造へ展開する汎用ユーティリティクラス
+ */
+export class PathTreeExpander {
+    /**
+     * フラットキーを含むオブジェクトを階層ツリー構造へ展開
+     */
     static build(data: any, terminalKey: string = DocDockConstants.ReservedKeys.Alias): any {
         if (!data || typeof data !== 'object' || Array.isArray(data)) {
             return data;
@@ -23,22 +29,41 @@ export class AliasTreeBuilder {
             }
 
             let currentObj = result;
-            for (let i = 0; i < tokens.length; i++) {
+            let i = 0;
+            while (i < tokens.length) {
                 const token = tokens[i];
-                const isLast = i === tokens.length - 1;
-
                 if (token.type === 'match') {
-                    currentObj = this.applyMatchToken(currentObj, token, processedValue, isLast, terminalKey);
+                    // 連続する条件トークン群の収集
+                    const matchTokens: Extract<PathToken, { type: 'match' }>[] = [];
+                    while (i < tokens.length && tokens[i].type === 'match') {
+                        matchTokens.push(tokens[i] as Extract<PathToken, { type: 'match' }>);
+                        i++;
+                    }
+                    const isLast = i === tokens.length;
+                    currentObj = this.applyCompositeMatchTokens(
+                        currentObj,
+                        matchTokens,
+                        processedValue,
+                        isLast,
+                        terminalKey
+                    );
                 } else {
+                    const isLast = i === tokens.length - 1;
                     const nextKey = token.type === 'prop' ? token.name : DocDockConstants.ReservedKeys.Array;
                     currentObj = this.applyPropOrArrayToken(currentObj, nextKey, processedValue, isLast, terminalKey);
+                    i++;
                 }
             }
         }
         return result;
     }
 
-    private static applySinglePropToken(result: Record<string, any>, propName: string, processedValue: any, terminalKey: string): void {
+    private static applySinglePropToken(
+        result: Record<string, any>,
+        propName: string,
+        processedValue: any,
+        terminalKey: string
+    ): void {
         if (typeof result[propName] === 'object' && result[propName] !== null) {
             if (typeof processedValue === 'object' && processedValue !== null) {
                 merge(result[propName], processedValue);
@@ -56,37 +81,40 @@ export class AliasTreeBuilder {
         }
     }
 
-    private static applyMatchToken(currentObj: any, token: Extract<PathToken, { type: 'match' }>, processedValue: any, isLast: boolean, terminalKey: string): any {
+    private static applyCompositeMatchTokens(
+        currentObj: any,
+        matchTokens: Extract<PathToken, { type: 'match' }>[],
+        processedValue: any,
+        isLast: boolean,
+        terminalKey: string
+    ): any {
         const matchKey = DocDockConstants.ReservedKeys.Match;
-        // 直前トークンがmatchでありcurrentObjがマッチャー自身である場合の複合条件処理
-        if (typeof currentObj === 'object' && currentObj !== null && !Array.isArray(currentObj) && !(matchKey in currentObj)) {
-            const hasCondition = Object.keys(currentObj).some(k => k.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix));
-            if (hasCondition) {
-                currentObj[token.key] = token.value;
-                if (isLast) {
-                    if (token.value === '') {
-                        currentObj[token.key] = processedValue;
-                    } else if (typeof processedValue === 'object' && processedValue !== null) {
-                        merge(currentObj, processedValue);
-                    } else {
-                        currentObj[terminalKey] = processedValue;
-                    }
-                }
-                return currentObj;
-            }
-        }
-
         if (!currentObj[matchKey]) currentObj[matchKey] = [];
-        
-        let matcher = currentObj[matchKey].find((m: any) => m[token.key] === token.value);
+
+        const expectedSelectorKeys = matchTokens.map((t) => (t.value ? `[${t.key}=${t.value}]` : `[${t.key}]`));
+
+        // 全条件キーが完全一致する既存マッチャーの探索
+        let matcher = currentObj[matchKey].find((m: any) => {
+            if (!m || typeof m !== 'object') return false;
+            const mConditionKeys = Object.keys(m).filter((k) => k.startsWith('[') && k.endsWith(']'));
+            if (mConditionKeys.length !== matchTokens.length) return false;
+            return expectedSelectorKeys.every((k) => k in m);
+        });
+
         if (!matcher) {
-            matcher = { [token.key]: token.value };
+            matcher = {};
+            for (let j = 0; j < matchTokens.length; j++) {
+                const t = matchTokens[j];
+                const sKey = expectedSelectorKeys[j];
+                matcher[sKey] = t.value;
+            }
             currentObj[matchKey].push(matcher);
         }
-        
+
         if (isLast) {
-            if (token.value === '') {
-                matcher[token.key] = processedValue;
+            // 単一キー構成かつ値が空のスカラーマッチャー判定
+            if (matchTokens.length === 1 && matchTokens[0].value === '') {
+                matcher[expectedSelectorKeys[0]] = processedValue;
             } else {
                 if (typeof processedValue === 'object' && processedValue !== null) {
                     merge(matcher, processedValue);
@@ -100,7 +128,13 @@ export class AliasTreeBuilder {
         }
     }
 
-    private static applyPropOrArrayToken(currentObj: any, nextKey: string, processedValue: any, isLast: boolean, terminalKey: string): any {
+    private static applyPropOrArrayToken(
+        currentObj: any,
+        nextKey: string,
+        processedValue: any,
+        isLast: boolean,
+        terminalKey: string
+    ): any {
         if (!currentObj[nextKey]) {
             currentObj[nextKey] = {};
         } else if (typeof currentObj[nextKey] !== 'object' || currentObj[nextKey] === null) {
@@ -108,20 +142,10 @@ export class AliasTreeBuilder {
         }
 
         if (isLast) {
-            if (typeof currentObj[nextKey] === 'object' && currentObj[nextKey] !== null) {
-                if (typeof processedValue === 'object' && processedValue !== null) {
-                    merge(currentObj[nextKey], processedValue);
-                } else {
-                    currentObj[nextKey][terminalKey] = processedValue;
-                }
+            if (typeof processedValue === 'object' && processedValue !== null) {
+                merge(currentObj[nextKey], processedValue);
             } else {
-                if (currentObj[nextKey] !== undefined && typeof processedValue === 'object' && processedValue !== null) {
-                    const prevVal = currentObj[nextKey];
-                    currentObj[nextKey] = processedValue;
-                    currentObj[nextKey][terminalKey] = prevVal;
-                } else {
-                    currentObj[nextKey] = processedValue;
-                }
+                currentObj[nextKey][terminalKey] = processedValue;
             }
             return currentObj;
         } else {

@@ -24,10 +24,8 @@ describe('SkeletonGenerator', () => {
         const dummySource = {
             tasks: [
                 {
-                    taskArn: "arn:aws:ecs...",
-                    containers: [
-                        { name: "web", image: "nginx" }
-                    ]
+                    taskArn: 'arn:aws:ecs...',
+                    containers: [{ name: 'web', image: 'nginx' }]
                 }
             ]
         };
@@ -37,12 +35,12 @@ describe('SkeletonGenerator', () => {
         const config = {
             pages: [
                 {
-                    title: "Test Page",
-                    sources: ["sources/dummy.yml"],
-                    aliasDir: "aliases",
-                    guideDir: "guides",
-                    excludeDir: "excludes",
-                    output: "output/test.html"
+                    title: 'Test Page',
+                    sources: ['sources/dummy.yml'],
+                    aliasDir: 'aliases',
+                    guideDir: 'guides',
+                    excludeDir: 'excludes',
+                    output: 'output/test.html'
                 }
             ]
         };
@@ -70,14 +68,12 @@ describe('SkeletonGenerator', () => {
 
     it('should append missing keys to an existing alias file, preserving [=xxxxx]', async () => {
         const existingAliasPath = path.join(aliasDir, `dummy${DocDockConstants.FileSuffixes.AliasYml}`);
-        fs.writeFileSync(existingAliasPath, 
-            `"tasks": "タスク一覧"\n"tasks[=taskArn:123]": "特殊タスク"\n`
-        );
+        fs.writeFileSync(existingAliasPath, `"tasks": "タスク一覧"\n"tasks[=taskArn:123]": "特殊タスク"\n`);
 
         await SkeletonGenerator.generate({ configPath, type: 'alias', silent: true });
 
         const content = fs.readFileSync(existingAliasPath, 'utf8');
-        
+
         expect(content).toContain('"tasks": "タスク一覧"');
         expect(content).toContain('"tasks[=taskArn:123]": "特殊タスク"');
         expect(content).toContain('"tasks[].taskArn": ""');
@@ -91,16 +87,14 @@ describe('SkeletonGenerator', () => {
     it('should not append duplicate keys when condition matcher key already exists in alias file', async () => {
         const existingAliasPath = path.join(aliasDir, `dummy${DocDockConstants.FileSuffixes.AliasYml}`);
         // 条件指定付きキーを含む既存エイリアスファイルの生成
-        fs.writeFileSync(existingAliasPath, 
-            `"tasks[=taskArn:123].taskArn": "特殊タスクARN"\n`
-        );
+        fs.writeFileSync(existingAliasPath, `"tasks[=taskArn:123].taskArn": "特殊タスクARN"\n`);
 
         // エイリアススケルトン生成処理の実行
         await SkeletonGenerator.generate({ configPath, type: 'alias', silent: true });
 
         // ファイル内容の読み込み検証
         const content = fs.readFileSync(existingAliasPath, 'utf8');
-        
+
         expect(content).toContain('"tasks[=taskArn:123].taskArn": "特殊タスクARN"');
         expect(content).not.toContain('"tasks[].taskArn": ""');
     });
@@ -121,14 +115,12 @@ describe('SkeletonGenerator', () => {
 
     it('should skip appending child keys if parent key is already true in exclude file', async () => {
         const existingExcludePath = path.join(excludeDir, `dummy${DocDockConstants.FileSuffixes.ExcludeYml}`);
-        fs.writeFileSync(existingExcludePath, 
-            `"tasks[].containers": true\n`
-        );
+        fs.writeFileSync(existingExcludePath, `"tasks[].containers": true\n`);
 
         await SkeletonGenerator.generate({ configPath, type: 'exclude', silent: true });
 
         const content = fs.readFileSync(existingExcludePath, 'utf8');
-        
+
         expect(content).toContain('"tasks[].containers": true');
         expect(content).toContain('"tasks": false');
         expect(content).toContain('"tasks[].taskArn": false');
@@ -138,14 +130,12 @@ describe('SkeletonGenerator', () => {
 
     it('should append child keys if parent key is false in exclude file', async () => {
         const existingExcludePath = path.join(excludeDir, `dummy${DocDockConstants.FileSuffixes.ExcludeYml}`);
-        fs.writeFileSync(existingExcludePath, 
-            `"tasks": false\n`
-        );
+        fs.writeFileSync(existingExcludePath, `"tasks": false\n`);
 
         await SkeletonGenerator.generate({ configPath, type: 'exclude', silent: true });
 
         const content = fs.readFileSync(existingExcludePath, 'utf8');
-        
+
         expect(content).toContain('"tasks": false');
         expect(content).toContain('"tasks[].taskArn": false');
         expect(content).toContain('"tasks[].containers": false');
@@ -155,16 +145,14 @@ describe('SkeletonGenerator', () => {
     it('should not append duplicate keys when condition matcher key already exists in exclude file', async () => {
         const existingExcludePath = path.join(excludeDir, `dummy${DocDockConstants.FileSuffixes.ExcludeYml}`);
         // 条件指定付きキーを含む既存Excludeファイルの生成
-        fs.writeFileSync(existingExcludePath, 
-            `"tasks[=taskArn:123].taskArn": false\n`
-        );
+        fs.writeFileSync(existingExcludePath, `"tasks[=taskArn:123].taskArn": false\n`);
 
         // Excludeスケルトン生成処理の実行
         await SkeletonGenerator.generate({ configPath, type: 'exclude', silent: true });
 
         // ファイル内容の読み込み検証
         const content = fs.readFileSync(existingExcludePath, 'utf8');
-        
+
         expect(content).toContain('"tasks[=taskArn:123].taskArn": false');
         expect(content).not.toContain('"tasks[].taskArn": false');
     });
@@ -181,10 +169,10 @@ describe('SkeletonGenerator', () => {
         const doc = yaml.load(content) as any;
 
         expect(doc.tasks).toBeInstanceOf(Array);
-        expect(doc.tasks[0]).toHaveProperty('=taskArn', 'arn:aws:ecs...');
+        expect(doc.tasks[0]).toHaveProperty('[taskArn=arn:aws:ecs...]');
         expect(doc.tasks[0].taskArn).toBe('');
         expect(doc.tasks[0].containers).toBeInstanceOf(Array);
-        expect(doc.tasks[0].containers[0]).toHaveProperty('=name', 'web');
+        expect(doc.tasks[0].containers[0]).toHaveProperty('[name=web]');
         expect(doc.tasks[0].containers[0].name).toBe('');
         expect(doc.tasks[0].containers[0].image).toBe('');
     });
@@ -194,11 +182,11 @@ describe('SkeletonGenerator', () => {
         const existingGuide = {
             tasks: [
                 {
-                    '=taskArn': 'arn:aws:ecs...',
+                    '[taskArn=arn:aws:ecs...]': '',
                     taskArn: 'タスクARNの説明',
                     containers: [
                         {
-                            '=name': 'web',
+                            '[name=web]': '',
                             name: 'コンテナ名の説明'
                         }
                     ]
@@ -236,10 +224,7 @@ describe('SkeletonGenerator', () => {
     it('should not duplicate scalar array elements when merging existing guide', async () => {
         const scalarSourcePath = path.join(sourceDir, 'scalar.yml');
         const scalarSource = {
-            transforms: [
-                'AWS::LanguageExtensions',
-                'AWS::Serverless-2016-10-31'
-            ]
+            transforms: ['AWS::LanguageExtensions', 'AWS::Serverless-2016-10-31']
         };
         // スカラー配列テンプレートの作成
         fs.writeFileSync(scalarSourcePath, yaml.dump(scalarSource));
@@ -262,10 +247,10 @@ describe('SkeletonGenerator', () => {
         const existingGuide = {
             transforms: [
                 {
-                    '=AWS::LanguageExtensions': '言語拡張の説明'
+                    '[AWS::LanguageExtensions]': '言語拡張の説明'
                 },
                 {
-                    '=AWS::Serverless-2016-10-31': 'SAM拡張の説明'
+                    '[AWS::Serverless-2016-10-31]': 'SAM拡張の説明'
                 }
             ]
         };
@@ -280,8 +265,8 @@ describe('SkeletonGenerator', () => {
         const doc = yaml.load(content) as any;
 
         expect(doc.transforms).toHaveLength(2);
-        expect(doc.transforms[0]['=AWS::LanguageExtensions']).toBe('言語拡張の説明');
-        expect(doc.transforms[1]['=AWS::Serverless-2016-10-31']).toBe('SAM拡張の説明');
+        expect(doc.transforms[0]['[AWS::LanguageExtensions]']).toBe('言語拡張の説明');
+        expect(doc.transforms[1]['[AWS::Serverless-2016-10-31]']).toBe('SAM拡張の説明');
     });
 
     it('should not duplicate elements with structured condition object when merging existing guide', async () => {
@@ -317,9 +302,7 @@ describe('SkeletonGenerator', () => {
         const existingGuide = {
             assertions: [
                 {
-                    '=Assert': {
-                        FnEquals: ['prod', 'stg']
-                    },
+                    '[Assert={"FnEquals":["prod","stg"]}]': '',
                     Assert: 'アサーション条件の説明',
                     AssertDescription: '説明文の説明'
                 }
@@ -404,8 +387,8 @@ describe('SkeletonGenerator', () => {
         const existingGuide = {
             items: [
                 {
-                    '=type': 'A',
-                    '=name': 'composite',
+                    '[type=A]': '',
+                    '[name=composite]': '',
                     type: '複合条件の種別説明',
                     name: '複合条件の名前説明'
                 }
@@ -423,8 +406,8 @@ describe('SkeletonGenerator', () => {
 
         // 条件キー総数不一致により別要素として追加されることの検証
         expect(doc.items).toHaveLength(2);
-        expect(doc.items[0]['=name']).toBe('composite');
-        expect(doc.items[1]['=name']).toBe('single');
+        expect(doc.items[0]['[name=composite]']).toBe('');
+        expect(doc.items[1]['[name=single]']).toBe('');
     });
 
     it('should throw Error when invalid skeleton type is passed', async () => {
@@ -464,5 +447,42 @@ describe('SkeletonGenerator', () => {
         // スカラー配列および空配列の角括弧付きキー抽出検証
         expect(content).toContain('"scalarList[]": ""');
         expect(content).toContain('"emptyList[]": ""');
+    });
+
+    it('should parse existing guide containing cfn intrinsic tags without crashing', async () => {
+        const cfnSource = {
+            Resources: {
+                MyBucket: {
+                    Type: 'AWS::S3::Bucket'
+                }
+            }
+        };
+        const cfnSourcePath = path.join(sourceDir, 'cfn_dummy.yml');
+        fs.writeFileSync(cfnSourcePath, yaml.dump(cfnSource));
+
+        const existingGuidePath = path.join(guideDir, `cfn_dummy${DocDockConstants.FileSuffixes.GuideYml}`);
+        fs.writeFileSync(existingGuidePath, 'Resources:\n  MyBucket:\n    Description: !Ref SomeOtherResource\n');
+
+        const cfnConfig = {
+            pages: [
+                {
+                    title: 'CFn Page',
+                    mode: 'cfn',
+                    sources: ['sources/cfn_dummy.yml'],
+                    guideDir: 'guides',
+                    output: 'output/cfn.html'
+                }
+            ]
+        };
+        const cfnConfigPath = path.join(testDir, 'cfn.config.yml');
+        fs.writeFileSync(cfnConfigPath, yaml.dump(cfnConfig));
+
+        // CFnモードでのガイドスケルトンマージ実行
+        await expect(
+            SkeletonGenerator.generate({ configPath: cfnConfigPath, type: 'guide', silent: true })
+        ).resolves.not.toThrow();
+
+        const mergedContent = fs.readFileSync(existingGuidePath, 'utf8');
+        expect(mergedContent).toContain('!Ref');
     });
 });

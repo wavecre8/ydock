@@ -189,6 +189,7 @@ The tool automatically searches for guide/alias files based on the source filena
 ### Guide File Example
 
 Write descriptions following the source structure. Use Markdown links `[Label](Key)` for internal references.
+To reference a property in another page, use the format `PageID::PropertyPath`.
 
 ```yaml
 Resources:
@@ -196,6 +197,9 @@ Resources:
     Description: Main VPC for production environment
     Properties:
       CidrBlock: IPv4 address range for the VPC (e.g. 10.0.0.0/16). See [Subnet Design](Resources.MySubnet) for details.
+      Tags:
+        0:
+          Value: Project tag for cost management. See [Common Tag Specs](common::Tags) for details.
 ```
 
 ### Alias File Example
@@ -208,9 +212,10 @@ Rename keys to friendly names. The alias file is defined using a flat, dot-separ
 "Resources.MyVPC.Properties.Tags[]": "Resource Tags"
 "Resources.MyVPC.Properties.Tags[].Key": "Tag Key"
 "Resources.MyVPC.Properties.Tags[].Value": "Tag Value"
+"Resources.MyVPC.Properties.Tags[Key=Project].Value": "Project Tag Value"
 ```
 
-Use `[]` to apply the same alias to all items in an array.
+Use `[]` to apply the same alias to all items in an array, or `[key=value]` to target specific items matching a condition.
 
 ### Exclude File Example
 
@@ -224,7 +229,10 @@ Hide unnecessary properties and array items. Like alias files, it uses a flat, d
 "tasks[].overrides": true
 
 # Hide specific array items matching a condition
-"tasks[].attachments[].details[=name:subnetId]": true
+"tasks[].attachments[].details[name=subnetId]": true
+
+# Combine multiple conditions
+"tasks[].containers[name=web&image=nginx]": true
 
 # Combine wildcards and overrides
 # Hide everything in containers, then only show name and image

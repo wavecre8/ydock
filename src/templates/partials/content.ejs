@@ -2,57 +2,78 @@
 <main class="flex-1 min-w-0 p-8">
     <div class="w-full max-w-none px-4">
 
-        <% renderableSections.forEach((sectionName, sectionIndex) => { %>
-            <%
-                const sectionGuide = doc.description?.[sectionName];
-                const sectionMeta = extractMetadata(sectionGuide);
-                const sectionDisplayName = sectionMeta.alias || sectionName;
-            %>
-            <h2 class="text-2xl font-bold text-slate-800 border-b border-slate-200 pb-2 cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-2" onclick="YdockUI.Navigation.toggleSection('section-<%= sectionIndex %>-content', 'section-<%= sectionIndex %>-content-icon')">
-                <span id="section-<%= sectionIndex %>-content-icon" class="text-slate-400 flex-shrink-0 rotate-icon"><svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-chevron-down"></use></svg></span>
-                <%= sectionDisplayName %>
-            </h2>
-            
-            <% 
-               const sectionData = doc.template[sectionName];
-               const entries = (typeof sectionData === 'object' && sectionData !== null) ? Object.entries(sectionData) : [];
-            %>
-            
-            <% if ((sectionName === 'Description') || (entries.length === 0 && (typeof sectionData !== 'object' || sectionData === null))) { %>
-                <%- include('sections/text', { 
-                    sectionName, 
-                    sectionIndex, 
-                    sectionData, 
-                    renderMarkdownClient,
-                    escapeHtml 
-                }) %>
-            <% } else if (strategy.getSectionRenderType(sectionName) === 'transform') { %>
-                <%- include('sections/transform', { 
-                    sectionName, 
-                    sectionIndex, 
-                    sectionData, 
-                    doc, 
-                    extractMetadata, 
-                    renderTooltip, 
-                    renderMarkdownClient,
-                    escapeHtml 
-                }) %>
-            <% } else { %>
-                <%- include('sections/resource_list', { 
-                    entries, 
-                    sectionName, 
-                    sectionIndex, 
-                    doc, 
-                    strategy, 
-                    extractMetadata, 
-                    renderTooltip, 
-                    renderMarkdownClient, 
-                    renderFlow, 
-                    isIntrinsic, 
-                    renderValue,
-                    escapeHtml 
-                }) %>
-            <% } %>
+        <% 
+        const docList = (typeof processedDocuments !== 'undefined' && processedDocuments.length > 0)
+            ? processedDocuments
+            : [{ docIndex: 0, docPrefix: '', doc: doc, renderableSections: renderableSections }];
+        
+        let globalSectionIndex = 0;
+        docList.forEach((docItem, docIdx) => { 
+        %>
+            <% docItem.renderableSections.forEach((sectionName, sectionIndex) => { %>
+                <%
+                    const sectionGuide = docItem.doc.description?.[sectionName];
+                    const sectionMeta = extractMetadata(sectionGuide);
+                    const sectionDisplayName = sectionMeta.alias || sectionName;
+                %>
+                <h2 class="text-2xl font-bold text-slate-800 border-b border-slate-200 pb-2 cursor-pointer hover:text-blue-600 transition-colors flex items-center gap-2" onclick="YdockUI.Navigation.toggleSection('section-<%= globalSectionIndex %>-content', 'section-<%= globalSectionIndex %>-content-icon')">
+                    <span id="section-<%= globalSectionIndex %>-content-icon" class="text-slate-400 flex-shrink-0 rotate-icon"><svg class="w-4 h-4 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-chevron-down"></use></svg></span>
+                    <%= sectionDisplayName %>
+                </h2>
+                
+                <% 
+                   const sectionData = docItem.doc.template[sectionName];
+                   const entries = (typeof sectionData === 'object' && sectionData !== null) ? Object.entries(sectionData) : [];
+                %>
+                
+                <% 
+                   const renderType = strategy.getSectionRenderType ? strategy.getSectionRenderType(sectionName) : 'normal';
+                %>
+                <% if (renderType === 'scalar_list' || renderType === 'transform') { %>
+                    <%- include('sections/scalar_list', { 
+                        sectionName, 
+                        sectionIndex: globalSectionIndex, 
+                        sectionData, 
+                        doc: docItem.doc, 
+                        extractMetadata, 
+                        renderTooltip: (txt) => renderTooltip(txt, docItem.linkResolver || docItem.docPrefix), 
+                        renderMarkdownClient: (txt) => renderMarkdownClient(txt, docItem.linkResolver || docItem.docPrefix),
+                        renderValue: (val, desc, ctx) => docItem.renderer.renderValue(val, desc, ctx), 
+                        renderFlow: (val) => docItem.renderer.renderFlow(val, new RenderContext(0)),
+                        renderAliasedKey,
+                        escapeHtml,
+                        createContext: (segments, isProps) => createContext(segments, isProps, docItem.docPrefix)
+                    }) %>
+                <% } else if (renderType === 'text' || (entries.length === 0 && (typeof sectionData !== 'object' || sectionData === null))) { %>
+                    <%- include('sections/text', { 
+                        sectionName, 
+                        sectionIndex: globalSectionIndex, 
+                        sectionData, 
+                        renderMarkdownClient: (txt) => renderMarkdownClient(txt, docItem.linkResolver || docItem.docPrefix),
+                        escapeHtml,
+                        createContext: (segments, isProps) => createContext(segments, isProps, docItem.docPrefix),
+                        strategy
+                    }) %>
+                <% } else { %>
+                    <%- include('sections/resource_list', { 
+                        entries, 
+                        sectionName, 
+                        sectionIndex: globalSectionIndex, 
+                        doc: docItem.doc, 
+                        strategy, 
+                        extractMetadata, 
+                        renderTooltip: (txt) => renderTooltip(txt, docItem.linkResolver || docItem.docPrefix), 
+                        renderMarkdownClient: (txt) => renderMarkdownClient(txt, docItem.linkResolver || docItem.docPrefix), 
+                        renderFlow: (val) => docItem.renderer.renderFlow(val, new RenderContext(0)), 
+                        renderAliasedKey,
+                        isIntrinsic, 
+                        renderValue: (val, desc, ctx) => docItem.renderer.renderValue(val, desc, ctx), 
+                        escapeHtml,
+                        createContext: (segments, isProps) => createContext(segments, isProps, docItem.docPrefix)
+                    }) %>
+                <% } %>
+                <% globalSectionIndex++; %>
+            <% }); %>
         <% }); %>
     </div>
 </main>

@@ -37,9 +37,7 @@ export class TemplateProcessingError extends Error {
 }
 
 export class CircularImportError extends Error {
-    constructor(
-        public readonly cyclePath: string[]
-    ) {
+    constructor(public readonly cyclePath: string[]) {
         super(`Circular import detected: ${cyclePath.join(' -> ')}`);
         this.name = 'CircularImportError';
     }

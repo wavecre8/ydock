@@ -1,11 +1,12 @@
 import * as path from 'path';
 import { Loader } from './loader';
-import { DocDockConfig, PageConfig } from '../types';
+import { DocDockConfig } from '../types';
 import { DocDockConstants } from './constants';
 import { Logger } from './logger';
 import { PageBuilder } from './page-builder';
 import { IndexBuilder } from './index-builder';
 import { ConfigValidator } from './config-validator';
+import { ConfigUtils } from './config-utils';
 
 export interface BuildOptions {
     configPath: string;
@@ -26,19 +27,20 @@ export class DocDockBuilder {
         const language = config.lang || DocDockConstants.Defaults.Language;
         const layoutPath = path.join(__dirname, DocDockConstants.Defaults.TemplateLayout);
 
-        const defaultGuideDir = config.guideDir || DocDockConstants.Defaults.GuideDir;
-        const defaultAliasDir = config.aliasDir || DocDockConstants.Defaults.AliasDir;
-        const defaultExcludeDir = config.excludeDir || DocDockConstants.Defaults.ExcludeDir;
-
-        for (const page of config.pages) {
-            // ページ設定に対するグローバルおよびデフォルトディレクトリの補完
-            const effectivePage: PageConfig = {
-                ...page,
-                guideDir: page.guideDir || defaultGuideDir,
-                aliasDir: page.aliasDir || defaultAliasDir,
-                excludeDir: page.excludeDir || defaultExcludeDir
-            };
-            await PageBuilder.build(effectivePage, globalMode as 'cfn' | 'generic', language, resolvedConfigPath, layoutPath, options.silent);
+        // 補完済みページ設定一覧の取得
+        const effectivePages = ConfigUtils.getEffectivePages(config);
+        for (const effectivePage of effectivePages) {
+            // カレントページ視点での相対ルーティングマップの導出
+            const pageRouteMap = ConfigUtils.createPageRouteMap(effectivePage, effectivePages);
+            await PageBuilder.build(
+                effectivePage,
+                globalMode,
+                language,
+                resolvedConfigPath,
+                layoutPath,
+                options.silent,
+                pageRouteMap
+            );
         }
 
         if (config.index) {
