@@ -1,12 +1,25 @@
 <!-- Sidebar -->
-<aside id="sidebar" class="h-screen sticky top-0 flex-shrink-0 z-40 bg-white border-r border-slate-200" style="width: var(--sidebar-width); min-width: 16rem;">
-    <!-- Resizer is relative to aside, which is visible -->
-    <div id="sidebar-resizer" class="sidebar-resizer"></div>
-    
+<aside id="sidebar" class="h-screen sticky top-0 flex-shrink-0 z-40 bg-white border-r border-slate-200" style="width: var(--sidebar-width);">
+    <!-- Collapsed Trigger Container -->
+    <div class="sidebar-collapsed-content flex flex-col items-center py-4 w-full h-full">
+        <button onclick="YdockUI.Sidebar.toggle()" class="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors" title="Expand Sidebar" aria-label="Expand Sidebar">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <use href="#icon-chevron-right"></use>
+            </svg>
+        </button>
+    </div>
+
     <!-- Inner Scroll Container -->
-    <div class="flex flex-col h-full w-full overflow-hidden">
+    <div class="sidebar-expanded-content flex flex-col h-full w-full overflow-hidden">
         <header class="p-6 border-b border-slate-100 flex-shrink-0">
-            <h1 class="text-lg font-bold text-slate-700 leading-tight break-words"><%= title %></h1>
+            <div class="flex items-center justify-between gap-2">
+                <h1 class="text-lg font-bold text-slate-700 leading-tight break-words"><%= title %></h1>
+                <button onclick="YdockUI.Sidebar.toggle()" class="p-1.5 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg transition-colors flex-shrink-0" title="Collapse Sidebar" aria-label="Collapse Sidebar">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <use href="#icon-chevron-left"></use>
+                    </svg>
+                </button>
+            </div>
             
             <div class="mt-6 flex gap-2 bg-slate-100 p-1 rounded-lg">
                 <button onclick="YdockUI.DisplayMode.setMode('inline')" data-mode="inline" class="mode-btn flex-1 px-2 py-1.5 rounded-md text-xs font-medium transition-colors text-center">
@@ -34,8 +47,8 @@
             <div class="mt-4 flex items-center justify-between bg-slate-100 p-2 rounded-lg">
                 <span class="text-xs font-medium text-slate-700">Show Alias</span>
                 <label class="relative inline-flex items-center cursor-pointer">
-                    <input type="checkbox" id="alias-toggle-checkbox" class="sr-only peer" checked onchange="YdockUI.DisplayMode.toggleAliasSwitch(this)">
-                    <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                    <input type="checkbox" id="alias-toggle-checkbox" class="sr-only peer" onchange="YdockUI.DisplayMode.toggleAliasSwitch(this)">
+                    <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 peer-checked:bg-blue-600"></div>
                 </label>
             </div>
 
@@ -44,46 +57,67 @@
                 <span class="text-xs font-medium text-slate-700">Compact View</span>
                 <label class="relative inline-flex items-center cursor-pointer">
                     <input type="checkbox" id="compact-toggle-checkbox" class="sr-only peer" onchange="YdockUI.DisplayMode.toggleCompactSwitch(this)">
-                    <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-blue-600"></div>
+                    <div class="w-9 h-5 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 peer-checked:bg-blue-600"></div>
                 </label>
             </div>
         </header>
 
         <nav class="flex-1 p-4 overflow-y-auto">
-            <% renderableSections.forEach((sectionName, sectionIndex) => { %>
-                <%
-                    const sectionGuide = doc.description?.[sectionName];
-                    const sectionMeta = extractMetadata(sectionGuide);
-                    const sectionDisplayName = sectionMeta.alias || sectionName;
-                %>
-                <h2 class="text-sm font-bold text-slate-600 tracking-wider mb-2 px-2 mt-4 pt-4 border-t border-slate-200 first:mt-0 first:pt-0 first:border-t-0"><%= sectionDisplayName %></h2>
-                <ul class="space-y-1">
-                    <% 
-                    const sectionData = doc.template[sectionName];
-                    const entries = (typeof sectionData === 'object' && sectionData !== null) ? Object.entries(sectionData) : [];
+            <% 
+            const docList = (typeof processedDocuments !== 'undefined' && processedDocuments.length > 0)
+                ? processedDocuments
+                : [{ docIndex: 0, docPrefix: '', doc: doc, renderableSections: renderableSections }];
+            
+            let globalSectionIndex = 0;
+            docList.forEach((docItem, docIdx) => { 
+            %>
+                <% docItem.renderableSections.forEach((sectionName, sectionIndex) => { %>
+                    <%
+                        const sectionGuide = docItem.doc.description?.[sectionName];
+                        const sectionMeta = extractMetadata(sectionGuide);
+                        const sectionDisplayName = sectionMeta.alias || sectionName;
+                        const isFirstSection = (docIdx === 0 && sectionIndex === 0);
+                        const borderClass = isFirstSection ? 'first:mt-0 first:pt-0 first:border-t-0' : 'border-t border-slate-200 mt-4 pt-4';
                     %>
-                    <% entries.forEach(([logicalId, content], cardIndex) => { %>
-                        <%
-                            const guideDesc = doc.description?.[sectionName]?.[logicalId];
-                            const meta = extractMetadata(guideDesc);
-                            const displayName = meta.alias || logicalId;
-                            // Build path context
-                            const ctx = createContext([sectionName, String(logicalId)]);
-                            const uniqueId = ctx.path;
+                    <h2 class="text-sm font-bold text-slate-600 tracking-wider mb-2 px-2 <%= borderClass %> truncate" title="<%= sectionDisplayName %>"><%= sectionDisplayName %></h2>
+                    <ul class="space-y-1">
+                        <% 
+                        const sectionData = docItem.doc.template[sectionName];
+                        const entries = (typeof sectionData === 'object' && sectionData !== null) ? Object.entries(sectionData) : [];
                         %>
-                        <li class="flex items-center gap-1">
-                            <button 
-                                data-item-id="<%= uniqueId %>"
-                                data-section-index="<%= sectionIndex %>"
-                                data-card-index="<%= cardIndex %>"
-                                onclick="YdockUI.Navigation.onSidebarItemClick(this)"
-                                class="flex-1 px-2 py-1.5 rounded-md text-sm text-slate-600 hover:bg-blue-50 hover:text-blue-700 transition-colors truncate text-left" 
-                                title="<%= logicalId %>">
-                                <%= displayName %>
-                            </button>
-                        </li>
-                    <% }); %>
-                </ul>
+                        <% entries.forEach(([logicalId, content], cardIndex) => { %>
+                            <%
+                                const guideDesc = docItem.doc.description?.[sectionName]?.[logicalId];
+                                const meta = extractMetadata(guideDesc);
+                                let displayName = meta.alias;
+                                if (!displayName) {
+                                    if (content && typeof content === 'object' && 'fileName' in content) {
+                                        displayName = content.fileName;
+                                    } else if (typeof content === 'string') {
+                                        displayName = content;
+                                    } else {
+                                        displayName = logicalId;
+                                    }
+                                }
+                                // Build path context
+                                const ctx = createContext([sectionName, String(logicalId)], false, docItem.docPrefix);
+                                const uniqueId = ctx.path;
+                            %>
+                            <li class="flex items-center gap-1">
+                                <button 
+                                    data-item-id="<%= uniqueId %>"
+                                    data-section-index="<%= globalSectionIndex %>"
+                                    data-card-index="<%= cardIndex %>"
+                                    onclick="YdockUI.Navigation.onSidebarItemClick(this)"
+                                    class="<%= constants.CssClasses.SidebarItemBtn %> flex-1 px-2.5 py-1.5 rounded-md text-sm text-slate-600 truncate text-left" 
+                                    title="<%= displayName %>">
+                                    <%= displayName %>
+                                </button>
+                            </li>
+                        <% }); %>
+                    </ul>
+                    <% globalSectionIndex++; %>
+                <% }); %>
             <% }); %>
         </nav>
 

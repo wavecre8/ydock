@@ -1,6 +1,8 @@
 import * as yaml from 'js-yaml';
-import { ModeStrategy, ResourceComponents } from './types';
+import * as path from 'path';
+import { ModeStrategy, ResourceComponents, DocumentMode } from './types';
 import { YamlValue } from '../types';
+import { DocDockConstants } from '../core/constants';
 
 // Common CloudFormation intrinsic functions
 const CLOUDFORMATION_TAGS = [
@@ -68,27 +70,72 @@ export class CfnStrategy implements ModeStrategy {
     }
 
     /**
+     * プロパティ格納ブロックのキー名を取得
+     */
+    getPropertiesKey(): string {
+        return DocDockConstants.Cfn.PropertiesKey;
+    }
+
+    /**
+     * モード種別の取得
+     */
+    getMode(): DocumentMode {
+        return DocumentMode.Cfn;
+    }
+
+    /**
      * Returns standard CFn top-level sections as mergeable keys.
      * This allows splitting "Resources" or "Parameters" across multiple files.
      */
     getMergeableKeys(): string[] {
-        return ['Transform', 'Metadata', 'Parameters', 'Rules', 'Mappings', 'Conditions', 'Resources', 'Outputs'];
+        const S = DocDockConstants.Cfn.Sections;
+        return [S.Transform, S.Metadata, S.Parameters, S.Rules, S.Mappings, S.Conditions, S.Resources, S.Outputs];
     }
 
     getSectionSortOrder(): string[] | undefined {
+        const S = DocDockConstants.Cfn.Sections;
         return [
-            'AWSTemplateFormatVersion',
-            'Description',
-            'Transform',
-            'Metadata',
-            'Parameters',
-            'Rules',
-            'Mappings',
-            'Conditions',
-            'Globals',
-            'Resources',
-            'Outputs'
+            S.AWSTemplateFormatVersion,
+            S.Description,
+            S.Transform,
+            S.Metadata,
+            S.Parameters,
+            S.Rules,
+            S.Mappings,
+            S.Conditions,
+            S.Globals,
+            S.Resources,
+            S.Outputs
         ];
+    }
+
+    /**
+     * トップレベルセクションとして認識されるキーであるかの判定
+     */
+    isKnownTopLevelSection(sectionName: string): boolean {
+        return Object.values(DocDockConstants.Cfn.Sections).includes(sectionName as any);
+    }
+
+    /**
+     * 省略されたセグメント列に対するモード固有の補完処理
+     */
+    completeOmittedSegments(segments: string[]): { segments: string[]; isPropertiesBlock: boolean } {
+        const resolved = [...segments];
+        let isPropertiesBlock = false;
+        if (resolved.length === 0) {
+            return { segments: resolved, isPropertiesBlock };
+        }
+        if (!this.isKnownTopLevelSection(resolved[0])) {
+            resolved.unshift(DocDockConstants.Cfn.Sections.Resources);
+        }
+        if (resolved.length >= 3 && resolved[0] === DocDockConstants.Cfn.Sections.Resources) {
+            const knownAttributes = [DocDockConstants.Cfn.TypeKey, ...this.getAttributes()];
+            if (resolved[2] !== DocDockConstants.Cfn.PropertiesKey && !knownAttributes.includes(resolved[2])) {
+                resolved.splice(2, 0, DocDockConstants.Cfn.PropertiesKey);
+                isPropertiesBlock = true;
+            }
+        }
+        return { segments: resolved, isPropertiesBlock };
     }
 
     isIntrinsic(val: unknown): boolean {
@@ -129,8 +176,51 @@ export class CfnStrategy implements ModeStrategy {
         };
     }
 
-    getSectionRenderType(sectionName: string): 'transform' | 'normal' {
-        return sectionName === 'Transform' ? 'transform' : 'normal';
+    /**
+     * レンダリング時のセクション種別判定
+     */
+    getSectionRenderType(sectionName: string): 'scalar_list' | 'transform' | 'text' | 'normal' {
+        if (sectionName === 'Transform') {
+            return 'scalar_list';
+        }
+        if (sectionName === 'Description') {
+            return 'text';
+        }
+        return 'normal';
+    }
+
+    /**
+     * テンプレートの前処理正規化
+     */
+    normalizeTemplate(
+        template: Record<string, YamlValue>,
+        docMeta?: { mode?: string; sourcePath?: string; sourceBaseName?: string }
+    ): Record<string, YamlValue> {
+        const normalized = { ...template };
+        // 単一文字列スカラーで指定されたTransformの配列化
+        if (typeof normalized.Transform === 'string') {
+            normalized.Transform = [normalized.Transform];
+        }
+        // Descriptionのファイル名属性付きオブジェクト化
+        if (
+            typeof normalized.Description === 'string' &&
+            (docMeta?.mode === 'cfn' || docMeta?.sourcePath || docMeta?.sourceBaseName)
+        ) {
+            const fileName = docMeta.sourcePath
+                ? path.basename(docMeta.sourcePath)
+                : docMeta.sourceBaseName
+                  ? `${docMeta.sourceBaseName}.yml`
+                  : 'Description';
+            normalized.Description = [{ fileName, content: normalized.Description }];
+        }
+        return normalized;
+    }
+
+    /**
+     * リソース定義コレクションセクションの判定
+     */
+    isResourceSection(sectionName: string): boolean {
+        return sectionName.toLowerCase() === 'resources';
     }
 
     getDuplicateExemptKeys(): string[] {
@@ -142,7 +232,11 @@ export class CfnStrategy implements ModeStrategy {
     }
 
     findPropertyFallback(obj: Record<string, YamlValue>, seg: string): YamlValue | undefined {
-        if (obj.Properties && typeof obj.Properties === 'object' && seg in (obj.Properties as Record<string, YamlValue>)) {
+        if (
+            obj.Properties &&
+            typeof obj.Properties === 'object' &&
+            seg in (obj.Properties as Record<string, YamlValue>)
+        ) {
             return (obj.Properties as Record<string, YamlValue>)[seg];
         }
         return undefined;
@@ -185,5 +279,65 @@ export class CfnStrategy implements ModeStrategy {
         }
 
         return { typeLabel, attributes, properties };
+    }
+
+    // リソースにおけるPropertiesブロックの保持判定
+    hasPropertiesBlock(resource: unknown): boolean {
+        if (!resource || typeof resource !== 'object' || Array.isArray(resource)) return false;
+        return (
+            'Properties' in (resource as Record<string, unknown>) && !!(resource as Record<string, unknown>).Properties
+        );
+    }
+
+    // リソースのプロパティ対象オブジェクトの抽出
+    getTargetObject(resource: unknown): unknown {
+        if (this.hasPropertiesBlock(resource)) {
+            return (resource as Record<string, unknown>).Properties;
+        }
+        return resource;
+    }
+
+    // リソース個別プロパティのガイド定義の取得
+    getResourcePropertyGuide(
+        doc: any,
+        sectionName: string,
+        logicalId: string,
+        propKey: string,
+        resource?: unknown
+    ): YamlValue {
+        if (this.hasPropertiesBlock(resource)) {
+            return doc?.description?.[sectionName]?.[logicalId]?.Properties?.[propKey];
+        }
+        return doc?.description?.[sectionName]?.[logicalId]?.[propKey];
+    }
+
+    // リソース全体のルートガイド定義の取得
+    getResourceRootGuide(doc: any, sectionName: string, logicalId: string, resource?: unknown): YamlValue {
+        if (this.hasPropertiesBlock(resource)) {
+            return doc?.description?.[sectionName]?.[logicalId]?.Properties;
+        }
+        return doc?.description?.[sectionName]?.[logicalId];
+    }
+
+    // 構造化テキストセクション判定
+    isStructuredTextSection(sectionName: string, sectionData: unknown): boolean {
+        if (sectionName !== 'Description') return false;
+        let entries: Array<[string, unknown]> = [];
+        if (Array.isArray(sectionData)) {
+            entries = sectionData.map((item, idx) => [String(idx), item]);
+        } else if (typeof sectionData === 'object' && sectionData !== null) {
+            entries = Object.entries(sectionData);
+        }
+        return (
+            entries.length > 0 &&
+            typeof entries[0][1] === 'object' &&
+            entries[0][1] !== null &&
+            'fileName' in entries[0][1]
+        );
+    }
+
+    // マークダウン形式テキストセクション判定
+    isMarkdownTextSection(sectionName: string): boolean {
+        return sectionName === 'Description';
     }
 }

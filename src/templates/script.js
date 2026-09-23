@@ -27,7 +27,7 @@ YdockUI.Utils = {
 YdockUI.Navigation = {
     COLLAPSIBLE_SELECTOR: '.collapsible-wrapper, .rotate-icon, .card-container',
     SECTION_HEADER_SELECTOR: '[id^="section-"][id$="-content"], [id^="section-"][id$="-content-icon"]',
-    
+
     toggleSection(contentId, iconId) {
         const content = YdockUI.Utils.toggleClassById(contentId, C.CssClasses.IsCollapsed);
         YdockUI.Utils.toggleClassById(iconId, C.CssClasses.IsCollapsed);
@@ -38,8 +38,14 @@ YdockUI.Navigation = {
                 cardContainer.classList.toggle(C.CssClasses.IsCollapsed);
             }
         }
+
+        if (YdockUI.ColumnResizer && typeof YdockUI.ColumnResizer.updateResizerHeights === 'function') {
+            setTimeout(() => {
+                YdockUI.ColumnResizer.updateResizerHeights();
+            }, 300);
+        }
     },
-    
+
     expandAll() {
         // 全展開時の一時的トランジション無効化設定
         document.body.classList.add('disable-transitions');
@@ -47,22 +53,28 @@ YdockUI.Navigation = {
         window.requestAnimationFrame(() => {
             // トランジション無効化の解除処理
             document.body.classList.remove('disable-transitions');
+            if (YdockUI.ColumnResizer && typeof YdockUI.ColumnResizer.updateResizerHeights === 'function') {
+                YdockUI.ColumnResizer.updateResizerHeights();
+            }
         });
     },
-    
+
     collapseAll() {
         // 全折りたたみ時の一時的トランジション無効化設定
         document.body.classList.add('disable-transitions');
         YdockUI.Utils.toggleClassOnSelector(this.COLLAPSIBLE_SELECTOR, C.CssClasses.IsCollapsed, true);
-        
+
         // 最上位セクションの展開状態維持処理
         YdockUI.Utils.toggleClassOnSelector(this.SECTION_HEADER_SELECTOR, C.CssClasses.IsCollapsed, false);
         window.requestAnimationFrame(() => {
             // トランジション無効化の解除処理
             document.body.classList.remove('disable-transitions');
+            if (YdockUI.ColumnResizer && typeof YdockUI.ColumnResizer.updateResizerHeights === 'function') {
+                YdockUI.ColumnResizer.updateResizerHeights();
+            }
         });
     },
-    
+
     expandItem(sectionIndex, cardIndex) {
         const elements = [
             { id: `section-${sectionIndex}-content`, isContent: false },
@@ -81,8 +93,14 @@ YdockUI.Navigation = {
                 }
             }
         });
+
+        if (YdockUI.ColumnResizer && typeof YdockUI.ColumnResizer.updateResizerHeights === 'function') {
+            setTimeout(() => {
+                YdockUI.ColumnResizer.updateResizerHeights();
+            }, 300);
+        }
     },
-    
+
     navigateToItem(itemId, sectionIndex, cardIndex) {
         this.expandItem(sectionIndex, cardIndex);
         const element = document.getElementById(itemId);
@@ -91,8 +109,13 @@ YdockUI.Navigation = {
             element.scrollIntoView({ behavior: 'smooth' });
         }
     },
-    
+
     onSidebarItemClick(btn) {
+        if (btn.dataset.itemId && YdockUI.ScrollSpy) {
+            // スクロール追従の一時ロックとアクティブ状態の即時反映
+            YdockUI.ScrollSpy.lock(btn.dataset.itemId);
+        }
+        // 対象要素へのスムーズスクロール実行
         this.navigateToItem(btn.dataset.itemId, btn.dataset.sectionIndex, btn.dataset.cardIndex);
     }
 };
@@ -102,7 +125,8 @@ YdockUI.Clipboard = {
     showFeedback(btnElement) {
         if (!btnElement) return;
         const original = btnElement.innerHTML;
-        btnElement.innerHTML = '<svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
+        btnElement.innerHTML =
+            '<svg class="w-3.5 h-3.5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>';
         btnElement.classList.add('bg-green-50');
         setTimeout(() => {
             btnElement.innerHTML = original;
@@ -151,11 +175,14 @@ YdockUI.Clipboard = {
 
         // クリップボードAPI利用可能環境でのコピー実行
         if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
-            navigator.clipboard.writeText(text).then(() => {
-                this.showFeedback(btnElement);
-            }).catch(() => {
-                this.fallbackCopy(text, btnElement);
-            });
+            navigator.clipboard
+                .writeText(text)
+                .then(() => {
+                    this.showFeedback(btnElement);
+                })
+                .catch(() => {
+                    this.fallbackCopy(text, btnElement);
+                });
         } else {
             // 非セキュア環境におけるフォールバックコピーの実行
             this.fallbackCopy(text, btnElement);
@@ -181,7 +208,30 @@ YdockUI.DeepLink = {
             targetId = hash;
         }
 
-        const element = document.getElementById(targetId);
+        let element = document.getElementById(targetId);
+        if (!element) {
+            // 接頭辞付き要素に対するフォールバック探索
+            try {
+                const escapedTargetId = typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(targetId) : targetId;
+                const prefixMatch = targetId.match(/^(doc_\d+)\.(.*)$/);
+                if (prefixMatch) {
+                    const docPrefix = prefixMatch[1];
+                    const pureTargetId =
+                        typeof CSS !== 'undefined' && CSS.escape ? CSS.escape(prefixMatch[2]) : prefixMatch[2];
+                    element =
+                        document.querySelector(`[id^="${docPrefix}."][id$=".${pureTargetId}"]`) ||
+                        document.querySelector(`[id^="${docPrefix}."][id*=".${pureTargetId}."]`) ||
+                        document.querySelector(`[id^="${docPrefix}."][id*="${pureTargetId}"]`);
+                } else {
+                    element =
+                        document.querySelector(`[id$=".${escapedTargetId}"]`) ||
+                        document.querySelector(`[id*=".${escapedTargetId}"]`);
+                }
+            } catch {
+                // セレクタ構文例外発生時のフォールバック中断抑止
+                element = null;
+            }
+        }
         if (!element) return;
 
         // 対象要素および祖先ツリーの折りたたみ状態の一括解除
@@ -226,11 +276,11 @@ YdockUI.DeepLink = {
             }
         }, C.UIConstants.Animation.TooltipDelayMs);
     },
-    
+
     init() {
         this.handleNavigation();
         window.addEventListener('hashchange', () => this.handleNavigation());
-        
+
         document.addEventListener('click', (e) => {
             const link = e.target.closest('a');
             if (link) {
@@ -257,6 +307,7 @@ YdockUI.DisplayMode = {
     },
 
     toggleAliasSwitch(checkbox) {
+        checkbox.nextElementSibling.classList.add('after:transition-all');
         const isChecked = checkbox.checked;
         if (!isChecked) {
             document.body.classList.add(C.CssClasses.HideDeepAliases);
@@ -268,6 +319,7 @@ YdockUI.DisplayMode = {
     },
 
     toggleCompactSwitch(checkbox) {
+        checkbox.nextElementSibling.classList.add('after:transition-all');
         const isChecked = checkbox.checked;
         if (isChecked) {
             document.body.classList.add(C.CssClasses.CompactMode);
@@ -277,7 +329,7 @@ YdockUI.DisplayMode = {
             localStorage.setItem(C.LocalStorageKeys.CompactMode, 'false');
         }
     },
-    
+
     init() {
         const savedMode = localStorage.getItem(C.LocalStorageKeys.DocMode) || C.Modes.Inline;
         this.setMode(savedMode);
@@ -307,7 +359,7 @@ YdockUI.DisplayMode = {
 YdockUI.Tooltip = {
     currentPinnedTooltip: null,
     currentPinnedRow: null,
-    
+
     toggleTooltipPin(tooltipElement, row) {
         if (this.currentPinnedTooltip === tooltipElement) {
             tooltipElement.classList.remove(C.CssClasses.Pinned);
@@ -322,7 +374,7 @@ YdockUI.Tooltip = {
             this.currentPinnedRow = row;
         }
     },
-    
+
     init() {
         document.body.addEventListener('click', (e) => {
             if (
@@ -340,7 +392,9 @@ YdockUI.Tooltip = {
 
                 if (row.tagName === 'TR') {
                     // 対象行直下のツールチップコンテナのみを検索
-                    container = row.querySelector(':scope > td > div > .tooltip-container, :scope > td > .tooltip-container');
+                    container = row.querySelector(
+                        ':scope > td > div > .tooltip-container, :scope > td > .tooltip-container'
+                    );
                 }
 
                 if (container) {
@@ -433,7 +487,8 @@ YdockUI.ColumnResizer = {
                 Math.min(C.UIConstants.Resizing.MaxColumnWidthPercent, newWidthPercent)
             );
 
-            const varName = this.currentLevel !== null ? `--col-width-level-${this.currentLevel}` : '--col-width-level-default';
+            const varName =
+                this.currentLevel !== null ? `--col-width-level-${this.currentLevel}` : '--col-width-level-default';
             // 列幅CSS変数の更新処理
             window.requestAnimationFrame(() => {
                 document.documentElement.style.setProperty(varName, `${newWidthPercent}%`);
@@ -462,48 +517,163 @@ YdockUI.ColumnResizer = {
     }
 };
 
-YdockUI.SidebarResizer = {
-    init() {
-        const sidebar = document.getElementById('sidebar');
-        const sidebarResizer = document.getElementById('sidebar-resizer');
+YdockUI.Sidebar = {
+    toggle() {
+        // サイドバー折りたたみ状態の反転設定
+        document.body.classList.toggle(C.CssClasses.SidebarCollapsed);
+        setTimeout(() => {
+            // アニメーション完了後のテーブルレイアウト再同期
+            window.dispatchEvent(new Event('resize'));
+        }, 250);
+    }
+};
 
-        if (sidebar && sidebarResizer) {
-            let isSidebarResizing = false;
-            let sidebarStartX = 0;
-            let sidebarStartWidth = 0;
+YdockUI.ScrollSpy = {
+    activeId: null,
+    isLocked: false,
+    lockTimer: null,
+    rafId: null,
+    scrollLockHandler: null,
+    cards: [],
 
-            sidebarResizer.addEventListener('mousedown', (e) => {
-                isSidebarResizing = true;
-                sidebarStartX = e.pageX;
-                sidebarStartWidth = sidebar.getBoundingClientRect().width;
+    // サイドバー項目のアクティブ状態切り替え処理
+    setActive(itemId) {
+        if (!itemId || this.activeId === itemId) return;
+        this.activeId = itemId;
 
-                document.body.style.cursor = 'ew-resize';
-                document.body.style.userSelect = 'none';
-                sidebarResizer.classList.add(C.CssClasses.IsResizing);
-            });
-
-            document.addEventListener('mousemove', (e) => {
-                if (!isSidebarResizing) return;
-
-                const diff = e.pageX - sidebarStartX;
-                const newWidth = sidebarStartWidth + diff;
-
-                const minWidth = C.UIConstants.Resizing.MinSidebarWidthPx;
-                const maxWidth = window.innerWidth * C.UIConstants.Resizing.MaxSidebarWidthRatio;
-
-                const clampedWidth = Math.max(minWidth, Math.min(maxWidth, newWidth));
-                sidebar.style.width = `${clampedWidth}px`;
-            });
-
-            document.addEventListener('mouseup', () => {
-                if (!isSidebarResizing) return;
-
-                isSidebarResizing = false;
-                document.body.style.cursor = '';
-                document.body.style.userSelect = '';
-                sidebarResizer.classList.remove(C.CssClasses.IsResizing);
-            });
+        const activeClass = C.CssClasses.SidebarItemActive;
+        const currentActive = document.querySelector(`.${activeClass}`);
+        if (currentActive) {
+            currentActive.classList.remove(activeClass);
         }
+
+        const targetBtn = document.querySelector(`button[data-item-id="${itemId}"]`);
+        if (!targetBtn) return;
+
+        targetBtn.classList.add(activeClass);
+        // サイドバー可視範囲外の場合の自動スクロール調整
+        targetBtn.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    },
+
+    // 手動クリック時のジャンプスクロール追従制御処理
+    lock(itemId) {
+        this.isLocked = true;
+        if (this.lockTimer) {
+            // 既存タイマーの解除処理
+            clearTimeout(this.lockTimer);
+            this.lockTimer = null;
+        }
+        if (this.scrollLockHandler) {
+            // 既存スクロールリスナーの解除処理
+            window.removeEventListener('scroll', this.scrollLockHandler);
+            this.scrollLockHandler = null;
+        }
+
+        // 即時アクティブ化反映
+        this.setActive(itemId);
+
+        const debounceWaitMs = C.UIConstants.ScrollSpy.DebounceWaitMs;
+
+        // スクロール停止検知用ハンドラー定義
+        this.scrollLockHandler = () => {
+            if (this.lockTimer) {
+                clearTimeout(this.lockTimer);
+            }
+            this.lockTimer = setTimeout(() => {
+                this.isLocked = false;
+                this.lockTimer = null;
+                if (this.scrollLockHandler) {
+                    window.removeEventListener('scroll', this.scrollLockHandler);
+                    this.scrollLockHandler = null;
+                }
+                // スクロール完了後の現在地判定再実行
+                this.updateActive();
+            }, debounceWaitMs);
+        };
+
+        // スクロール発生時のタイマー延長イベント登録
+        window.addEventListener('scroll', this.scrollLockHandler, { passive: true });
+        // 初期待機タイマーの設定
+        this.scrollLockHandler();
+    },
+
+    // 現在のスクロール位置に基づくアクティブカード更新処理
+    updateActive() {
+        if (this.isLocked || this.cards.length === 0) return;
+
+        const cfg = C.UIConstants.ScrollSpy;
+        const scrollBottom = window.innerHeight + window.scrollY;
+        const documentHeight = document.documentElement.scrollHeight;
+
+        // ページ最下部到達時の末尾カード選択判定
+        if (scrollBottom >= documentHeight - cfg.BottomThresholdPx) {
+            const lastCard = this.cards[this.cards.length - 1];
+            if (lastCard && lastCard.id) {
+                this.setActive(lastCard.id);
+                return;
+            }
+        }
+
+        const referenceLine = cfg.ReferenceOffsetPx;
+        let intersectingId = null;
+        let closestId = null;
+        let minDistance = Infinity;
+
+        // 基準線を跨ぐカードおよび最近傍カードの一括走査処理
+        for (let i = 0; i < this.cards.length; i++) {
+            const card = this.cards[i];
+            const rect = card.getBoundingClientRect();
+
+            if (rect.top <= referenceLine && rect.bottom > referenceLine) {
+                intersectingId = card.id;
+                break;
+            }
+
+            const distance = Math.abs(rect.top - referenceLine);
+            if (distance < minDistance) {
+                minDistance = distance;
+                closestId = card.id;
+            }
+        }
+
+        const matchedId = intersectingId || closestId;
+        if (matchedId) {
+            this.setActive(matchedId);
+        }
+    },
+
+    // スクロール追従監視の初期化処理
+    init() {
+        this.cards = Array.from(document.querySelectorAll('.card-container')).filter((el) => !!el.id);
+        if (this.cards.length === 0) return;
+
+        // 初回表示時のアクティブ項目判定実行
+        this.updateActive();
+
+        // スクロールイベントに対する描画最適化リスナー登録
+        window.addEventListener(
+            'scroll',
+            () => {
+                if (this.isLocked) return;
+                if (this.rafId) {
+                    cancelAnimationFrame(this.rafId);
+                }
+                this.rafId = window.requestAnimationFrame(() => {
+                    this.updateActive();
+                });
+            },
+            { passive: true }
+        );
+
+        // リサイズイベントに対する再判定リスナー登録
+        window.addEventListener(
+            'resize',
+            () => {
+                if (this.isLocked) return;
+                this.updateActive();
+            },
+            { passive: true }
+        );
     }
 };
 
@@ -514,5 +684,6 @@ document.addEventListener('DOMContentLoaded', () => {
     YdockUI.DeepLink.init();
     YdockUI.Tooltip.init();
     YdockUI.ColumnResizer.init();
-    YdockUI.SidebarResizer.init();
+    // スクロール追従監視モジュールの初期化
+    YdockUI.ScrollSpy.init();
 });

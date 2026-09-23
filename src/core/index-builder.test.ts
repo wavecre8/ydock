@@ -89,9 +89,7 @@ describe('IndexBuilder', () => {
         });
 
         it('グループ設定のidまたはnameのいずれを指定しても同一グループへ分類される', () => {
-            const configuredGroups: IndexGroupConfig[] = [
-                { id: 'network-id', name: 'Network Section' }
-            ];
+            const configuredGroups: IndexGroupConfig[] = [{ id: 'network-id', name: 'Network Section' }];
 
             const pages: IndexPageItem[] = [
                 { title: 'Page By ID', filename: 'p1.html', link: 'p1.html', mode: 'cfn', group: 'network-id' },
@@ -106,6 +104,29 @@ describe('IndexBuilder', () => {
             expect(result.groups).toHaveLength(1);
             expect(result.groups[0].name).toBe('Network Section');
             expect(result.groups[0].pages).toHaveLength(3);
+        });
+
+        it('グループ設定のidまたはnameと大文字小文字が異なる場合も同一グループへ分類される', () => {
+            const configuredGroups: IndexGroupConfig[] = [{ id: 'frontend', name: 'Frontend Application' }];
+
+            const pages: IndexPageItem[] = [
+                { title: 'Page Upper ID', filename: 'p1.html', link: 'p1.html', mode: 'cfn', group: 'FRONTEND' },
+                {
+                    title: 'Page Lower Name',
+                    filename: 'p2.html',
+                    link: 'p2.html',
+                    mode: 'cfn',
+                    group: 'frontend application'
+                }
+            ];
+
+            // 大文字小文字の差異を許容したグループ分類処理の実行
+            const result = IndexBuilder.buildGroups(pages, configuredGroups, 'その他');
+
+            expect(result.hasGroups).toBe(true);
+            expect(result.groups).toHaveLength(1);
+            expect(result.groups[0].name).toBe('Frontend Application');
+            expect(result.groups[0].pages).toHaveLength(2);
         });
 
         it('設定に未分類グループ名と同名のグループが存在する場合は未分類ページが合流する', () => {
@@ -242,6 +263,20 @@ describe('IndexBuilder', () => {
             if (fs.existsSync(tempDir)) {
                 fs.rmdirSync(tempDir);
             }
+        });
+
+        it('大文字小文字の異なる未分類グループ名が設定された場合でも重複せず合流する', () => {
+            const configuredGroups: IndexGroupConfig[] = [{ id: 'other', name: 'other' }];
+
+            const pages: IndexPageItem[] = [
+                { title: 'Page1', filename: 'p1.html', link: 'p1.html', mode: 'generic', group: 'other' },
+                { title: 'Page2', filename: 'p2.html', link: 'p2.html', mode: 'generic' }
+            ];
+
+            const result = IndexBuilder.buildGroups(pages, configuredGroups, 'Other');
+            expect(result.groups).toHaveLength(1);
+            expect(result.groups[0].name.toLowerCase()).toBe('other');
+            expect(result.groups[0].pages).toHaveLength(2);
         });
     });
 });

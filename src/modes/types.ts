@@ -19,6 +19,14 @@ export type MergeCustomizer = (
     stack: unknown
 ) => unknown;
 
+export enum DocumentMode {
+    Generic = 'generic',
+    Cfn = 'cfn'
+}
+
+export type StrategyMode = DocumentMode;
+export const StrategyMode = DocumentMode;
+
 export interface ResourceComponents {
     typeLabel?: string;
     properties: Array<{ key: string; val: YamlValue }>;
@@ -33,6 +41,16 @@ export interface ModeStrategy {
      * Returns the YAML schema to use for parsing.
      */
     getSchema(): Schema;
+
+    /**
+     * プロパティ格納ブロックのキー名を取得
+     */
+    getPropertiesKey?(): string;
+
+    /**
+     * モード種別の取得
+     */
+    getMode?(): DocumentMode;
 
     /**
      * Returns keys that should be merged at the top level.
@@ -75,9 +93,22 @@ export interface ModeStrategy {
 
     /**
      * Returns the type of section for rendering purposes.
-     * @returns 'transform' | 'normal'
+     * @returns 'scalar_list' | 'transform' | 'text' | 'normal'
      */
-    getSectionRenderType(sectionName: string): 'transform' | 'normal';
+    getSectionRenderType(sectionName: string): 'scalar_list' | 'transform' | 'text' | 'normal';
+
+    /**
+     * Normalizes template sections before preprocessing (e.g. scalar Transform to array, Description normalization).
+     */
+    normalizeTemplate?(
+        template: Record<string, YamlValue>,
+        docMeta?: { mode?: string; sourcePath?: string; sourceBaseName?: string }
+    ): Record<string, YamlValue>;
+
+    /**
+     * Determines whether a given section represents a resource collection (e.g. CloudFormation 'Resources').
+     */
+    isResourceSection?(sectionName: string): boolean;
 
     /**
      * Returns a list of top-level keys that are exempt from duplicate checks during multi-file merging.
@@ -91,4 +122,50 @@ export interface ModeStrategy {
      * Useful for skipping implicit layers like 'Properties' in CloudFormation.
      */
     findPropertyFallback?(obj: Record<string, YamlValue>, seg: string): YamlValue | undefined;
+
+    /**
+     * Determines whether the resource uses an explicit properties wrapper block.
+     */
+    hasPropertiesBlock?(resource: unknown): boolean;
+
+    /**
+     * Extracts the target properties object from a resource.
+     */
+    getTargetObject?(resource: unknown): unknown;
+
+    /**
+     * Retrieves the guide for a specific property of a resource.
+     */
+    getResourcePropertyGuide?(
+        doc: any,
+        sectionName: string,
+        logicalId: string,
+        propKey: string,
+        resource?: unknown
+    ): YamlValue;
+
+    /**
+     * Retrieves the root guide for a resource.
+     */
+    getResourceRootGuide?(doc: any, sectionName: string, logicalId: string, resource?: unknown): YamlValue;
+
+    /**
+     * Checks if a section data should be treated as structured text entries (e.g. multi-file descriptions).
+     */
+    isStructuredTextSection?(sectionName: string, sectionData: unknown): boolean;
+
+    /**
+     * Checks if a text section content should be parsed as markdown.
+     */
+    isMarkdownTextSection?(sectionName: string): boolean;
+
+    /**
+     * トップレベルセクションとして認識されるキーであるかの判定
+     */
+    isKnownTopLevelSection?(sectionName: string): boolean;
+
+    /**
+     * 省略されたセグメント列に対するモード固有の補完処理
+     */
+    completeOmittedSegments?(segments: string[]): { segments: string[]; isPropertiesBlock: boolean };
 }

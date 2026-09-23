@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { ModeFactory } from '../modes/factory';
-import { PageConfig, TemplateData, GuideData, DocDockDocument, ExcludeTree } from '../types';
+import { PageConfig, TemplateData, DocDockDocument, SingleDocument } from '../types';
 import { SourceProcessor } from './source-processor';
 import { Generator } from './generator';
 import { Logger } from './logger';
@@ -19,59 +19,46 @@ export class PageBuilder {
      */
     static async build(
         page: PageConfig,
-        globalMode: 'cfn' | 'generic',
+        globalMode: string,
         language: string,
         configPath: string,
         layoutPath: string,
-        silent?: boolean
+        silent?: boolean,
+        pageRouteMap?: Map<string, string>
     ): Promise<void> {
         const configDir = PathUtils.getConfigDir(configPath);
         const resolvedOutput = PathUtils.resolveRelative(configDir, page.output);
 
         Logger.info(`Generating ${resolvedOutput}...`);
 
-        let accumulatedTemplate: TemplateData = {};
-        let accumulatedGuide: GuideData = {};
-        let accumulatedExcludeTree: ExcludeTree = {};
-        const seenKeys = new Set<string>();
-
         const pageMode = page.mode || globalMode;
         const strategy = ModeFactory.getStrategy(pageMode);
 
         const sources = page.sources || page.templates || [];
-        const descriptionList: Array<{ fileName: string; content: string }> = [];
+        if (sources.length === 0) {
+            Logger.warn(`Page '${page.output}' does not define any sources or templates.`);
+            return;
+        }
+        const documents: SingleDocument[] = [];
 
+        // 各ソースファイルの独立処理とドキュメント配列への収集
         for (const sourcePath of sources) {
-            const result = SourceProcessor.process(
-                sourcePath,
-                strategy,
-                page,
-                configPath,
-                seenKeys,
-                descriptionList,
-                accumulatedTemplate,
-                accumulatedGuide,
-                accumulatedExcludeTree,
-                silent
-            );
-
-            accumulatedTemplate = result.template;
-            accumulatedGuide = result.guide;
-            accumulatedExcludeTree = result.excludeTree;
+            const singleDoc = SourceProcessor.processSingle(sourcePath, strategy, page, configPath, silent);
+            documents.push(singleDoc);
         }
 
-        if (descriptionList.length > 0) {
-            accumulatedTemplate.Description = descriptionList;
-        }
+        // 共通後方互換用テンプレートオブジェクトの参照設定
+        const baseTemplate: TemplateData = documents[0]?.template || {};
 
         const doc: DocDockDocument = {
-            template: accumulatedTemplate,
-            description: accumulatedGuide,
-            excludeTree: accumulatedExcludeTree,
-            mode: pageMode
+            template: baseTemplate,
+            description: documents[0]?.description || {},
+            excludeTree: documents[0]?.excludeTree || {},
+            mode: pageMode,
+            documents
         };
 
-        const html = Generator.generate(doc, layoutPath, strategy, page.title, language);
+        const html = Generator.generate(doc, layoutPath, strategy, page.title, language, { pageRouteMap });
 
         const outputDir = path.dirname(resolvedOutput);
         if (!fs.existsSync(outputDir)) {

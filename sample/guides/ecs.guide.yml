@@ -1,10 +1,10 @@
 tasks:
-  - '=taskArn': arn:aws:ecs:us-east-1:123456789012:task/MyCluster/74de0355a10a4f979ac495c14EXAMPLE
+  - '[taskArn=arn:aws:ecs:us-east-1:123456789012:task/MyCluster/74de0355a10a4f979ac495c14EXAMPLE]': ''
     attachments:
-      - '=id': d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE
+      - '[id=d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE]': ''
         type: |-
           Attachment type. Typically ElasticNetworkInterface
-          (See [EC2 DeleteOnTermination](Reservations[=ReservationId:r-99999999999].Instances[=InstanceId:i-99999999999999999].BlockDeviceMappings[=DeviceName:/dev/xvda].Ebs.DeleteOnTermination))
+          (See [EC2 DeleteOnTermination](ec2::Reservations[ReservationId=r-99999999999].Instances[InstanceId=i-99999999999999999].BlockDeviceMappings[DeviceName=/dev/xvda].Ebs.DeleteOnTermination))
         status: |-
           Attachment status:
           ATTACHED = Successfully attached
@@ -12,16 +12,16 @@ tasks:
 
           Details: [AWS Docs](https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-networking.html)
         details:
-          - '=name': subnetId
+          - '[name=subnetId]': ''
             name: Detail item name (e.g. subnetId, networkInterfaceId)
             value: Corresponding value
     attributes:
-      - '=name': ecs.cpu-architecture
+      - '[name=ecs.cpu-architecture]': ''
         name: Attribute name
         value: Attribute value
     clusterArn: ARN of the cluster where the task is running
     containers:
-      - '=name': web
+      - '[name=web]': ''
         containerArn: Container ARN
         name: Container name (defined in task definition)
         image: Docker image to use (e.g. nginx, myapp:latest)
@@ -34,7 +34,7 @@ tasks:
           RUNNING = Currently running
           STOPPED = Stopped
         networkInterfaces:
-          - '=attachmentId': d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE
+          - '[attachmentId=d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE]': ''
             attachmentId: Corresponding attachment ID
             privateIpv4Address: Assigned private IP address
         cpu: CPU units allocated to the container
@@ -50,7 +50,7 @@ tasks:
     taskDefinitionArn: ARN of the task definition being used
     ephemeralStorage:
       sizeInGiB: Ephemeral storage size in GiB. Default 20GiB, max 200GiB
-  - '=attachments':
+  - '[attachments]':
       - id: d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE
         type: ElasticNetworkInterface
         status: ATTACHED
@@ -66,28 +66,28 @@ tasks:
           - name: privateIPv4Address
             value: 10.0.1.184
     attachments:
-      - '=id': d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE
+      - '[id=d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE]': ''
         id: ''
         type: ''
         status: ''
         details:
-          - '=name': subnetId
+          - '[name=subnetId]': ''
             name: ''
             value: ''
-          - '=name': networkInterfaceId
+          - '[name=networkInterfaceId]': ''
             name: ''
             value: ''
-          - '=name': macAddress
+          - '[name=macAddress]': ''
             name: ''
             value: ''
-          - '=name': privateDnsName
+          - '[name=privateDnsName]': ''
             name: ''
             value: ''
-          - '=name': privateIPv4Address
+          - '[name=privateIPv4Address]': ''
             name: ''
             value: ''
     attributes:
-      - '=name': ecs.cpu-architecture
+      - '[name=ecs.cpu-architecture]': ''
         name: ''
         value: ''
     availabilityZone: ''
@@ -95,7 +95,7 @@ tasks:
     connectivity: ''
     connectivityAt: ''
     containers:
-      - '=name': web
+      - '[name=web]': ''
         containerArn: ''
         taskArn: ''
         name: ''
@@ -104,7 +104,7 @@ tasks:
         lastStatus: ''
         networkBindings: []
         networkInterfaces:
-          - '=attachmentId': d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE
+          - '[attachmentId=d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE]': ''
             attachmentId: ''
             privateIpv4Address: ''
         healthStatus: ''
@@ -121,7 +121,7 @@ tasks:
     memory: ''
     overrides:
       containerOverrides:
-        - '=name': web
+        - '[name=web]': ''
           name: ''
       inferenceAcceleratorOverrides: []
     platformVersion: ''
@@ -136,7 +136,7 @@ tasks:
     version: ''
     ephemeralStorage:
       sizeInGiB: ''
-  - '=attachments':
+  - '[attachments]':
       - id: 214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE
         type: ElasticNetworkInterface
         status: ATTACHED
@@ -152,28 +152,28 @@ tasks:
           - name: privateIPv4Address
             value: 10.0.1.41
     attachments:
-      - '=id': 214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE
+      - '[id=214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE]': ''
         id: ''
         type: ''
         status: ''
         details:
-          - '=name': subnetId
+          - '[name=subnetId]': ''
             name: ''
             value: ''
-          - '=name': networkInterfaceId
+          - '[name=networkInterfaceId]': ''
             name: ''
             value: ''
-          - '=name': macAddress
+          - '[name=macAddress]': ''
             name: ''
             value: ''
-          - '=name': privateDnsName
+          - '[name=privateDnsName]': ''
             name: ''
             value: ''
-          - '=name': privateIPv4Address
+          - '[name=privateIPv4Address]': ''
             name: ''
             value: ''
     attributes:
-      - '=name': ecs.cpu-architecture
+      - '[name=ecs.cpu-architecture]': ''
         name: ''
         value: ''
     availabilityZone: ''
@@ -181,7 +181,7 @@ tasks:
     connectivity: ''
     connectivityAt: ''
     containers:
-      - '=name': web
+      - '[name=web]': ''
         containerArn: ''
         taskArn: ''
         name: ''
@@ -190,7 +190,7 @@ tasks:
         lastStatus: ''
         networkBindings: []
         networkInterfaces:
-          - '=attachmentId': 214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE
+          - '[attachmentId=214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE]': ''
             attachmentId: ''
             privateIpv4Address: ''
         healthStatus: ''
@@ -207,7 +207,7 @@ tasks:
     memory: ''
     overrides:
       containerOverrides:
-        - '=name': web
+        - '[name=web]': ''
           name: ''
       inferenceAcceleratorOverrides: []
     platformVersion: ''
@@ -222,7 +222,7 @@ tasks:
     version: ''
     ephemeralStorage:
       sizeInGiB: ''
-  - '=attachments':
+  - '[attachments]':
       - id: d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE
         type: ElasticNetworkInterface
         status: ATTACHED
@@ -238,28 +238,28 @@ tasks:
           - name: privateIPv4Address
             value: 10.0.1.184
     attachments:
-      - '=id': d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE
+      - '[id=d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE]': ''
         id: ''
         type: ''
         status: ''
         details:
-          - '=name': subnetId
+          - '[name=subnetId]': ''
             name: ''
             value: ''
-          - '=name': networkInterfaceId
+          - '[name=networkInterfaceId]': ''
             name: ''
             value: ''
-          - '=name': macAddress
+          - '[name=macAddress]': ''
             name: ''
             value: ''
-          - '=name': privateDnsName
+          - '[name=privateDnsName]': ''
             name: ''
             value: ''
-          - '=name': privateIPv4Address
+          - '[name=privateIPv4Address]': ''
             name: ''
             value: ''
     attributes:
-      - '=name': ecs.cpu-architecture
+      - '[name=ecs.cpu-architecture]': ''
         name: ''
         value: ''
     availabilityZone: ''
@@ -267,7 +267,7 @@ tasks:
     connectivity: ''
     connectivityAt: ''
     containers:
-      - '=name': web
+      - '[name=web]': ''
         containerArn: ''
         taskArn: ''
         name: ''
@@ -276,7 +276,7 @@ tasks:
         lastStatus: ''
         networkBindings: []
         networkInterfaces:
-          - '=attachmentId': d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE
+          - '[attachmentId=d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE]': ''
             attachmentId: ''
             privateIpv4Address: ''
         healthStatus: ''
@@ -293,7 +293,7 @@ tasks:
     memory: ''
     overrides:
       containerOverrides:
-        - '=name': web
+        - '[name=web]': ''
           name: ''
       inferenceAcceleratorOverrides: []
     platformVersion: ''
@@ -308,7 +308,7 @@ tasks:
     version: ''
     ephemeralStorage:
       sizeInGiB: ''
-  - '=attachments':
+  - '[attachments]':
       - id: 214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE
         type: ElasticNetworkInterface
         status: ATTACHED
@@ -324,28 +324,28 @@ tasks:
           - name: privateIPv4Address
             value: 10.0.1.41
     attachments:
-      - '=id': 214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE
+      - '[id=214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE]': ''
         id: ''
         type: ''
         status: ''
         details:
-          - '=name': subnetId
+          - '[name=subnetId]': ''
             name: ''
             value: ''
-          - '=name': networkInterfaceId
+          - '[name=networkInterfaceId]': ''
             name: ''
             value: ''
-          - '=name': macAddress
+          - '[name=macAddress]': ''
             name: ''
             value: ''
-          - '=name': privateDnsName
+          - '[name=privateDnsName]': ''
             name: ''
             value: ''
-          - '=name': privateIPv4Address
+          - '[name=privateIPv4Address]': ''
             name: ''
             value: ''
     attributes:
-      - '=name': ecs.cpu-architecture
+      - '[name=ecs.cpu-architecture]': ''
         name: ''
         value: ''
     availabilityZone: ''
@@ -353,7 +353,7 @@ tasks:
     connectivity: ''
     connectivityAt: ''
     containers:
-      - '=name': web
+      - '[name=web]': ''
         containerArn: ''
         taskArn: ''
         name: ''
@@ -362,7 +362,7 @@ tasks:
         lastStatus: ''
         networkBindings: []
         networkInterfaces:
-          - '=attachmentId': 214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE
+          - '[attachmentId=214eb5a9-45cd-4bf8-87bc-57fefEXAMPLE]': ''
             attachmentId: ''
             privateIpv4Address: ''
         healthStatus: ''
@@ -379,7 +379,7 @@ tasks:
     memory: ''
     overrides:
       containerOverrides:
-        - '=name': web
+        - '[name=web]': ''
           name: ''
       inferenceAcceleratorOverrides: []
     platformVersion: ''

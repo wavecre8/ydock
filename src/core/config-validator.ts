@@ -3,15 +3,24 @@ import { z } from 'zod';
 import { DocDockConfig } from '../types';
 import { ConfigValidationError } from './errors';
 import { PathUtils } from './path-utils';
+import { Logger } from './logger';
 
-const nonEmptyString = (message: string) =>
-    z.string().refine(val => val.trim().length > 0, message);
+import { ModeFactory } from '../modes/factory';
+
+const nonEmptyString = (message: string) => z.string().refine((val) => val.trim().length > 0, message);
+
+const modeSchema = z
+    .string()
+    .refine((val: string) => ModeFactory.getSupportedModes().includes(val.toLowerCase()), {
+        message: `Invalid mode. Allowed modes are: ${ModeFactory.getSupportedModes().join(', ')}`
+    })
+    .optional();
 
 const PageConfigSchema = z.object({
     title: z.string().optional(),
     sources: z.array(nonEmptyString('Source path must not be empty')).optional(),
     output: nonEmptyString('Output path must not be empty'),
-    mode: z.enum(['cfn', 'generic']).optional(),
+    mode: modeSchema,
     group: z.string().optional(),
     guideDir: nonEmptyString('Guide directory path must not be empty').optional(),
     aliasDir: nonEmptyString('Alias directory path must not be empty').optional(),
@@ -35,7 +44,7 @@ const IndexConfigSchema = z.union([
 
 const DocDockConfigSchema = z.object({
     pages: z.array(PageConfigSchema).min(1, 'At least one page must be defined in pages'),
-    mode: z.enum(['cfn', 'generic']).optional(),
+    mode: modeSchema,
     lang: z.string().optional(),
     index: IndexConfigSchema.optional(),
     guideDir: nonEmptyString('Guide directory path must not be empty').optional(),
@@ -51,7 +60,7 @@ export class ConfigValidator {
         // スキーマ構造および型の検証
         const parseResult = DocDockConfigSchema.safeParse(rawConfig);
         if (!parseResult.success) {
-            const errorDetails = parseResult.error.issues.map(issue => {
+            const errorDetails = parseResult.error.issues.map((issue) => {
                 const pathStr = issue.path.join('.');
                 return `${pathStr}: ${issue.message}`;
             });
@@ -117,6 +126,12 @@ export class ConfigValidator {
 
         for (let i = 0; i < config.pages.length; i++) {
             const page = config.pages[i];
+            const sources = page.sources || page.templates || [];
+            // 入力ソース定義の存在確認と未指定時の警告通知
+            if (sources.length === 0) {
+                Logger.warn(`Page '${page.output}' does not define any sources or templates.`);
+            }
+
             const resolvedPath = PathUtils.resolveRelative(configDir, page.output);
             const normalized = path.normalize(resolvedPath).toLowerCase();
 

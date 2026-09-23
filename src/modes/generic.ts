@@ -1,9 +1,16 @@
 import * as yaml from 'js-yaml';
-import { ModeStrategy, MergeCustomizer, ResourceComponents } from './types';
+import { ModeStrategy, MergeCustomizer, ResourceComponents, DocumentMode } from './types';
 import { YamlValue } from '../types';
 import * as _ from 'lodash';
 
 export class GenericStrategy implements ModeStrategy {
+    /**
+     * モード種別の取得
+     */
+    getMode(): DocumentMode {
+        return DocumentMode.Generic;
+    }
+
     getSchema(): yaml.Schema {
         return yaml.DEFAULT_SCHEMA;
     }
@@ -65,8 +72,25 @@ export class GenericStrategy implements ModeStrategy {
         return [];
     }
 
-    getSectionRenderType(_sectionName: string): 'transform' | 'normal' {
+    getSectionRenderType(_sectionName: string): 'scalar_list' | 'transform' | 'text' | 'normal' {
         return 'normal';
+    }
+
+    /**
+     * テンプレートの前処理正規化
+     */
+    normalizeTemplate(
+        template: Record<string, YamlValue>,
+        _docMeta?: { mode?: string; sourcePath?: string; sourceBaseName?: string }
+    ): Record<string, YamlValue> {
+        return template;
+    }
+
+    /**
+     * リソース定義コレクションセクションの判定
+     */
+    isResourceSection(_sectionName: string): boolean {
+        return false;
     }
 
     getDuplicateExemptKeys(): string[] {
@@ -91,5 +115,51 @@ export class GenericStrategy implements ModeStrategy {
             attributes: [],
             properties
         };
+    }
+
+    // リソースにおけるPropertiesブロックの保持判定
+    hasPropertiesBlock(_resource: unknown): boolean {
+        return false;
+    }
+
+    // リソースのプロパティ対象オブジェクトの抽出
+    getTargetObject(resource: unknown): unknown {
+        return resource;
+    }
+
+    // リソース個別プロパティのガイド定義の取得
+    getResourcePropertyGuide(
+        doc: any,
+        sectionName: string,
+        logicalId: string,
+        propKey: string,
+        _resource?: unknown
+    ): YamlValue {
+        return doc?.description?.[sectionName]?.[logicalId]?.[propKey];
+    }
+
+    // リソース全体のルートガイド定義の取得
+    getResourceRootGuide(doc: any, sectionName: string, logicalId: string, _resource?: unknown): YamlValue {
+        return doc?.description?.[sectionName]?.[logicalId];
+    }
+
+    // 構造化テキストセクション判定
+    isStructuredTextSection(_sectionName: string, _sectionData: unknown): boolean {
+        return false;
+    }
+
+    // マークダウン形式テキストセクション判定
+    isMarkdownTextSection(_sectionName: string): boolean {
+        return false;
+    }
+
+    // トップレベルセクション判定
+    isKnownTopLevelSection(_sectionName: string): boolean {
+        return false;
+    }
+
+    // 省略セグメント補完処理
+    completeOmittedSegments(segments: string[]): { segments: string[]; isPropertiesBlock: boolean } {
+        return { segments: [...segments], isPropertiesBlock: false };
     }
 }

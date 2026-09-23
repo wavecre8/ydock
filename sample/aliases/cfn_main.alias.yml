@@ -1,5 +1,5 @@
-"Transform[=AWS::LanguageExtensions]": "Language Extensions"
-"Transform[=AWS::Serverless-2016-10-31]": "SAM Transform"
+"Transform[AWS=:LanguageExtensions]": "Language Extensions"
+"Transform[AWS=:Serverless-2016-10-31]": "SAM Transform"
 
 "Metadata.AWS::CloudFormation::Interface": "Console UI Configuration"
 

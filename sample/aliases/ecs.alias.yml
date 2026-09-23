@@ -63,7 +63,7 @@
 
 "failures": "失敗したタスク一覧"
 
-"tasks[=taskArn:arn:aws:ecs:us-east-1:123456789012:task/MyCluster/74de0355a10a4f979ac495c14EXAMPLE]": "フロントエンドタスク"
-"tasks[=taskArn:arn:aws:ecs:us-east-1:123456789012:task/MyCluster/d789e94343414c25b9f6bd59eEXAMPLE]": "バックエンドタスク"
-"tasks[].attachments[=id:d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE]": "ENIアタッチメント"
+"tasks[taskArn=arn:aws:ecs:us-east-1:123456789012:task/MyCluster/74de0355a10a4f979ac495c14EXAMPLE]": "フロントエンドタスク"
+"tasks[taskArn=arn:aws:ecs:us-east-1:123456789012:task/MyCluster/d789e94343414c25b9f6bd59eEXAMPLE]": "バックエンドタスク"
+"tasks[].attachments[id=d9e7735a-16aa-4128-bc7a-b2d51EXAMPLE]": "ENIアタッチメント"
 "tasks[].attachments[].id": ""

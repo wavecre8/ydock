@@ -1,5 +1,5 @@
 "Reservations": "インスタンス一覧"
-"Reservations[=ReservationId:r-99999999999]": "メインインスタンス"
+"Reservations[ReservationId=r-99999999999]": "メインインスタンス"
 "Reservations[].Groups": ""
 "Reservations[].Instances": ""
 "Reservations[].Instances[].AmiLaunchIndex": ""

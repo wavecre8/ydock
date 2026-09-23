@@ -38,7 +38,7 @@ export class ImportResolver {
             if (visitedStack.includes(importPath)) {
                 throw new CircularImportError([...visitedStack, importPath]);
             }
-            
+
             if (!fs.existsSync(importPath)) {
                 throw new FileNotFoundError(importPath, 'import resolution');
             }
@@ -47,14 +47,14 @@ export class ImportResolver {
             let subData = Loader.loadTemplate(importPath, undefined) as GuideData;
             // 再帰的なインポート解決の実行
             subData = this.resolve(subData, path.dirname(importPath), [...visitedStack, importPath]);
-            
+
             // 読み込み済みインポートデータに対するガイドマージ処理
             importedData = Merger.mergeDescriptions([importedData, subData]) as GuideData;
         }
 
         // Destructure to remove _imports from the merged result
         const { [importsKey]: _, ...ownData } = inputWithImports;
-        
+
         // インポート定義に対する個別定義の優先マージ処理
         return Merger.mergeDescriptions([importedData, ownData as GuideData]) as GuideData;
     }

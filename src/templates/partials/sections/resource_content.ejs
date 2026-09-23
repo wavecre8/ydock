@@ -11,8 +11,10 @@
     const attributeEntries = components.attributes;
     const pEntries = components.properties;
     
-    // Note: for constructing the Copy Key path (rawPath), we still need to know if we are in 'Properties' sub-path or root.
-    const isPropertiesBlock = !!resource?.Properties;
+    // リソースにおけるPropertiesブロックの保持判定をStrategyへ委譲
+    const isPropertiesBlock = (typeof strategy !== 'undefined' && strategy && strategy.hasPropertiesBlock)
+        ? strategy.hasPropertiesBlock(resource)
+        : !!resource?.Properties;
 %>
 
 <% if (attributeEntries.length > 0) { %>
@@ -105,9 +107,11 @@
                     const propKey = entry.key;
                     const propVal = entry.val;
                     
-                    // Guide Mapping for Properties
+                    // ガイド定義の取得処理をStrategyへ委譲
                     let propDesc = undefined;
-                    if (isPropertiesBlock) {
+                    if (typeof strategy !== 'undefined' && strategy && strategy.getResourcePropertyGuide) {
+                        propDesc = strategy.getResourcePropertyGuide(doc, sectionName, logicalId, propKey, resource);
+                    } else if (isPropertiesBlock) {
                         propDesc = doc.description?.[sectionName]?.[logicalId]?.Properties?.[propKey];
                     } else {
                         propDesc = doc.description?.[sectionName]?.[logicalId]?.[propKey];
@@ -155,9 +159,12 @@
 
 <% } else { %>
     <%
-        const rootDesc = resource?.Properties
-            ? doc.description?.[sectionName]?.[logicalId]?.Properties
-            : doc.description?.[sectionName]?.[logicalId];
+        // ルートガイド定義の取得処理をStrategyへ委譲
+        const rootDesc = (typeof strategy !== 'undefined' && strategy && strategy.getResourceRootGuide)
+            ? strategy.getResourceRootGuide(doc, sectionName, logicalId, resource)
+            : (isPropertiesBlock
+                ? doc.description?.[sectionName]?.[logicalId]?.Properties
+                : doc.description?.[sectionName]?.[logicalId]);
     %>
     <div class="bg-white p-4 rounded-lg border border-slate-200">
         <div class="font-mono text-slate-700">

@@ -1,13 +1,24 @@
 import { DocDockDocument } from '../types';
 import { ConditionMatcher } from './condition-matcher';
 import { DocDockConstants } from './constants';
+import { TreePruner } from './tree-pruner';
 
 export class DocumentPreprocessor {
     static process(doc: DocDockDocument, matcher: ConditionMatcher): DocDockDocument {
         if (!doc.template) return doc;
 
-        const prunedDoc = this.applyExcludes(doc, matcher);
-        const newTemplate = { ...prunedDoc.template };
+        // 除外ツリーに基づくテンプレートノードの刈り取り
+        const prunedDoc = TreePruner.prune(doc, matcher);
+        const strategy = matcher.getStrategy();
+        // モード戦略に応じたテンプレート構造の正規化
+        const newTemplate =
+            strategy && typeof strategy.normalizeTemplate === 'function'
+                ? strategy.normalizeTemplate(prunedDoc.template, {
+                      mode: doc.mode,
+                      sourcePath: doc.sourcePath,
+                      sourceBaseName: doc.sourceBaseName
+                  })
+                : { ...prunedDoc.template };
         const newDescription = prunedDoc.description ? { ...prunedDoc.description } : undefined;
 
         for (const sectionName of Object.keys(newTemplate)) {
@@ -20,12 +31,8 @@ export class DocumentPreprocessor {
 
                 templateVal.forEach((item, index) => {
                     const itemDesc = matcher.findMatchingGuide(item, descVal, index);
-                    const baseSegment = matcher.getMatchingConditionSegment(item, descVal);
-                    // キー重複を防止した一意なセグメント識別子の導出
-                    let segment = baseSegment || String(index);
-                    if (segment in newTemplateObj) {
-                        segment = baseSegment ? `${baseSegment}_${index}` : String(index);
-                    }
+                    // 一意なセグメント識別子の導出
+                    const { segment } = matcher.deriveUniqueSegment(item, descVal, index, (s) => s in newTemplateObj);
 
                     newTemplateObj[segment] = item;
                     if (newDescription && itemDesc !== undefined) {
@@ -35,9 +42,18 @@ export class DocumentPreprocessor {
 
                 newTemplate[sectionName] = newTemplateObj;
                 if (newDescription) {
-                    if (typeof descVal === 'object' && descVal !== null) {
+                    if (typeof descVal === 'string') {
+                        // 文字列形式によるセクション説明文の保持
+                        newDescObj[DocDockConstants.ReservedKeys.DescriptionUpper] = descVal;
+                    } else if (typeof descVal === 'object' && descVal !== null) {
                         Object.keys(descVal).forEach((k) => {
-                            if (k.startsWith('_')) {
+                            // 予約語プレフィックス、条件セレクタキー、セクション説明文キーの保持
+                            if (
+                                k.startsWith('_') ||
+                                (k.startsWith('[') && k.endsWith(']')) ||
+                                k === DocDockConstants.ReservedKeys.DescriptionUpper ||
+                                k === DocDockConstants.ReservedKeys.DescriptionLower
+                            ) {
                                 newDescObj[k] = (descVal as any)[k];
                             }
                         });
@@ -52,101 +68,5 @@ export class DocumentPreprocessor {
             template: newTemplate,
             description: newDescription
         };
-    }
-
-    private static applyExcludes(doc: DocDockDocument, matcher: ConditionMatcher): DocDockDocument {
-        if (!doc.template || !doc.excludeTree) return doc;
-
-        const newTemplate = this.pruneNode(doc.template, doc.excludeTree, matcher);
-
-        return {
-            ...doc,
-            template: newTemplate === undefined ? {} : newTemplate
-        };
-    }
-
-    private static hasFalseDescendant(excludeNode: any): boolean {
-        if (excludeNode === false) return true;
-        if (!excludeNode || typeof excludeNode !== 'object') return false;
-        if (excludeNode[DocDockConstants.ReservedKeys.ExcludeValue] === false) return true;
-        
-        for (const key of Object.keys(excludeNode)) {
-            if (key === DocDockConstants.ReservedKeys.ExcludeValue) continue;
-            if (Array.isArray(excludeNode[key])) {
-                for (const item of excludeNode[key]) {
-                    if (this.hasFalseDescendant(item)) return true;
-                }
-            } else {
-                if (this.hasFalseDescendant(excludeNode[key])) return true;
-            }
-        }
-        return false;
-    }
-
-    private static pruneNode(data: any, excludeNode: any, matcher: ConditionMatcher): any {
-        if (data === undefined) return undefined;
-
-        const isExcludeTrue = typeof excludeNode === 'boolean' ? excludeNode : (excludeNode && excludeNode[DocDockConstants.ReservedKeys.ExcludeValue] === true);
-        const hasFalseChild = this.hasFalseDescendant(excludeNode);
-
-        if (isExcludeTrue && !hasFalseChild) {
-            return undefined;
-        }
-
-        if (typeof data !== 'object' || data === null) {
-            if (isExcludeTrue) {
-                return undefined;
-            }
-            return data;
-        }
-
-        if (Array.isArray(data)) {
-            const newArray: any[] = [];
-            for (let i = 0; i < data.length; i++) {
-                const item = data[i];
-                let itemExclude = matcher.findMatchingGuide(item, excludeNode, i) as any;
-                
-                if (isExcludeTrue) {
-                    if (itemExclude === undefined) {
-                        itemExclude = true;
-                    } else if (typeof itemExclude === 'object' && itemExclude[DocDockConstants.ReservedKeys.ExcludeValue] === undefined) {
-                        itemExclude = { ...itemExclude, [DocDockConstants.ReservedKeys.ExcludeValue]: true };
-                    }
-                }
-
-                const prunedItem = this.pruneNode(item, itemExclude, matcher);
-                if (prunedItem !== undefined) {
-                    newArray.push(prunedItem);
-                }
-            }
-            if (data.length > 0 && newArray.length === 0) {
-                return undefined;
-            }
-            return newArray;
-        }
-
-        const newObj: Record<string, any> = {};
-        for (const [key, value] of Object.entries(data)) {
-            let childExclude = excludeNode ? excludeNode[key] : undefined;
-            
-            if (isExcludeTrue) {
-                if (childExclude === undefined) {
-                    childExclude = true;
-                } else if (typeof childExclude === 'object' && childExclude[DocDockConstants.ReservedKeys.ExcludeValue] === undefined) {
-                    childExclude = { ...childExclude, [DocDockConstants.ReservedKeys.ExcludeValue]: true };
-                }
-            }
-
-            const prunedValue = this.pruneNode(value, childExclude, matcher);
-            if (prunedValue !== undefined) {
-                newObj[key] = prunedValue;
-            }
-        }
-        
-        const originalKeys = Object.keys(data);
-        if (originalKeys.length > 0 && Object.keys(newObj).length === 0) {
-            return undefined;
-        }
-        return newObj;
     }
 }

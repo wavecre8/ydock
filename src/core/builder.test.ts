@@ -43,7 +43,8 @@ describe('DocDockBuilder', () => {
             'ja',
             expect.any(String),
             expect.any(String),
-            true
+            true,
+            expect.any(Map)
         );
     });
 
@@ -84,7 +85,8 @@ describe('DocDockBuilder', () => {
             'ja',
             expect.any(String),
             expect.any(String),
-            true
+            true,
+            expect.any(Map)
         );
     });
 
@@ -119,7 +121,8 @@ describe('DocDockBuilder', () => {
             'ja',
             expect.any(String),
             expect.any(String),
-            true
+            true,
+            expect.any(Map)
         );
     });
 });

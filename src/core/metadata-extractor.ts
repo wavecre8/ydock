@@ -14,9 +14,12 @@ export class MetadataExtractor {
                 typeof d[DocDockConstants.ReservedKeys.DescriptionUpper] === 'string'
                     ? (d[DocDockConstants.ReservedKeys.DescriptionUpper] as string)
                     : typeof d[DocDockConstants.ReservedKeys.DescriptionLower] === 'string'
-                        ? (d[DocDockConstants.ReservedKeys.DescriptionLower] as string)
-                        : undefined;
-            const alias = typeof d[DocDockConstants.ReservedKeys.Alias] === 'string' ? (d[DocDockConstants.ReservedKeys.Alias] as string) : undefined;
+                      ? (d[DocDockConstants.ReservedKeys.DescriptionLower] as string)
+                      : undefined;
+            const alias =
+                typeof d[DocDockConstants.ReservedKeys.Alias] === 'string'
+                    ? (d[DocDockConstants.ReservedKeys.Alias] as string)
+                    : undefined;
 
             return {
                 description,

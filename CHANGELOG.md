@@ -47,3 +47,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - Bug fixes.
+
+## [1.1.1] - 2026-09-17
+
+### Added
+- **Sidebar Collapse**: Added sidebar collapse and expand toggle functionality, with the sidebar open by default on every page load.
+
+### Changed
+- **Portal Site UI**: Adjusted layout and added highlight display.
+
+### Fixed
+- Bug fixes.

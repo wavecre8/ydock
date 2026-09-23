@@ -35,11 +35,7 @@ describe('Watcher', () => {
         const relativeCommon = path.relative(guidesDir, externalCommonYaml).replace(/\\/g, '/');
 
         const mainGuide = path.resolve(guidesDir, 'main.guide.yml');
-        fs.writeFileSync(
-            mainGuide,
-            `_imports:\n  - ${relativeCommon}\nmainKey: mainValue\n`,
-            'utf8'
-        );
+        fs.writeFileSync(mainGuide, `_imports:\n  - ${relativeCommon}\nmainKey: mainValue\n`, 'utf8');
 
         const configPath = path.resolve(testDir, 'setting.config.yml');
         fs.writeFileSync(

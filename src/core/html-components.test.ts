@@ -45,7 +45,7 @@ describe('HtmlComponents', () => {
 
         it('should return structured html if alias provided', () => {
             const result = HtmlComponents.renderAliasedKey('MyKey', 'MyAlias');
-            
+
             expect(result).toContain('MyKey');
             expect(result).toContain('MyAlias');
             expect(result).toContain('alias-wrapper');
@@ -53,7 +53,7 @@ describe('HtmlComponents', () => {
 
         it('should escape both key and alias', () => {
             const result = HtmlComponents.renderAliasedKey('<MyKey>', '<MyAlias>');
-            
+
             expect(result).toContain('&lt;MyKey&gt;');
             expect(result).toContain('&lt;MyAlias&gt;');
         });
@@ -63,6 +63,27 @@ describe('HtmlComponents', () => {
         it('should escape primitive value including regex pattern', () => {
             const result = HtmlComponents.renderPrimitive('(?<group>[a-zA-Z]+)');
             expect(result).toContain('(?&lt;group&gt;[a-zA-Z]+)');
+        });
+    });
+
+    describe('renderComplexArrayItem', () => {
+        it('should pass docPrefix to renderTooltip', () => {
+            vi.mocked(MarkdownProcessor.render).mockReturnValue('<p>Processed Tooltip</p>');
+
+            // 複合配列アイテムのHTML生成実行
+            const result = HtmlComponents.renderComplexArrayItem(
+                'item_path',
+                '0',
+                '<div>inner</div>',
+                'Item Alias',
+                'Tooltip Text',
+                'doc_0'
+            );
+
+            expect(MarkdownProcessor.render).toHaveBeenCalledWith('Tooltip Text', 'doc_0');
+            expect(result).toContain('item_path');
+            expect(result).toContain('Item Alias');
+            expect(result).toContain('<p>Processed Tooltip</p>');
         });
     });
 });

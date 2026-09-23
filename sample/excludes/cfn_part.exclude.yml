@@ -30,7 +30,7 @@
 "Resources.EC2Instance.Properties.JsonVal": false
 "Resources.EC2Instance.Properties.LengthVal": false
 "Resources.Fn::ForEach::Loop": false
-"Resources.Fn::ForEach::Loop[].Resource${Identifier}": false
-"Resources.Fn::ForEach::Loop[].Resource${Identifier}.Type": false
-"Resources.Fn::ForEach::Loop[].Resource${Identifier}.Properties": false
-"Resources.Fn::ForEach::Loop[].Resource${Identifier}.Properties.TopicName": false
+"Resources.Fn::ForEach::Loop[Resource${Identifier}]": false
+"Resources.Fn::ForEach::Loop[Resource${Identifier}].Type": false
+"Resources.Fn::ForEach::Loop[Resource${Identifier}].Properties": false
+"Resources.Fn::ForEach::Loop[Resource${Identifier}].Properties.TopicName": false

@@ -50,7 +50,9 @@ pages:
       - sources/ecs.yml
     output: output/ecs.html
 
-  - title: EC2
+  - title: |-
+      EC2
+      インスタンス
     group: compute
     sources:
       - sources/ec2.yml
@@ -60,6 +62,7 @@ pages:
     group: compute
     sources:
       - sources/ecs.yml
+      - sources/ecs_secondary.yml
       - sources/ec2.yml
     output: output/ecs-and-ec2.html
 
@@ -70,7 +73,9 @@ pages:
       - sources/cfn_main.yml
     output: output/cfn-main.html
 
-  - title: CloudFormation サブスタック
+  - title: |-
+      CloudFormation
+      サブスタック
     group: cfn
     mode: cfn
     sources:

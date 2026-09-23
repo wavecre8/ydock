@@ -5,11 +5,7 @@ Rules:
   ProdCheck:
     RuleCondition: ''
     Assertions:
-      - '=Assert':
-          '!Contains':
-            - - prod
-              - stg
-            - '!Ref': EnvType
+      - '[Assert={"Fn::Contains":[["prod","stg"],{"Ref":"EnvType"}]}]': ''
         Assert: ''
         AssertDescription: ''
 Resources:
@@ -35,11 +31,11 @@ Resources:
       JsonVal: ''
       LengthVal: ''
   Fn::ForEach::Loop:
-    - '=Identifier': ''
+    - '[Identifier]': ''
     - '0': ''
       '1': ''
-      '=0': A
-    - '=Resource${Identifier}':
+      '[0=A]': ''
+    - '[Resource${Identifier}]':
         Type: AWS::SNS::Topic
         Properties:
           TopicName:

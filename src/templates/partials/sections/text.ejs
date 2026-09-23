@@ -1,30 +1,49 @@
 <%
-    // Treat the scalar value as the "content"
+    // スカラー値のコンテキスト識別子導出
     const logicalId = sectionName;
-    const isMainDescription = (sectionName === 'Description');
-    
-    let descriptionItems = [];
-    if (isMainDescription) {
+
+    // 構造化テキストセクション判定のStrategy委譲
+    const isStructured = (typeof strategy !== 'undefined' && strategy && strategy.isStructuredTextSection)
+        ? strategy.isStructuredTextSection(sectionName, sectionData)
+        : (sectionName === 'Description' && Array.isArray(sectionData) && sectionData.length > 0 && typeof sectionData[0] === 'object' && sectionData[0] !== null && 'fileName' in sectionData[0]);
+
+    // マークダウン解釈対象セクション判定のStrategy委譲
+    const isMarkdown = (typeof strategy !== 'undefined' && strategy && strategy.isMarkdownTextSection)
+        ? strategy.isMarkdownTextSection(sectionName)
+        : (sectionName === 'Description');
+
+    let descriptionEntries = [];
+    if (isStructured) {
         if (Array.isArray(sectionData)) {
-            descriptionItems = sectionData;
+            descriptionEntries = sectionData.map((item, idx) => [String(idx), item]);
         } else if (typeof sectionData === 'object' && sectionData !== null) {
-            descriptionItems = Object.values(sectionData);
+            descriptionEntries = Object.entries(sectionData);
         }
     }
-    
-    // Check if it's an array of {fileName, content} objects
-    const isDescriptionArray = isMainDescription && descriptionItems.length > 0 && typeof descriptionItems[0] === 'object' && descriptionItems[0] !== null && 'fileName' in descriptionItems[0];
+
+    // 非構造化テキストの安全なHTML文字列導出
+    let plainContentHtml = '';
+    if (!isStructured) {
+        if (typeof sectionData === 'string') {
+            plainContentHtml = isMarkdown ? renderMarkdownClient(sectionData) : escapeHtml(sectionData);
+        } else if (sectionData !== null && typeof sectionData !== 'undefined') {
+            plainContentHtml = escapeHtml(JSON.stringify(sectionData, null, 2));
+        }
+    }
 %>
 <div id="section-<%= sectionIndex %>-content" class="collapsible-wrapper transition-all duration-300 ease-in-out">
    <div class="p-6 overflow-hidden min-h-0">
-           <% if (isDescriptionArray) { %>
-               <% descriptionItems.forEach((item, itemIndex) => { %>
+           <% if (isStructured) { %>
+               <% descriptionEntries.forEach(([key, item], itemIndex) => { %>
                    <%
-                       // Use common card component
+                       // 共通カードコンポーネント用の識別子生成
                        const contentHtml = renderMarkdownClient(item.content);
-                       const cardId = `desc-file-card-${itemIndex}`;
-                       const contentId = `desc-file-${itemIndex}`;
-                       const iconId = `desc-file-icon-${itemIndex}`;
+                       const ctx = (typeof createContext === 'function')
+                           ? createContext([sectionName, String(key)])
+                           : null;
+                       const cardId = ctx ? ctx.path : `desc-file-card-${sectionIndex}-${itemIndex}`;
+                       const contentId = `card-${sectionIndex}-${itemIndex}-content`;
+                       const iconId = `${contentId}-icon`;
                    %>
                    <%- include('/partials/components/card.ejs', {
                        cardId: cardId,
@@ -37,7 +56,7 @@
                    }) %>
                <% }); %>
            <% } else { %>
-               <div class="bg-white p-4 rounded-lg border border-slate-200 font-mono text-sm text-slate-700 whitespace-pre-wrap"><%- isMainDescription ? renderMarkdownClient(sectionData) : escapeHtml(sectionData) %></div>
+               <div class="bg-white p-4 rounded-lg border border-slate-200 font-mono text-sm text-slate-700 whitespace-pre-wrap"><%- plainContentHtml %></div>
            <% } %>
    </div>
 </div>

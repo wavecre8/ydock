@@ -1,5 +1,5 @@
 Subnets:
-  - '=SubnetId': subnet-0111111111111111a
+  - '[SubnetId=subnet-0111111111111111a]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -21,16 +21,16 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=SubnetId': subnet-0111111111111111c
+  - '[SubnetId=subnet-0111111111111111c]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -52,16 +52,16 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=SubnetId': subnet-0222222222222222a
+  - '[SubnetId=subnet-0222222222222222a]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -83,16 +83,16 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=SubnetId': subnet-0222222222222222c
+  - '[SubnetId=subnet-0222222222222222c]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -114,16 +114,16 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=SubnetId': subnet-0333333333333333a
+  - '[SubnetId=subnet-0333333333333333a]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -145,16 +145,16 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=SubnetId': subnet-0333333333333333c
+  - '[SubnetId=subnet-0333333333333333c]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -176,16 +176,16 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=SubnetId': subnet-0444444444444444a
+  - '[SubnetId=subnet-0444444444444444a]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -207,16 +207,16 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=SubnetId': subnet-0444444444444444c
+  - '[SubnetId=subnet-0444444444444444c]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -238,16 +238,16 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=SubnetId': subnet-0555555555555555a
+  - '[SubnetId=subnet-0555555555555555a]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -269,16 +269,16 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''
-  - '=SubnetId': subnet-0555555555555555c
+  - '[SubnetId=subnet-0555555555555555c]': ''
     SubnetId: ''
     VpcId: ''
     CidrBlock: ''
@@ -300,12 +300,12 @@ Subnets:
       EnableResourceNameDnsARecord: ''
       EnableResourceNameDnsAAAARecord: ''
     Tags:
-      - '=Key': Name
+      - '[Key=Name]': ''
         Key: ''
         Value: ''
-      - '=Key': Tier
+      - '[Key=Tier]': ''
         Key: ''
         Value: ''
-      - '=Key': Environment
+      - '[Key=Environment]': ''
         Key: ''
         Value: ''

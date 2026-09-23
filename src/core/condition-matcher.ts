@@ -16,6 +16,13 @@ export class ConditionMatcher {
         this.doc = doc;
     }
 
+    /**
+     * 適用中のモード戦略の取得
+     */
+    getStrategy(): ModeStrategy {
+        return this.strategy;
+    }
+
     isPrimitive(val: unknown): val is string | number | boolean | null | undefined {
         return ConditionEvaluator.isPrimitive(val);
     }
@@ -28,10 +35,10 @@ export class ConditionMatcher {
         for (const element of arr) {
             if (typeof element !== 'object' || element === null) continue;
             const obj = element as Record<string, YamlValue>;
-            const conditionKeys = Object.keys(obj).filter(k => k.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix));
-            
+            const conditionKeys = Object.keys(obj).filter((k) => ConditionEvaluator.isConditionKey(k));
+
             if (conditionKeys.length === 0) continue;
-            
+
             if (ConditionEvaluator.matchesConditions(item, obj, conditionKeys)) {
                 return this.extractGuide(item, obj, conditionKeys);
             }
@@ -66,15 +73,24 @@ export class ConditionMatcher {
             baseElementDesc = descObj[index];
         }
 
-        if (baseElementDesc && matchedOverride) {
+        if (
+            typeof baseElementDesc === 'object' &&
+            baseElementDesc !== null &&
+            typeof matchedOverride === 'object' &&
+            matchedOverride !== null
+        ) {
             return Merger.customGuideMerge(cloneDeep(baseElementDesc), matchedOverride);
         }
 
-        return matchedOverride || baseElementDesc;
+        return matchedOverride !== undefined ? matchedOverride : baseElementDesc;
     }
 
     getMatchingConditionSegment(item: YamlValue, desc: YamlValue, rawPath: string[] = []): string | undefined {
-        const activeDesc = desc || (rawPath && rawPath.length > 0 ? PathResolver.findGuideByPath(this.doc, rawPath, this.strategy) : undefined);
+        const activeDesc =
+            desc ||
+            (rawPath && rawPath.length > 0
+                ? PathResolver.findGuideByPath(this.doc, rawPath, this.strategy)
+                : undefined);
 
         if (Array.isArray(activeDesc)) {
             return ConditionEvaluator.getSegmentFromArray(item, activeDesc);
@@ -83,12 +99,12 @@ export class ConditionMatcher {
         if (typeof activeDesc === 'object' && activeDesc !== null) {
             const descObj = activeDesc as Record<string, YamlValue>;
             const matchKey = DocDockConstants.ReservedKeys.Match;
-            
+
             if (Array.isArray(descObj[matchKey])) {
                 const segment = ConditionEvaluator.getSegmentFromArray(item, descObj[matchKey]);
                 if (segment) return segment;
             }
-            
+
             return ConditionEvaluator.getSegmentFromObject(item, descObj);
         }
 
@@ -102,9 +118,11 @@ export class ConditionMatcher {
                 if (index in obj) {
                     return obj[index];
                 }
-                const values = Object.values(obj);
-                if (values.length > 0) {
-                    return values[0];
+                // 条件キー以外のデフォルト要素を探索
+                for (const [k, v] of Object.entries(obj)) {
+                    if (!ConditionEvaluator.isConditionKey(k)) {
+                        return v;
+                    }
                 }
             }
             return undefined;
@@ -112,7 +130,7 @@ export class ConditionMatcher {
 
         const fallbackElement = desc[index];
         if (typeof fallbackElement === 'object' && fallbackElement !== null) {
-            const hasCondition = Object.keys(fallbackElement).some(k => k.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix));
+            const hasCondition = Object.keys(fallbackElement).some((k) => ConditionEvaluator.isConditionKey(k));
             if (!hasCondition) {
                 return fallbackElement;
             }
@@ -129,7 +147,7 @@ export class ConditionMatcher {
 
         const result: Record<string, YamlValue> = {};
         for (const k of Object.keys(guideObj)) {
-            if (!k.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix)) {
+            if (!ConditionEvaluator.isConditionKey(k)) {
                 result[k] = guideObj[k];
             }
         }
@@ -142,5 +160,24 @@ export class ConditionMatcher {
 
     public resolveObjectSegment(obj: Record<string, YamlValue>, seg: string): YamlValue {
         return PathResolver.resolveObjectSegment(obj, seg, this.strategy);
+    }
+
+    /**
+     * ガイド照合に基づく一意なセグメント識別子の導出
+     */
+    public deriveUniqueSegment(
+        item: YamlValue,
+        desc: YamlValue,
+        index: number,
+        isSegmentTaken: (segment: string) => boolean,
+        rawPath: string[] = []
+    ): { segment: string; baseSegment: string | undefined } {
+        // 条件一致セグメントの導出
+        const baseSegment = this.getMatchingConditionSegment(item, desc, rawPath);
+        let segment = baseSegment || String(index);
+        if (isSegmentTaken(segment)) {
+            segment = baseSegment ? `${baseSegment}_${index}` : String(index);
+        }
+        return { segment, baseSegment };
     }
 }

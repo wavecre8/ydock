@@ -1,11 +1,12 @@
+import { DocumentMode } from '../modes/types';
+
 export const DocDockConstants = {
-    PathSeparator: '__',
+    PathSeparator: '.',
     ReservedKeys: {
         Alias: '_alias',
         Match: '_match',
         Imports: '_imports',
         Array: '[]',
-        ConditionPrefix: '=',
         DescriptionLower: 'description',
         DescriptionUpper: 'Description',
         ExcludeValue: '__value'
@@ -23,9 +24,24 @@ export const DocDockConstants = {
         TemplateLayout: '../templates/layout.ejs',
         TemplateIndex: '../templates/index.ejs'
     },
-    StrategyModes: {
-        Generic: 'generic',
-        Cfn: 'cfn'
+    StrategyModes: DocumentMode,
+    // CloudFormation仕様に基づくセクション名および予約キー定義
+    Cfn: {
+        Sections: {
+            Resources: 'Resources',
+            Parameters: 'Parameters',
+            Outputs: 'Outputs',
+            Conditions: 'Conditions',
+            Mappings: 'Mappings',
+            Metadata: 'Metadata',
+            Rules: 'Rules',
+            Transform: 'Transform',
+            Globals: 'Globals',
+            AWSTemplateFormatVersion: 'AWSTemplateFormatVersion',
+            Description: 'Description'
+        },
+        PropertiesKey: 'Properties',
+        TypeKey: 'Type'
     },
     SkeletonTypes: {
         All: 'all',
@@ -47,7 +63,8 @@ export const DocDockConstants = {
     LocalStorageKeys: {
         DocMode: 'doc-mode',
         AliasMode: 'alias-mode',
-        CompactMode: 'compact-mode'
+        CompactMode: 'compact-mode',
+        SidebarCollapsed: 'sidebar-collapsed'
     },
     Modes: {
         Inline: 'inline',
@@ -79,19 +96,25 @@ export const DocDockConstants = {
         ColResizer: 'col-resizer',
         GroupNavBtn: 'group-nav-btn',
         GroupSection: 'group-section',
-        PageCard: 'page-card'
+        PageCard: 'page-card',
+        SidebarCollapsed: 'sidebar-collapsed',
+        SidebarItemBtn: 'sidebar-item-btn',
+        SidebarItemActive: 'is-active'
     },
     UIConstants: {
         Resizing: {
             MinColumnWidthPercent: 10,
-            MaxColumnWidthPercent: 90,
-            MinSidebarWidthPx: 256,
-            MaxSidebarWidthRatio: 0.3
+            MaxColumnWidthPercent: 90
         },
         Animation: {
             HighlightDurationMs: 2000,
             TooltipDelayMs: 100,
             CopyFeedbackDurationMs: 1000
+        },
+        ScrollSpy: {
+            ReferenceOffsetPx: 120,
+            DebounceWaitMs: 150,
+            BottomThresholdPx: 30
         }
     }
 } as const;

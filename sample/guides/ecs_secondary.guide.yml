@@ -1,0 +1,8 @@
+tasks:
+  - '[taskArn=arn:aws:ecs:us-east-1:123456789012:task/StagingCluster/staging-task-001]': ''
+    clusterArn: ステージング検証用クラスタのARN
+    containers:
+      - '[name=api]': ''
+        image: |-
+          APIサーバ用Dockerイメージ
+          (See [EC2 インスタンス](ec2::Reservations[ReservationId=r-99999999999].Instances[InstanceId=i-99999999999999999].InstanceId))

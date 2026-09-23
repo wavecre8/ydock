@@ -10,11 +10,11 @@ describe('CfnStrategy', () => {
         });
 
         it('should classify Fn::Sub as intrinsic', () => {
-             expect(strategy.isIntrinsic({ 'Fn::Sub': '${Var}' })).toBe(true);
+            expect(strategy.isIntrinsic({ 'Fn::Sub': '${Var}' })).toBe(true);
         });
 
         it('should not classify regular objects as intrinsic', () => {
-            expect(strategy.isIntrinsic({ 'Type': 'AWS::S3::Bucket' })).toBe(false);
+            expect(strategy.isIntrinsic({ Type: 'AWS::S3::Bucket' })).toBe(false);
         });
 
         it('should not classify null as intrinsic', () => {
@@ -22,8 +22,8 @@ describe('CfnStrategy', () => {
         });
 
         it('should not classify primitives as intrinsic', () => {
-             expect(strategy.isIntrinsic('string')).toBe(false);
-             expect(strategy.isIntrinsic(123)).toBe(false);
+            expect(strategy.isIntrinsic('string')).toBe(false);
+            expect(strategy.isIntrinsic(123)).toBe(false);
         });
     });
 
@@ -50,13 +50,13 @@ describe('CfnStrategy', () => {
         });
 
         it('should return undefined for other keys', () => {
-             const customizer = strategy.getCustomizer();
-             const result = customizer({}, {}, 'Parameters', undefined, undefined, undefined);
-             expect(result).toBeUndefined();
+            const customizer = strategy.getCustomizer();
+            const result = customizer({}, {}, 'Parameters', undefined, undefined, undefined);
+            expect(result).toBeUndefined();
         });
     });
 
-     describe('getSectionSortOrder', () => {
+    describe('getSectionSortOrder', () => {
         it('should define a specific sort order', () => {
             const order = strategy.getSectionSortOrder();
             expect(order).toBeDefined();

@@ -8,7 +8,7 @@ import { CircularImportError, InvalidImportError } from './errors';
 vi.mock('fs', async () => {
     return {
         ...(await vi.importActual('fs')),
-        existsSync: vi.fn(),
+        existsSync: vi.fn()
     };
 });
 

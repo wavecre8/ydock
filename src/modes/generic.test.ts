@@ -23,8 +23,8 @@ describe('GenericStrategy', () => {
         });
 
         it('should concatenate scalar + array', () => {
-             const result = customizer('a', ['b'], 'key', undefined, undefined, undefined);
-             expect(result).toEqual(['a', 'b']);
+            const result = customizer('a', ['b'], 'key', undefined, undefined, undefined);
+            expect(result).toEqual(['a', 'b']);
         });
 
         it('should return undefined for non-conflicting types or identical scalars (let lodash handle)', () => {

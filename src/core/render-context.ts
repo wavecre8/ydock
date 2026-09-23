@@ -8,79 +8,84 @@ export class RenderContext {
         public readonly copyPath: string = ''
     ) {}
 
-    static create(segments: string[], isPropertiesBlock: boolean = false): RenderContext {
+    // パスセグメントからRenderContextインスタンスを生成
+    static create(segments: string[], isPropertiesBlock: boolean = false, docPrefix?: string): RenderContext {
+        // 完全解決済みセグメント列の正規化
+        const effectiveSegments: string[] = [];
+        for (let i = 0; i < segments.length; i++) {
+            if (isPropertiesBlock && i === 2 && segments[i] !== 'Properties') {
+                effectiveSegments.push('Properties');
+            }
+            effectiveSegments.push(segments[i]);
+        }
+
         let path = '';
         let copyPath = '';
         const rawPath: string[] = [];
 
-        for (let i = 0; i < segments.length; i++) {
-            const segment = segments[i];
-            const sanitizedSegment = segment.replace(/[^a-zA-Z0-9_-]/g, '_');
-            
-            // For path (DOM ID)
+        for (const segment of effectiveSegments) {
+            // 角括弧や記号をサニタイズ対象から除外したパス文字の置換処理
+            const sanitizedSegment = segment.replace(/[^a-zA-Z0-9_\-[\]=.:]/g, '_');
+
+            // DOM ID用のパス組み立て処理
             if (path) {
-                // If it's a Properties block in CFn, append __Properties__ instead of __
-                // but only for the element right after the logicalId (index 2)
-                if (isPropertiesBlock && i === 2) {
-                    path += `${DocDockConstants.PathSeparator}Properties${DocDockConstants.PathSeparator}${sanitizedSegment}`;
-                } else {
-                    path += `${DocDockConstants.PathSeparator}${sanitizedSegment}`;
-                }
+                path += `${DocDockConstants.PathSeparator}${sanitizedSegment}`;
             } else {
-                path = sanitizedSegment;
+                path = docPrefix
+                    ? `${docPrefix}${DocDockConstants.PathSeparator}${sanitizedSegment}`
+                    : sanitizedSegment;
             }
 
-            // For rawPath
-            if (isPropertiesBlock && i === 2) {
-                rawPath.push('Properties', segment);
-            } else {
-                rawPath.push(segment);
-            }
+            rawPath.push(segment);
 
-            // For copyPath
+            // コピー用パスの組み立て処理
+            const copySeg = RenderContext.formatCopySegment(segment);
             if (!copyPath) {
-                copyPath = segment;
-            } else if (segment.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix)) {
-                copyPath += `[${segment}]`;
-            } else if (/^\d+$/.test(segment)) {
-                copyPath += '[]';
+                copyPath = copySeg;
+            } else if (copySeg.startsWith('[')) {
+                copyPath += copySeg;
             } else {
-                if (isPropertiesBlock && i === 2) {
-                    copyPath += `.Properties.${segment}`;
-                } else {
-                    copyPath += `.${segment}`;
-                }
+                copyPath += `.${copySeg}`;
             }
         }
 
         return new RenderContext(0, path, rawPath, copyPath);
     }
 
+    static formatCopySegment(segment: string): string {
+        if (segment.startsWith('[') && segment.endsWith(']')) {
+            return segment;
+        }
+        if (segment.includes('=')) {
+            return `[${segment}]`;
+        }
+        if (/^\d+$/.test(segment)) {
+            return `[${segment}]`;
+        }
+        if (segment.includes('.')) {
+            return `[${segment}]`;
+        }
+        return segment;
+    }
+
     derivePath(segment: string): string {
-        const sanitizedSegment = segment.replace(/[^a-zA-Z0-9_-]/g, '_');
+        // 角括弧や記号をサニタイズ対象から除外したパス文字の置換処理
+        const sanitizedSegment = segment.replace(/[^a-zA-Z0-9_\-[\]=.:]/g, '_');
         return this.path ? `${this.path}${DocDockConstants.PathSeparator}${sanitizedSegment}` : sanitizedSegment;
     }
 
     deriveCopyPath(segment: string): string {
-        if (!this.copyPath) return segment;
-
-        // If segment starts with condition prefix, it's a condition key like [=name:web]
-        if (segment.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix)) {
-            return `${this.copyPath}[${segment}]`;
+        const copySeg = RenderContext.formatCopySegment(segment);
+        if (!this.copyPath) return copySeg;
+        if (copySeg.startsWith('[')) {
+            return `${this.copyPath}${copySeg}`;
         }
-
-        // If segment is purely numeric, it's an array index like []
-        if (/^\d+$/.test(segment)) {
-            return `${this.copyPath}${DocDockConstants.ReservedKeys.Array}`;
-        }
-
-        // Otherwise it's a normal property name
-        return `${this.copyPath}.${segment}`;
+        return `${this.copyPath}.${copySeg}`;
     }
 
     child(segment?: string, rawSegment?: string, incrementLevel: boolean = true): RenderContext {
         const nextLevel = incrementLevel ? this.level + 1 : this.level;
-        
+
         let nextPath = this.path;
         if (segment !== undefined) {
             nextPath = this.derivePath(segment);

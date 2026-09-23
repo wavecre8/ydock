@@ -1,6 +1,7 @@
-import { mergeWith, isArray, isObject, isEqual } from 'lodash';
+import { mergeWith, isArray, isObject, cloneDeep } from 'lodash';
 import { YamlTemplate, YamlValue } from '../types';
 import { DocDockConstants } from './constants';
+import { ConditionEvaluator } from './condition-evaluator';
 
 export class Merger {
     /**
@@ -56,52 +57,19 @@ export class Merger {
 
     private static getConditionKeys(item: unknown): string[] {
         if (!Merger.isPlainObjectOrRecord(item)) return [];
-        return Object.keys(item as Record<string, unknown>).filter(k => k.startsWith(DocDockConstants.ReservedKeys.ConditionPrefix));
+        return Object.keys(item as Record<string, unknown>).filter((k) => ConditionEvaluator.isConditionKey(k));
     }
 
-    private static findIndexByConditions(array: any[], srcItem: any, conditionKeys: string[]): number {
-        return array.findIndex(objItem => {
-            if (!Merger.isPlainObjectOrRecord(objItem)) return false;
-            const objConditionKeys = Merger.getConditionKeys(objItem);
-            // 条件キー総数の一致検証
-            if (objConditionKeys.length !== conditionKeys.length) return false;
-
-            return conditionKeys.every(cKey => {
-                if (!(cKey in objItem)) return false;
-                const objVal = (objItem as any)[cKey];
-                const srcVal = (srcItem as any)[cKey];
-
-                // 単一キー構成の要素はスカラー値に対するマッチャーであるためキー一致で合致判定
-                const objKeys = Object.keys(objItem);
-                const srcKeys = Object.keys(srcItem);
-                if (objKeys.length === 1 && srcKeys.length === 1 && objKeys[0] === cKey && srcKeys[0] === cKey) {
-                    return true;
-                }
-
-                // 構造化条件値に対する深い等価比較判定
-                if (typeof objVal === 'object' && objVal !== null && typeof srcVal === 'object' && srcVal !== null) {
-                    return isEqual(objVal, srcVal);
-                }
-
-                // 一方のみがオブジェクトである場合の不一致判定
-                if ((typeof objVal === 'object' && objVal !== null) || (typeof srcVal === 'object' && srcVal !== null)) {
-                    return false;
-                }
-
-                // プレースホルダー空文字列を含む場合は合致判定
-                if (objVal === '' || srcVal === '') {
-                    return true;
-                }
-
-                // オブジェクト属性に対する条件指定の場合は条件値の完全一致を検証
-                return objVal === srcVal;
-            });
+    private static findIndexByConditions(array: any[], srcItem: any, _conditionKeys: string[]): number {
+        return array.findIndex((objItem) => {
+            // 条件一致判定処理の委譲
+            return ConditionEvaluator.areConditionItemsMatching(objItem, srcItem, false);
         });
     }
 
     private static mergeArrays(objValue: any[], srcValue: any[], customizer: any): any[] {
         const result = [...objValue];
-        
+
         for (let i = 0; i < srcValue.length; i++) {
             const srcItem = srcValue[i];
             const isMerged = Merger.mergeByConditions(result, srcItem, customizer);
@@ -109,7 +77,7 @@ export class Merger {
                 Merger.mergeByIndex(result, srcItem, i, customizer);
             }
         }
-        
+
         return result;
     }
 
@@ -128,7 +96,13 @@ export class Merger {
 
     private static mergeByIndex(result: any[], srcItem: any, index: number, customizer: any): void {
         if (index < result.length) {
-            if (isObject(result[index]) && isObject(srcItem)) {
+            // カスタムマージ関数による型衝突の安全な解決処理
+            const customResult = customizer
+                ? customizer(result[index], srcItem, String(index), result, result, null)
+                : undefined;
+            if (customResult !== undefined) {
+                result[index] = customResult;
+            } else if (isObject(result[index]) && isObject(srcItem)) {
                 result[index] = mergeWith({}, result[index], srcItem, customizer);
             } else {
                 result[index] = srcItem;
@@ -142,54 +116,67 @@ export class Merger {
      * Merges an alias object structure (with _alias, [], _match) with an array of guide items.
      * Elements of the array are distributed into _match or [] based on their condition keys.
      */
-    static mergeAliasObjectWithArray(aliasObj: Record<string, any>, guideArray: any[], customizer: any): Record<string, any> {
-        const mergedObj = { ...aliasObj };
+    static mergeAliasObjectWithArray(
+        aliasObj: Record<string, any>,
+        guideArray: any[]
+    ): Record<string, any> {
+        // 参照元オブジェクトの破壊的変更を防止するための複製
+        const mergedObj = cloneDeep(aliasObj);
         const matchKey = DocDockConstants.ReservedKeys.Match;
         const arrKey = DocDockConstants.ReservedKeys.Array;
-        
+
         for (const guideItem of guideArray) {
             if (Merger.getConditionKeys(guideItem).length > 0) {
                 mergedObj[matchKey] = mergedObj[matchKey] || [];
-                Merger.mergeByConditions(mergedObj[matchKey] as any[], guideItem, customizer);
+                Merger.mergeByConditions(mergedObj[matchKey] as any[], guideItem, Merger.guideCustomizer);
             } else {
-                mergedObj[arrKey] = mergeWith({}, mergedObj[arrKey] || {}, guideItem, customizer);
+                mergedObj[arrKey] = mergeWith({}, mergedObj[arrKey] || {}, guideItem, Merger.guideCustomizer);
             }
         }
-        
+
         return mergedObj;
+    }
+
+    /**
+     * ガイドとエイリアスを統合するカスタムマージ関数
+     */
+    static guideCustomizer(objValue: unknown, srcValue: unknown): unknown {
+        const descKey = DocDockConstants.ReservedKeys.DescriptionUpper;
+        if (
+            typeof objValue === 'string' &&
+            typeof srcValue === 'object' &&
+            srcValue !== null &&
+            !Array.isArray(srcValue)
+        ) {
+            return { [descKey]: objValue, ...srcValue };
+        }
+        if (
+            typeof objValue === 'object' &&
+            objValue !== null &&
+            !Array.isArray(objValue) &&
+            typeof srcValue === 'string'
+        ) {
+            return { ...objValue, [descKey]: srcValue };
+        }
+
+        if (Array.isArray(objValue) && typeof srcValue === 'object' && srcValue !== null && !Array.isArray(srcValue)) {
+            // 配列とオブジェクトの衝突マージ処理
+            return Merger.mergeAliasObjectWithArray(srcValue as Record<string, any>, objValue as any[]);
+        }
+
+        if (typeof objValue === 'object' && objValue !== null && !Array.isArray(objValue) && Array.isArray(srcValue)) {
+            // オブジェクトと配列の衝突マージ処理
+            return Merger.mergeAliasObjectWithArray(objValue as Record<string, any>, srcValue as any[]);
+        }
+
+        return undefined;
     }
 
     /**
      * Custom merge logic for guide resolution, extracted from ConditionMatcher.
      */
     static customGuideMerge(baseElementDesc: any, matchedOverride: any): any {
-        return mergeWith({}, baseElementDesc, matchedOverride, function customizer(objValue: any, srcValue: any): any {
-            if (typeof objValue === 'object' && objValue !== null && !Array.isArray(objValue) && typeof srcValue === 'string') {
-                return { ...objValue, [DocDockConstants.ReservedKeys.DescriptionUpper]: srcValue };
-            }
-            if (typeof objValue === 'string' && typeof srcValue === 'object' && srcValue !== null && !Array.isArray(srcValue)) {
-                return { ...srcValue, [DocDockConstants.ReservedKeys.DescriptionUpper]: objValue };
-            }
-            
-            if (typeof objValue === 'object' && objValue !== null && !Array.isArray(objValue) && Array.isArray(srcValue)) {
-                // 既存オブジェクトと後続配列の衝突マージ処理
-                return Merger.mergeAliasObjectWithArray(
-                    objValue as Record<string, any>,
-                    srcValue as any[],
-                    customizer
-                );
-            }
-
-            if (Array.isArray(objValue) && typeof srcValue === 'object' && srcValue !== null && !Array.isArray(srcValue)) {
-                // 既存配列と後続オブジェクトの衝突マージ処理
-                return Merger.mergeAliasObjectWithArray(
-                    srcValue as Record<string, any>,
-                    objValue as any[],
-                    customizer
-                );
-            }
-
-            return undefined;
-        });
+        // カスタムマージ関数によるガイド結合の実行
+        return mergeWith({}, baseElementDesc, matchedOverride, Merger.guideCustomizer);
     }
 }

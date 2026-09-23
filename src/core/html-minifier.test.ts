@@ -41,4 +41,18 @@ describe('HtmlMinifier', () => {
         const result = HtmlMinifier.minify(input);
         expect(result).toContain(scriptContent);
     });
+
+    it('should preserve nested div elements within inline descriptions', () => {
+        const nestedDesc = '<div class="elem-inline-desc">Line 1\n<div>Nested Line 2</div>\nLine 3</div>';
+        const input = `<div>\n  ${nestedDesc}\n</div>`;
+        const result = HtmlMinifier.minify(input);
+        expect(result).toContain(nestedDesc);
+    });
+
+    it('本文中にプレースホルダー形式の文字列が含まれていても誤置換されないこと', () => {
+        const input = '<div><span>___PROTECTED_BLOCK_0___</span><pre>code block</pre></div>';
+        const result = HtmlMinifier.minify(input);
+        expect(result).toContain('___PROTECTED_BLOCK_0___');
+        expect(result).toContain('<pre>code block</pre>');
+    });
 });
